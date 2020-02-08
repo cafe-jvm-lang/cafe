@@ -21,7 +21,7 @@ public enum TokenType {
 	/** ")" */
 	SEP_RPAREN,
 	
-	/** "," */
+	/** ";" */
 	SEP_SEMI,
 	
 	/** "+" */
@@ -35,18 +35,21 @@ public enum TokenType {
 	
 	/** "*" */
 	 OP_MULTIPLY ,
+	 
+	 /** "=" */
+	 OP_ASG ,
 	
-	/** "+=" */
-	 OP_PLUS_ASG ,
-	
-	/** "-=" */
-	 OP_MINUS_ASG ,
-	
-	/** "/=" */
-	 OP_DIV_ASG ,
-	
-	/** "*=" */
-	 OP_MUL_ASG ,
+//	/** "+=" */
+//	 OP_PLUS_ASG ,
+//	
+//	/** "-=" */
+//	 OP_MINUS_ASG ,
+//	
+//	/** "/=" */
+//	 OP_DIV_ASG ,
+//	
+//	/** "*=" */
+//	 OP_MUL_ASG ,
 	
 	/** "++" */
 	 OP_INC ,
@@ -118,7 +121,6 @@ public enum TokenType {
 	 OP_RELLE,
 	 OP_RELGE,
 	 OP_RELEE,
-	 OP_RELEEE,
 			
 	 KW_VAR,
 	 KW_NULL,
