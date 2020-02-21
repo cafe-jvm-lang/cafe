@@ -1,6 +1,5 @@
 package compiler.ast.body;
 
-import compiler.ast.Node;
 import compiler.ast.utils.EnclosingScope;
 
 public class VarDeclarationNode extends ProgramNode{

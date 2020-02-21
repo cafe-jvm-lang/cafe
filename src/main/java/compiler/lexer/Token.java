@@ -1,5 +1,7 @@
 package compiler.lexer;
 
+import compiler.lexer.tokentypes.TokenType;
+
 public class Token {
 	
 	private TokenType type;
