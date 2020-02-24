@@ -1,16 +1,7 @@
 package compiler.ast;
 
-public abstract class Node implements NodeCreator<Node>{
-	
-	private Node parentNode;
-	
-	@Override
-	public Node getParentNode() {
-		return parentNode;
-	}
-	
-	@Override
-	public void setParentNode(Node node) {
-		parentNode = node;
-	}
+import compiler.ast.visitor.Visitor;
+
+public interface Node {
+	public void accept(Visitor v);
 }
