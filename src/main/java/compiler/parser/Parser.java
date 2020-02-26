@@ -3,6 +3,7 @@ package compiler.parser;
 import java.util.List;
 
 import compiler.ast.Node;
+import compiler.ast.ProgramNode;
 import compiler.lexer.Token;
 import compiler.lexer.tokentypes.TokenType;
 
@@ -24,10 +25,21 @@ public class Parser {
 		return null;
 	}
 	
+	Node parseVarDecl() {
+		return null;
+	}
+	
 	Node parse() {
 		currT = getNextToken();
+		Node root = new ProgramNode();
+		Node node;
 		
-	
+		if(currT.getTokenType() == TokenType.KWTokenType.KW_VAR) {
+			node = parseVarDecl();
+			if(node != null) {
+				
+			}
+		}
 		
 		return null;
 	}

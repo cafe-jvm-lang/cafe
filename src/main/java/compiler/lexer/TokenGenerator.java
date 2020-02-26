@@ -9,9 +9,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import compiler.lexer.tokentypes.KWTokenType;
-import compiler.lexer.tokentypes.OpTokenType;
-import compiler.lexer.tokentypes.SepTokenType;
 import compiler.lexer.tokentypes.TokenType;
 
 public class TokenGenerator implements Lexer {
@@ -41,31 +38,31 @@ public class TokenGenerator implements Lexer {
 
 	TokenType checkKeywordTokenType(String keyword) {
 		if (keyword.equals("var")) {
-			return KWTokenType.KW_VAR;
+			return TokenType.KWTokenType.KW_VAR;
 		} else if (keyword.equals("null")) {
-			return KWTokenType.KW_NULL;
+			return TokenType.KWTokenType.KW_NULL;
 		} else if (keyword.equals("func")) {
-			return KWTokenType.KW_FUNC;
+			return TokenType.KWTokenType.KW_FUNC;
 		} else if (keyword.equals("if")) {
-			return KWTokenType.KW_IF;
+			return TokenType.KWTokenType.KW_IF;
 		} else if (keyword.equals("else")) {
-			return KWTokenType.KW_ELSE;
+			return TokenType.KWTokenType.KW_ELSE;
 		} else if (keyword.equals("and")) {
-			return KWTokenType.KW_AND;
+			return TokenType.KWTokenType.KW_AND;
 		} else if (keyword.equals("or")) {
-			return KWTokenType.KW_OR;
+			return TokenType.KWTokenType.KW_OR;
 		} else if (keyword.equals("not")) {
-			return KWTokenType.KW_NOT;
+			return TokenType.KWTokenType.KW_NOT;
 		} else if (keyword.equals("xor")) {
-			return KWTokenType.KW_XOR;
+			return TokenType.KWTokenType.KW_XOR;
 		} else if (keyword.equals("return")) {
-			return KWTokenType.KW_RETURN;
+			return TokenType.KWTokenType.KW_RETURN;
 		} else if (keyword.equals("loop")) {
-			return KWTokenType.KW_LOOP;
+			return TokenType.KWTokenType.KW_LOOP;
 		} else if (keyword.equals("break")) {
-			return KWTokenType.KW_BREAK;
+			return TokenType.KWTokenType.KW_BREAK;
 		} else if (keyword.equals("continue")) {
-			return KWTokenType.KW_CONTINUE;
+			return TokenType.KWTokenType.KW_CONTINUE;
 		}
 		return null;
 	}
@@ -81,27 +78,27 @@ public class TokenGenerator implements Lexer {
 				char ch = (char) charac;
 				colCount++;
 				if (ch == '(') {
-					tokenList.add(new Token(SepTokenType.SEP_LPAREN, Character.toString(ch),
+					tokenList.add(new Token(TokenType.SepTokenType.SEP_LPAREN, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == ')') {
-					tokenList.add(new Token(SepTokenType.SEP_RPAREN, Character.toString(ch),
+					tokenList.add(new Token(TokenType.SepTokenType.SEP_RPAREN, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '{') {
-					tokenList.add(new Token(SepTokenType.SEP_LBRACE, Character.toString(ch),
+					tokenList.add(new Token(TokenType.SepTokenType.SEP_LBRACE, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '}') {
-					tokenList.add(new Token(SepTokenType.SEP_RBRACE, Character.toString(ch),
+					tokenList.add(new Token(TokenType.SepTokenType.SEP_RBRACE, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == ';') {
 					tokenList.add(
-							new Token(SepTokenType.SEP_SEMI, Character.toString(ch), new Position(rowCount, colCount)));
+							new Token(TokenType.SepTokenType.SEP_SEMI, Character.toString(ch), new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '}') {
-					tokenList.add(new Token(SepTokenType.SEP_RBRACE, Character.toString(ch),
+					tokenList.add(new Token(TokenType.SepTokenType.SEP_RBRACE, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '+') {
@@ -110,10 +107,10 @@ public class TokenGenerator implements Lexer {
 					if (ch == '+') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_INC, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_INC, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_PLUS, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_PLUS, temp, new Position(rowCount, colCount)));
 					}
 					temp = "";
 				} else if (ch == '-') {
@@ -122,18 +119,18 @@ public class TokenGenerator implements Lexer {
 					if (ch == '-') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_DEC, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_DEC, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_MINUS, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_MINUS, temp, new Position(rowCount, colCount)));
 					}
 					temp = "";
 				} else if (ch == '/') {
 					tokenList.add(
-							new Token(OpTokenType.OP_DIVIDE, Character.toString(ch), new Position(rowCount, colCount)));
+							new Token(TokenType.OpTokenType.OP_DIVIDE, Character.toString(ch), new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '*') {
-					tokenList.add(new Token(OpTokenType.OP_MULTIPLY, Character.toString(ch),
+					tokenList.add(new Token(TokenType.OpTokenType.OP_MULTIPLY, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '&') {
@@ -142,10 +139,10 @@ public class TokenGenerator implements Lexer {
 					if (ch == '&') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_LOGAND, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_LOGAND, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_BITAND, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_BITAND, temp, new Position(rowCount, colCount)));
 					}
 					temp = "";
 				} else if (ch == '|') {
@@ -154,22 +151,22 @@ public class TokenGenerator implements Lexer {
 					if (ch == '|') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_LOGOR, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_LOGOR, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_BITOR, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_BITOR, temp, new Position(rowCount, colCount)));
 					}
 					temp = "";
 				} else if (ch == '!') {
 					tokenList.add(
-							new Token(OpTokenType.OP_LOGNOT, Character.toString(ch), new Position(rowCount, colCount)));
+							new Token(TokenType.OpTokenType.OP_LOGNOT, Character.toString(ch), new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '^') {
 					tokenList.add(
-							new Token(OpTokenType.OP_BITXOR, Character.toString(ch), new Position(rowCount, colCount)));
+							new Token(TokenType.OpTokenType.OP_BITXOR, Character.toString(ch), new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '~') {
-					tokenList.add(new Token(OpTokenType.OP_BITCOMPLIMENT, Character.toString(ch),
+					tokenList.add(new Token(TokenType.OpTokenType.OP_BITCOMPLIMENT, Character.toString(ch),
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '<') {
@@ -178,15 +175,15 @@ public class TokenGenerator implements Lexer {
 					if (ch == '<') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_BITLEFTSHIFT, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_BITLEFTSHIFT, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else if (ch == '=') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_RELLE, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_RELLE, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_RELLT, Character.toString(ch),
+						tokenList.add(new Token(TokenType.OpTokenType.OP_RELLT, Character.toString(ch),
 								new Position(rowCount, colCount)));
 					}
 					temp = "";
@@ -196,15 +193,15 @@ public class TokenGenerator implements Lexer {
 					if (ch == '>') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_BITRIGHTSHIFT, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_BITRIGHTSHIFT, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else if (ch == '=') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_RELGE, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_RELGE, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_RELGT, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_RELGT, temp, new Position(rowCount, colCount)));
 					}
 					temp = "";
 				} else if (ch == '=') {
@@ -213,10 +210,10 @@ public class TokenGenerator implements Lexer {
 					if (ch == '=') {
 						temp += ch;
 						colCount++;
-						tokenList.add(new Token(OpTokenType.OP_RELEE, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_RELEE, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
 					} else {
-						tokenList.add(new Token(OpTokenType.OP_ASG, temp, new Position(rowCount, colCount)));
+						tokenList.add(new Token(TokenType.OpTokenType.OP_ASG, temp, new Position(rowCount, colCount)));
 					}
 					temp = "";
 
@@ -231,14 +228,14 @@ public class TokenGenerator implements Lexer {
 						ch = (char) (charac = reader.read());
 					}
 
-					tokenList.add(new Token(KWTokenType.TK_NUMLITERAL, temp, new Position(rowCount, startColCount)));
+					tokenList.add(new Token(TokenType.KWTokenType.TK_NUMLITERAL, temp, new Position(rowCount, startColCount)));
 
 					temp = "";
 				} else if (Character.isLetter(ch)) {
 					temp += ch;
 					ch = (char) (charac = reader.read());
 					int startColCount = colCount;
-					int x;
+					//int x;
 
 					TokenType t;
 
@@ -251,7 +248,7 @@ public class TokenGenerator implements Lexer {
 						tokenList.add(new Token(t, temp, new Position(rowCount, startColCount)));
 					} else {
 						tokenList
-								.add(new Token(KWTokenType.TK_IDENTIFIER, temp, new Position(rowCount, startColCount)));
+								.add(new Token(TokenType.KWTokenType.TK_IDENTIFIER, temp, new Position(rowCount, startColCount)));
 					}
 					temp = "";
 				} else if (ch == '\n') {
