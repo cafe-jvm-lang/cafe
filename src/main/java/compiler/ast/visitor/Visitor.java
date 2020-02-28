@@ -3,8 +3,10 @@ package compiler.ast.visitor;
 import compiler.ast.ArgsNode;
 import compiler.ast.BinaryExprNode;
 import compiler.ast.FuncDeclNode;
+import compiler.ast.IdentifierNode;
 import compiler.ast.IntegerLiteral;
 import compiler.ast.MethodCall;
+import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
 import compiler.ast.UnaryExprNode;
@@ -31,4 +33,8 @@ public interface Visitor {
 	void visit(UnaryExprNode n);
 	
 	void visit(MethodCall n);
+	
+	void visit(IdentifierNode n);
+	
+	void visit(OperatorNode n);
 }

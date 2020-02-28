@@ -1,5 +1,5 @@
 package compiler.ast;
 
-public interface ExprNode extends Node{
-	
+public interface ExprNode extends StmtNode{
+
 }

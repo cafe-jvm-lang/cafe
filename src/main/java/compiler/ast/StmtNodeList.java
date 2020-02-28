@@ -17,6 +17,12 @@ public class StmtNodeList {
 		return list.elementAt(i);
 	}
 	
+	public void addAll(StmtNodeList stmtL) {
+		for(int i=0;i < stmtL.size(); i++) {
+			list.add(stmtL.elementAt(i));
+		}
+	}
+	
 	public int size() {
 		return list.size();
 	}

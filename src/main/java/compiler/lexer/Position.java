@@ -15,4 +15,8 @@ public class Position {
 	public int getPosY() {
 		return y;
 	}
+	
+	public void print() {
+		System.out.println("row:"+x+" col:"+y);
+	}
 }

@@ -3,12 +3,12 @@ package compiler.ast;
 import compiler.ast.visitor.Visitor;
 
 public class FuncDeclNode implements Node{
-	public String nm;
+	public IdentifierNode nm;
 	public ArgsNodeList argL;
 	public StmtNodeList stmtL;
 	public VarDeclNodeList varL;
 	
-	public FuncDeclNode(String name,ArgsNodeList argsList,StmtNodeList stmtList,VarDeclNodeList varList) {
+	public FuncDeclNode(IdentifierNode name,ArgsNodeList argsList,StmtNodeList stmtList,VarDeclNodeList varList) {
 		nm = name;
 		argL = argsList;
 		stmtL = stmtList;

@@ -3,9 +3,9 @@ package compiler.ast;
 import compiler.ast.visitor.Visitor;
 
 public class VarDeclNode implements Node{
-	String nm;
+	public IdentifierNode nm;
 	
-	public VarDeclNode(String nm) {
+	public VarDeclNode(IdentifierNode nm) {
 		this.nm = nm;
 	}
 	

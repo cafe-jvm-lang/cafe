@@ -143,5 +143,7 @@ public interface TokenType {
 		/** ";" */
 		SEP_SEMI,
 		
+		/** "," */
+		SEP_COMMA
 	}
 }

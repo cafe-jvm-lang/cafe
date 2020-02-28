@@ -17,6 +17,12 @@ public class VarDeclNodeList {
 		return list.elementAt(i);
 	}
 
+	public void addAll(VarDeclNodeList varL) {
+		for(int i=0;i < varL.size(); i++) {
+			list.add(varL.elementAt(i));
+		}
+	}
+	
 	public int size() {
 		return list.size();
 	}

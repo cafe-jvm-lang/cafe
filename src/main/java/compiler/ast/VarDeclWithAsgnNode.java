@@ -4,14 +4,14 @@ import compiler.ast.visitor.Visitor;
 
 public class VarDeclWithAsgnNode implements Node{
 	
-	public String nm;
+	public IdentifierNode nm;
 	public ExprNode val;
 	
-	public VarDeclWithAsgnNode(String nm) {
+	public VarDeclWithAsgnNode(IdentifierNode nm) {
 		this(nm,null);
 	}
 	
-	public VarDeclWithAsgnNode(String nm,ExprNode val) {
+	public VarDeclWithAsgnNode(IdentifierNode nm,ExprNode val) {
 		this.nm = nm;
 		this.val = val;
 	}
