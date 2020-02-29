@@ -1,6 +1,7 @@
 package compiler.parser;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
@@ -33,6 +34,7 @@ public class Parser {
 	private FuncDeclNode mainF;
 
 	private boolean error = false;
+	private boolean isNextToken = false;
 
 	public Parser(List<Token> tokenL) {
 		this.tokenL = tokenL;
@@ -53,6 +55,7 @@ public class Parser {
 		error = true;
 		System.out.println(err + "\n at ");
 		currT.getPosition().print();
+		System.out.println("\nToken:" + currT.getTokenValue());
 
 	}
 
@@ -89,10 +92,11 @@ public class Parser {
 		if (Utility.isLParen()) {
 			currT = getNextToken();
 
-			if ((arg = parseIdentifier()) != null)
+			if ((arg = parseIdentifier()) != null) {
 				argL.addElement((ArgsNode) arg);
+				currT = getNextToken();
+			}
 
-			currT = getNextToken();
 			while (!Utility.isRParen()) {
 				if (Utility.isComma()) {
 					currT = getNextToken();
@@ -138,22 +142,22 @@ public class Parser {
 
 		if (Utility.isOpLogOr()) {
 			return new OperatorNode(TokenType.OpTokenType.OP_LOGOR);
-		} 
-		
+		}
+
 		return null;
 	}
-	
+
 	ExprNode parseLogAndOp() {
 		if (error)
 			return null;
 
 		if (Utility.isOpLogAnd()) {
 			return new OperatorNode(TokenType.OpTokenType.OP_LOGAND);
-		} 
-		
+		}
+
 		return null;
 	}
-	
+
 	ExprNode parseRelEqOp() {
 		if (error)
 			return null;
@@ -166,7 +170,7 @@ public class Parser {
 
 		return null;
 	}
-	
+
 	ExprNode parseRelOp() {
 		if (error)
 			return null;
@@ -275,7 +279,8 @@ public class Parser {
 		ExprNode e3;
 
 		if ((e1 = parseFactorExp()) != null) {
-			currT = getNextToken();
+			if (!isNextToken)
+				currT = getNextToken();
 			if ((e2 = parseMulDivOp()) != null) {
 				currT = getNextToken();
 				if ((e3 = parseFactorExp()) != null) {
@@ -284,6 +289,7 @@ public class Parser {
 					error("Invalid Expr");
 				}
 			} else {
+				isNextToken = true;
 				return new BinaryExprNode(e1);
 			}
 		}
@@ -297,7 +303,8 @@ public class Parser {
 		ExprNode e3;
 
 		if ((e1 = parseTermExp()) != null) {
-			currT = getNextToken();
+			if (!isNextToken)
+				currT = getNextToken();
 			if ((e2 = parseAddSubOp()) != null) {
 				currT = getNextToken();
 				if ((e3 = parseTermExp()) != null) {
@@ -306,6 +313,7 @@ public class Parser {
 					error("Invalid Expr");
 				}
 			} else {
+				isNextToken = true;
 				return new BinaryExprNode(e1);
 			}
 		}
@@ -319,7 +327,8 @@ public class Parser {
 		ExprNode e3;
 
 		if ((e1 = parseAddExp()) != null) {
-			currT = getNextToken();
+			if (!isNextToken)
+				currT = getNextToken();
 			if ((e2 = parseRelOp()) != null) {
 				currT = getNextToken();
 				if ((e3 = parseAddExp()) != null) {
@@ -328,6 +337,7 @@ public class Parser {
 					error("Invalid Expr");
 				}
 			} else {
+				isNextToken = true;
 				return new BinaryExprNode(e1);
 			}
 		}
@@ -336,13 +346,14 @@ public class Parser {
 	}
 
 	ExprNode parseEqExp() {
-		
+
 		ExprNode e1;
 		ExprNode e2;
 		ExprNode e3;
 
 		if ((e1 = parseRelExp()) != null) {
-			currT = getNextToken();
+			if (!isNextToken)
+				currT = getNextToken();
 			if ((e2 = parseRelEqOp()) != null) {
 				currT = getNextToken();
 				if ((e3 = parseRelExp()) != null) {
@@ -351,21 +362,23 @@ public class Parser {
 					error("Invalid Expr");
 				}
 			} else {
+				isNextToken = true;
 				return new BinaryExprNode(e1);
 			}
 		}
-		
+
 		return null;
 	}
 
 	ExprNode parseLogAndExp() {
-		
+
 		ExprNode e1;
 		ExprNode e2;
 		ExprNode e3;
 
 		if ((e1 = parseEqExp()) != null) {
-			currT = getNextToken();
+			if (!isNextToken)
+				currT = getNextToken();
 			if ((e2 = parseLogAndOp()) != null) {
 				currT = getNextToken();
 				if ((e3 = parseEqExp()) != null) {
@@ -374,21 +387,23 @@ public class Parser {
 					error("Invalid Expr");
 				}
 			} else {
+				isNextToken = true;
 				return new BinaryExprNode(e1);
 			}
 		}
-		
+
 		return null;
 	}
 
 	ExprNode parseLogOrExp() {
-		
+
 		ExprNode e1;
 		ExprNode e2;
 		ExprNode e3;
 
 		if ((e1 = parseLogAndExp()) != null) {
-			currT = getNextToken();
+			if (!isNextToken)
+				currT = getNextToken();
 			if ((e2 = parseLogOrOp()) != null) {
 				currT = getNextToken();
 				if ((e3 = parseLogAndExp()) != null) {
@@ -397,10 +412,11 @@ public class Parser {
 					error("Invalid Expr");
 				}
 			} else {
+				isNextToken = true;
 				return new BinaryExprNode(e1);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -409,28 +425,31 @@ public class Parser {
 		ExprNode e1;
 		ExprNode e2;
 		ExprNode e3;
-		
+
 		if (error)
 			return null;
-		
-		if((e1 = parseIdentifier()) != null) {
+
+		if ((e1 = parseIdentifier()) != null) {
 			currT = getNextToken();
-			if((e2 = parseAsgOp()) != null) {
+			if ((e2 = parseAsgOp()) != null) {
 				currT = getNextToken();
-				if((e3 = parseExpr()) != null) {
-					return new BinaryExprNode(e1,(OperatorNode) e2, e3);
-				}
-				else {
+				if ((e3 = parseExpr()) != null) {
+					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
+				} else {
 					error("Invalid expr");
 				}
-			}
-			else {
+			} else {
 				error("'=' expected");
 			}
+		} else if ((e1 = parseLogAndExp()) != null) {
+			isNextToken = false;
+			if (Utility.isSemi()) {
+				return e1;
+			} else {
+				error("';' expected");
+			}
 		}
-		else if((e1 = parseLogAndExp()) != null) {
-			return e1;
-		}
+		isNextToken = false;
 		return null;
 	}
 
@@ -442,7 +461,7 @@ public class Parser {
 		return null;
 	}
 
-	Block<VarDeclNodeList, StmtNodeList> parseStmt(Scope scope) {
+	Block<VarDeclNodeList, StmtNodeList> parseStmt(final Scope scope) {
 
 		if (error)
 			return null;
@@ -451,7 +470,8 @@ public class Parser {
 		StmtNodeList stmtL = new StmtNodeList();
 
 		Node n;
-
+		
+		// Error here , reset while cond
 		while (currT != null) {
 			if (currT.getTokenType() == TokenType.KWTokenType.KW_FUNC) {
 				if (scope == Scope.GLOBAL) {
@@ -464,10 +484,12 @@ public class Parser {
 			}
 
 			if ((n = parseVarDecl()) != null) {
-				if(n instanceof VarDeclNode)
-					varL.addElement((NodeWithVarDecl)(VarDeclNode) n);
-				else if(n instanceof VarDeclWithAsgnNode)
-					varL.addElement((NodeWithVarDecl)(VarDeclWithAsgnNode) n);
+				if (n instanceof VarDeclNode)
+					varL.addElement((NodeWithVarDecl) (VarDeclNode) n);
+				else if (n instanceof VarDeclWithAsgnNode)
+					varL.addElement((NodeWithVarDecl) (VarDeclWithAsgnNode) n);
+
+				currT = getNextToken();
 			} else if ((n = parseExpr()) != null) {
 				stmtL.addElement((ExprNode) n);
 			} else if ((n = parseReturnStmt()) != null) {
@@ -597,12 +619,12 @@ public class Parser {
 
 		Node t1;
 		while (currT != null) {
-			if ((block = parseStmt(Scope.GLOBAL)) != null) {
-				stmtM.addAll(block.u);
-				varM.addAll(block.t);
-			} else if ((t1 = parseFuncDecl()) != null) {
+			if ((t1 = parseFuncDecl()) != null) {
 				root.addFuncDeclNode((FuncDeclNode) t1);
 				currT = getNextToken();
+			} else if ((block = parseStmt(Scope.GLOBAL)) != null) {
+				stmtM.addAll(block.u);
+				varM.addAll(block.t);
 			} else {
 				if (!error)
 					error("Some error");
