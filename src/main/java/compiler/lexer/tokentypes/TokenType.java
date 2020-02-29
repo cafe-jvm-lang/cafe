@@ -122,6 +122,7 @@ public interface TokenType {
 		 OP_RELLE,
 		 OP_RELGE,
 		 OP_RELEE,
+		 OP_RELNE
 	}
 	
 	public enum SepTokenType implements TokenType{

@@ -2,7 +2,7 @@ package compiler.ast;
 
 import compiler.ast.visitor.Visitor;
 
-public class IdentifierNode implements Node {
+public class IdentifierNode implements ExprNode {
 
 	public String id;
 

@@ -2,16 +2,12 @@ package compiler.ast;
 
 import compiler.ast.visitor.Visitor;
 
-public class VarDeclWithAsgnNode implements Node{
+public class VarDeclWithAsgnNode implements Node,NodeWithVarDecl{
 	
-	public IdentifierNode nm;
+	public VarDeclNode nm;
 	public ExprNode val;
 	
-	public VarDeclWithAsgnNode(IdentifierNode nm) {
-		this(nm,null);
-	}
-	
-	public VarDeclWithAsgnNode(IdentifierNode nm,ExprNode val) {
+	public VarDeclWithAsgnNode(VarDeclNode nm,ExprNode val) {
 		this.nm = nm;
 		this.val = val;
 	}

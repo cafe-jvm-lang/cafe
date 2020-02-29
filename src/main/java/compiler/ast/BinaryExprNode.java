@@ -8,6 +8,10 @@ public class BinaryExprNode implements ExprNode{
 	public OperatorNode op;
 	public ExprNode expr2;
 	
+	public BinaryExprNode(ExprNode expr1) {
+		this(expr1,null,null);
+	}
+	
 	public BinaryExprNode(ExprNode expr1,OperatorNode op,ExprNode expr2) {
 		this.expr1 = expr1;
 		this.op = op;

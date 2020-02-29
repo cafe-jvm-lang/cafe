@@ -3,17 +3,17 @@ package compiler.ast;
 import java.util.Vector;
 
 public class VarDeclNodeList {
-	private Vector<VarDeclNode> list;
+	private Vector<NodeWithVarDecl> list;
 
 	public VarDeclNodeList() {
 		list = new Vector<>();
 	}
 
-	public void addElement(VarDeclNode n) {
+	public void addElement(NodeWithVarDecl n) {
 		list.addElement(n);
 	}
 
-	public VarDeclNode elementAt(int i) {
+	public NodeWithVarDecl elementAt(int i) {
 		return list.elementAt(i);
 	}
 

@@ -5,11 +5,11 @@ import compiler.lexer.tokentypes.TokenType;
 import compiler.lexer.tokentypes.TokenType.OpTokenType;
 
 public class UnaryExprNode implements ExprNode{
-	public TokenType.OpTokenType op;
+	public OperatorNode op;
 	public ExprNode expr;
 
 	
-	public UnaryExprNode(OpTokenType op, ExprNode expr) {
+	public UnaryExprNode(OperatorNode op, ExprNode expr) {
 		this.op = op;
 		this.expr = expr;
 	}
