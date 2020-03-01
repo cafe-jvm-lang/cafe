@@ -146,4 +146,16 @@ public final class Utility {
 			return true;
 		return false;
 	}
+	
+	protected final static boolean isFunc() {
+		if (Parser.currT.getTokenType() == TokenType.KWTokenType.KW_FUNC)
+			return true;
+		return false;
+	}
+	
+	protected final static boolean isReturnStmt() {
+		if (Parser.currT.getTokenType() == TokenType.KWTokenType.KW_RETURN)
+			return true;
+		return false;
+	}
 }

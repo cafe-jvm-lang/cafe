@@ -1,7 +1,6 @@
 package compiler.parser;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
@@ -22,7 +21,6 @@ import compiler.ast.VarDeclNodeList;
 import compiler.ast.VarDeclWithAsgnNode;
 import compiler.lexer.Token;
 import compiler.lexer.tokentypes.TokenType;
-import compiler.utils.Scope;
 
 public class Parser {
 
@@ -282,6 +280,7 @@ public class Parser {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseMulDivOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseFactorExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
@@ -306,6 +305,7 @@ public class Parser {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseAddSubOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseTermExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
@@ -330,6 +330,7 @@ public class Parser {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseRelOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseAddExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
@@ -355,6 +356,7 @@ public class Parser {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseRelEqOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseRelExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
@@ -380,6 +382,7 @@ public class Parser {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseLogAndOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseEqExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
@@ -405,6 +408,7 @@ public class Parser {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseLogOrOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseLogAndExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
@@ -432,8 +436,9 @@ public class Parser {
 		if ((e1 = parseIdentifier()) != null) {
 			currT = getNextToken();
 			if ((e2 = parseAsgOp()) != null) {
+				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseExpr()) != null) {
+				if ((e3 = parseLogAndExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid expr");
@@ -441,15 +446,9 @@ public class Parser {
 			} else {
 				error("'=' expected");
 			}
-		} else if ((e1 = parseLogAndExp()) != null) {
-			isNextToken = false;
-			if (Utility.isSemi()) {
-				return e1;
-			} else {
-				error("';' expected");
-			}
+		} else  if ((e1 = parseLogAndExp()) != null) {
+			return e1;
 		}
-		isNextToken = false;
 		return null;
 	}
 
@@ -458,47 +457,117 @@ public class Parser {
 		if (error)
 			return null;
 
+		StmtNode n1;
+
+		if (Utility.isReturnStmt()) {
+			currT = getNextToken();
+			if ((n1 = parseLogAndExp()) != null) {
+				if (!isNextToken)
+					currT = getNextToken();
+				if (Utility.isSemi()) {
+					isNextToken = false;
+					return n1;
+				} else {
+					error("';' expected");
+				}
+			}
+		}
+
 		return null;
 	}
 
-	Block<VarDeclNodeList, StmtNodeList> parseStmt(final Scope scope) {
+//	Block<VarDeclNodeList, StmtNodeList> parseStmt(final Scope scope) {
+//
+//		if (error)
+//			return null;
+//
+//		VarDeclNodeList varL = new VarDeclNodeList();
+//		StmtNodeList stmtL = new StmtNodeList();
+//
+//		Node n;
+//		
+//		// Error here , reset while cond
+//		while (currT != null) {
+//			if (currT.getTokenType() == TokenType.KWTokenType.KW_FUNC) {
+//				if (scope == Scope.GLOBAL) {
+//					return new Block<>(varL, stmtL);
+//				} else {
+//					if (!error)
+//						error("Unexpected token 'func'");
+//					return null;
+//				}
+//			}
+//
+//			if ((n = parseVarDecl()) != null) {
+//				if (n instanceof VarDeclNode)
+//					varL.addElement((NodeWithVarDecl) (VarDeclNode) n);
+//				else if (n instanceof VarDeclWithAsgnNode)
+//					varL.addElement((NodeWithVarDecl) (VarDeclWithAsgnNode) n);
+//
+//				currT = getNextToken();
+//			} else if ((n = parseExpr()) != null) {
+//				stmtL.addElement((ExprNode) n);
+//			} else if ((n = parseReturnStmt()) != null) {
+//				stmtL.addElement((StmtNode) n);
+//			} else {
+//				if (!error)
+//					error("Unexpected Token");
+//				break;
+//			}
+//		}
+//
+//		return null;
+//	}
 
-		if (error)
-			return null;
+	Node parseStmt() {
+		Node n;
 
+		if ((n = parseVarDecl()) != null) {
+			return n;
+		} else if ((n = parseExpr()) != null) {
+			if(!isNextToken)
+				currT = getNextToken();
+			if(Utility.isSemi()) {
+				isNextToken = false;
+				return n;
+			}
+			else
+				error("';' expected");
+		} else if ((n = parseReturnStmt()) != null) {
+			return n;
+		} else {
+			if (!error)
+				error("Unexpected Token");
+		}
+
+		return null;
+	}
+
+	Block<VarDeclNodeList, StmtNodeList> parseBlock() {
+
+		Block<VarDeclNodeList, StmtNodeList> b;
 		VarDeclNodeList varL = new VarDeclNodeList();
 		StmtNodeList stmtL = new StmtNodeList();
 
 		Node n;
-		
-		// Error here , reset while cond
-		while (currT != null) {
-			if (currT.getTokenType() == TokenType.KWTokenType.KW_FUNC) {
-				if (scope == Scope.GLOBAL) {
-					return new Block<>(varL, stmtL);
-				} else {
-					if (!error)
-						error("Unexpected token 'func'");
-					return null;
-				}
-			}
 
-			if ((n = parseVarDecl()) != null) {
+		if (Utility.isLBrace()) {
+			currT = getNextToken();
+			while (!Utility.isRBrace()) {
+				n = parseStmt();
 				if (n instanceof VarDeclNode)
 					varL.addElement((NodeWithVarDecl) (VarDeclNode) n);
 				else if (n instanceof VarDeclWithAsgnNode)
 					varL.addElement((NodeWithVarDecl) (VarDeclWithAsgnNode) n);
+				else if (n instanceof StmtNode)
+					stmtL.addElement((StmtNode) n);
 
-				currT = getNextToken();
-			} else if ((n = parseExpr()) != null) {
-				stmtL.addElement((ExprNode) n);
-			} else if ((n = parseReturnStmt()) != null) {
-				stmtL.addElement((StmtNode) n);
-			} else {
-				if (!error)
-					error("Unexpected Token");
-				break;
+				if (!isNextToken)
+					currT = getNextToken();
 			}
+
+			b = new Block<>(varL, stmtL);
+			return b;
 		}
 
 		return null;
@@ -527,9 +596,16 @@ public class Parser {
 				opAsg = parseAsgOp();
 				if (opAsg != null) {
 					currT = getNextToken();
-					e1 = parseExpr();
+					e1 = parseLogAndExp();
 					if (e1 != null) {
-						return new VarDeclWithAsgnNode(new VarDeclNode((IdentifierNode) id1), (ExprNode) e1);
+						if (!isNextToken)
+							currT = getNextToken();
+						if (Utility.isSemi()) {
+							isNextToken = false;
+							return new VarDeclWithAsgnNode(new VarDeclNode((IdentifierNode) id1), (ExprNode) e1);
+						} else {
+							error("';' expected");
+						}
 					} else {
 						if (!error)
 							error("Invalid Token");
@@ -561,8 +637,8 @@ public class Parser {
 
 		Node idM;
 		ArgsNodeList argsM;
-		StmtNodeList stmtM;
-		VarDeclNodeList varM;
+		StmtNodeList stmtM = new StmtNodeList();
+		VarDeclNodeList varM = new VarDeclNodeList();
 		Block<VarDeclNodeList, StmtNodeList> block;
 
 		currT = getNextToken();
@@ -572,23 +648,14 @@ public class Parser {
 			currT = getNextToken();
 			if ((argsM = parseArgs()) != null) {
 				currT = getNextToken();
-				if (Utility.isLBrace()) {
-					currT = getNextToken();
+				if ((block = parseBlock()) != null) {
+					varM.addAll(block.t);
+					stmtM.addAll(block.u);
 
-					block = parseStmt(Scope.LOCAL);
-					if (block != null) {
-						stmtM = block.u;
-						varM = block.t;
-						if (Utility.isRBrace()) {
-							return new FuncDeclNode((IdentifierNode) idM, argsM, stmtM, varM);
-						} else {
-							if (!error)
-								error("'}' expected");
-						}
-					}
+					return new FuncDeclNode((IdentifierNode) idM, argsM, stmtM, varM);
 				} else {
 					if (!error)
-						error("'{' expected");
+						error("Invalid block");
 				}
 			} else {
 				if (!error)
@@ -615,16 +682,23 @@ public class Parser {
 		ArgsNodeList argsM = null;
 		StmtNodeList stmtM = new StmtNodeList();
 		VarDeclNodeList varM = new VarDeclNodeList();
-		Block<VarDeclNodeList, StmtNodeList> block;
+
+		Node n1;
 
 		Node t1;
 		while (currT != null) {
 			if ((t1 = parseFuncDecl()) != null) {
 				root.addFuncDeclNode((FuncDeclNode) t1);
 				currT = getNextToken();
-			} else if ((block = parseStmt(Scope.GLOBAL)) != null) {
-				stmtM.addAll(block.u);
-				varM.addAll(block.t);
+			} else if ((n1 = parseStmt()) != null) {
+				if (n1 instanceof VarDeclNode)
+					varM.addElement((NodeWithVarDecl) (VarDeclNode) n1);
+				else if (n1 instanceof VarDeclWithAsgnNode)
+					varM.addElement((NodeWithVarDecl) (VarDeclWithAsgnNode) n1);
+				else if (n1 instanceof StmtNode)
+					stmtM.addElement((StmtNode) n1);
+				if (!isNextToken)
+					currT = getNextToken();
 			} else {
 				if (!error)
 					error("Some error");
@@ -634,5 +708,6 @@ public class Parser {
 
 		mainF = new FuncDeclNode(idM, argsM, stmtM, varM);
 		root.setMainF(mainF);
+		System.out.println("Success");
 	}
 }
