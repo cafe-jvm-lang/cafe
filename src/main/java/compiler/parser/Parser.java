@@ -50,6 +50,7 @@ public class Parser {
 	}
 
 	public void error(String err) {
+
 		error = true;
 		System.out.println(err + "\n at ");
 		currT.getPosition().print();
@@ -438,7 +439,7 @@ public class Parser {
 			if ((e2 = parseAsgOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseLogAndExp()) != null) {
+				if ((e3 = parseLogOrExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid expr");
@@ -446,7 +447,7 @@ public class Parser {
 			} else {
 				error("'=' expected");
 			}
-		} else  if ((e1 = parseLogAndExp()) != null) {
+		} else  if ((e1 = parseLogOrExp()) != null) {
 			return e1;
 		}
 		return null;
@@ -461,7 +462,7 @@ public class Parser {
 
 		if (Utility.isReturnStmt()) {
 			currT = getNextToken();
-			if ((n1 = parseLogAndExp()) != null) {
+			if ((n1 = parseLogOrExp()) != null) {
 				if (!isNextToken)
 					currT = getNextToken();
 				if (Utility.isSemi()) {
@@ -596,7 +597,7 @@ public class Parser {
 				opAsg = parseAsgOp();
 				if (opAsg != null) {
 					currT = getNextToken();
-					e1 = parseLogAndExp();
+					e1 = parseLogOrExp();
 					if (e1 != null) {
 						if (!isNextToken)
 							currT = getNextToken();

@@ -1,9 +1,0 @@
-var x=1;
-
-func hello(){
-	var z = 3+5/5;
-	return x;
-}
-
-var y = s+t;
-x = y+1;

@@ -12,7 +12,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		String is = classloader.getResource("test.txt").getFile();
+		String is = classloader.getResource("test1.txt").getFile();
 
 		Lexer lex = new TokenGenerator(new File(is));
 		List<Token> tokenL = lex.lex();
