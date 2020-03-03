@@ -247,10 +247,12 @@ public class Parser {
 
 		if (Utility.isLParen()) {
 			currT = getNextToken();
-			e1 = parseExpr();
+			e1 = parseLogOrExp();
 			if (e1 != null) {
-				currT = getNextToken();
+				if(!isNextToken)
+					currT = getNextToken();
 				if (Utility.isRParen()) {
+					isNextToken = false;
 					return e1;
 				} else {
 					error("')' expected");
@@ -283,7 +285,7 @@ public class Parser {
 			if ((e2 = parseMulDivOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseFactorExp()) != null) {
+				if ((e3 = parseTermExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -308,7 +310,7 @@ public class Parser {
 			if ((e2 = parseAddSubOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseTermExp()) != null) {
+				if ((e3 = parseAddExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -333,7 +335,7 @@ public class Parser {
 			if ((e2 = parseRelOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseAddExp()) != null) {
+				if ((e3 = parseRelExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -359,7 +361,7 @@ public class Parser {
 			if ((e2 = parseRelEqOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseRelExp()) != null) {
+				if ((e3 = parseEqExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -385,7 +387,7 @@ public class Parser {
 			if ((e2 = parseLogAndOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseEqExp()) != null) {
+				if ((e3 = parseLogAndExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -411,7 +413,7 @@ public class Parser {
 			if ((e2 = parseLogOrOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseLogAndExp()) != null) {
+				if ((e3 = parseLogOrExp()) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -447,7 +449,7 @@ public class Parser {
 			} else {
 				error("'=' expected");
 			}
-		} else  if ((e1 = parseLogOrExp()) != null) {
+		} else if ((e1 = parseLogOrExp()) != null) {
 			return e1;
 		}
 		return null;
@@ -526,13 +528,12 @@ public class Parser {
 		if ((n = parseVarDecl()) != null) {
 			return n;
 		} else if ((n = parseExpr()) != null) {
-			if(!isNextToken)
+			if (!isNextToken)
 				currT = getNextToken();
-			if(Utility.isSemi()) {
+			if (Utility.isSemi()) {
 				isNextToken = false;
 				return n;
-			}
-			else
+			} else
 				error("';' expected");
 		} else if ((n = parseReturnStmt()) != null) {
 			return n;
@@ -557,9 +558,9 @@ public class Parser {
 			while (!Utility.isRBrace()) {
 				n = parseStmt();
 				if (n instanceof VarDeclNode)
-					varL.addElement((NodeWithVarDecl) (VarDeclNode) n);
+					varL.addElement((VarDeclNode) n);
 				else if (n instanceof VarDeclWithAsgnNode)
-					varL.addElement((NodeWithVarDecl) (VarDeclWithAsgnNode) n);
+					varL.addElement((VarDeclWithAsgnNode) n);
 				else if (n instanceof StmtNode)
 					stmtL.addElement((StmtNode) n);
 
@@ -633,7 +634,7 @@ public class Parser {
 		if (error)
 			return null;
 
-		if (!(currT.getTokenType() == TokenType.KWTokenType.KW_FUNC))
+		if (!Utility.isFunc())
 			return null;
 
 		Node idM;
@@ -675,6 +676,10 @@ public class Parser {
 		return null;
 	}
 
+	/**
+	 * Parser entry point <br>
+	 *
+	 */
 	public void parse() {
 
 		currT = getNextToken();
@@ -686,10 +691,9 @@ public class Parser {
 
 		Node n1;
 
-		Node t1;
 		while (currT != null) {
-			if ((t1 = parseFuncDecl()) != null) {
-				root.addFuncDeclNode((FuncDeclNode) t1);
+			if ((n1 = parseFuncDecl()) != null) {
+				root.addFuncDeclNode((FuncDeclNode) n1);
 				currT = getNextToken();
 			} else if ((n1 = parseStmt()) != null) {
 				if (n1 instanceof VarDeclNode)
