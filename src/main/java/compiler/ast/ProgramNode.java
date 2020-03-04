@@ -3,7 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.Vector;
 
-import compiler.ast.visitor.Visitor;
+import compiler.visitor.Visitor;
 
 public class ProgramNode implements Node{
 	private FuncDeclNode mainF;

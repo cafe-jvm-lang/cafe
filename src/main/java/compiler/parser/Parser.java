@@ -260,7 +260,7 @@ public class Parser {
 			} else {
 				error("Invalid expr");
 			}
-		} else if ((e1 = parseUnaryOp()) != null) { // RECHECK GRAMMAR
+		} else if ((e1 = parseUnaryOp()) != null) { // RECHECK GRAMMAR  {Accepts ---a,++++++b}
 			currT = getNextToken();
 			e2 = parseFactorExp();
 			return new UnaryExprNode((OperatorNode) e1, e2);
@@ -292,7 +292,7 @@ public class Parser {
 				}
 			} else {
 				isNextToken = true;
-				return new BinaryExprNode(e1);
+				return e1;
 			}
 		}
 		return null;
@@ -317,7 +317,7 @@ public class Parser {
 				}
 			} else {
 				isNextToken = true;
-				return new BinaryExprNode(e1);
+				return e1;
 			}
 		}
 		return null;
@@ -342,7 +342,7 @@ public class Parser {
 				}
 			} else {
 				isNextToken = true;
-				return new BinaryExprNode(e1);
+				return e1;
 			}
 		}
 
@@ -368,7 +368,7 @@ public class Parser {
 				}
 			} else {
 				isNextToken = true;
-				return new BinaryExprNode(e1);
+				return e1;
 			}
 		}
 
@@ -394,7 +394,7 @@ public class Parser {
 				}
 			} else {
 				isNextToken = true;
-				return new BinaryExprNode(e1);
+				return e1;
 			}
 		}
 
@@ -420,7 +420,7 @@ public class Parser {
 				}
 			} else {
 				isNextToken = true;
-				return new BinaryExprNode(e1);
+				return e1;
 			}
 		}
 
@@ -535,6 +535,7 @@ public class Parser {
 				return n;
 			} else
 				error("';' expected");
+				return null;
 		} else if ((n = parseReturnStmt()) != null) {
 			return n;
 		} else {
@@ -557,12 +558,17 @@ public class Parser {
 			currT = getNextToken();
 			while (!Utility.isRBrace()) {
 				n = parseStmt();
-				if (n instanceof VarDeclNode)
-					varL.addElement((VarDeclNode) n);
-				else if (n instanceof VarDeclWithAsgnNode)
-					varL.addElement((VarDeclWithAsgnNode) n);
-				else if (n instanceof StmtNode)
-					stmtL.addElement((StmtNode) n);
+				if(n != null) {
+					if (n instanceof VarDeclNode)
+						varL.addElement((VarDeclNode) n);
+					else if (n instanceof VarDeclWithAsgnNode)
+						varL.addElement((VarDeclWithAsgnNode) n);
+					else if (n instanceof StmtNode)
+						stmtL.addElement((StmtNode) n);
+				}
+				else {
+					return null;
+				}
 
 				if (!isNextToken)
 					currT = getNextToken();
@@ -694,14 +700,15 @@ public class Parser {
 		while (currT != null) {
 			if ((n1 = parseFuncDecl()) != null) {
 				root.addFuncDeclNode((FuncDeclNode) n1);
+				stmtM.addElement((StmtNode) n1);
 				currT = getNextToken();
 			} else if ((n1 = parseStmt()) != null) {
 				if (n1 instanceof VarDeclNode)
-					varM.addElement((NodeWithVarDecl) (VarDeclNode) n1);
+					varM.addElement((VarDeclNode) n1);
 				else if (n1 instanceof VarDeclWithAsgnNode)
-					varM.addElement((NodeWithVarDecl) (VarDeclWithAsgnNode) n1);
-				else if (n1 instanceof StmtNode)
-					stmtM.addElement((StmtNode) n1);
+					varM.addElement((VarDeclWithAsgnNode) n1);
+				
+				stmtM.addElement((StmtNode) n1);
 				if (!isNextToken)
 					currT = getNextToken();
 			} else {

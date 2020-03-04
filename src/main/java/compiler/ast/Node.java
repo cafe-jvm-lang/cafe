@@ -1,6 +1,6 @@
 package compiler.ast;
 
-import compiler.ast.visitor.Visitor;
+import compiler.visitor.Visitor;
 
 public interface Node {
 	public void accept(Visitor v);

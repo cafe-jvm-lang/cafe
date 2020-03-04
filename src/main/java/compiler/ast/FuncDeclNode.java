@@ -1,8 +1,8 @@
 package compiler.ast;
 
-import compiler.ast.visitor.Visitor;
+import compiler.visitor.Visitor;
 
-public class FuncDeclNode implements Node{
+public class FuncDeclNode implements StmtNode{
 	public IdentifierNode nm;
 	public ArgsNodeList argL;
 	public StmtNodeList stmtL;

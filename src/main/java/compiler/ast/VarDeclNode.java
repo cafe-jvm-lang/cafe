@@ -1,8 +1,8 @@
 package compiler.ast;
 
-import compiler.ast.visitor.Visitor;
+import compiler.visitor.Visitor;
 
-public class VarDeclNode implements Node,NodeWithVarDecl{
+public class VarDeclNode implements StmtNode,NodeWithVarDecl{
 	public IdentifierNode nm;
 	
 	public VarDeclNode(IdentifierNode nm) {

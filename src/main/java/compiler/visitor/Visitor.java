@@ -1,4 +1,4 @@
-package compiler.ast.visitor;
+package compiler.visitor;
 
 import compiler.ast.ArgsNode;
 import compiler.ast.BinaryExprNode;

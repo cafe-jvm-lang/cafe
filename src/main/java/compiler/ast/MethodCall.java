@@ -1,6 +1,6 @@
 package compiler.ast;
 
-import compiler.ast.visitor.Visitor;
+import compiler.visitor.Visitor;
 
 public class MethodCall implements ExprNode{
 	

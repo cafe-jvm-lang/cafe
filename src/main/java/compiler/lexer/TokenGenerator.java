@@ -106,30 +106,32 @@ public class TokenGenerator implements Lexer {
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '+') {
-					temp += ch;
+					/*temp += ch;
 					ch = (char) (charac = reader.read());
 					if (ch == '+') {
 						temp += ch;
 						colCount++;
 						tokenList.add(new Token(TokenType.OpTokenType.OP_INC, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
-					} else {
-						tokenList.add(new Token(TokenType.OpTokenType.OP_PLUS, temp, new Position(rowCount, colCount)));
-					}
-					temp = "";
+					} else {*/
+						tokenList.add(new Token(TokenType.OpTokenType.OP_PLUS, Character.toString(ch), new Position(rowCount, colCount)));
+						charac = reader.read();
+						/* } 
+					temp = ""; */
 				} else if (ch == '-') {
-					temp += ch;
+					/*temp += ch;
 					ch = (char) (charac = reader.read());
 					if (ch == '-') {
 						temp += ch;
 						colCount++;
 						tokenList.add(new Token(TokenType.OpTokenType.OP_DEC, temp, new Position(rowCount, colCount)));
 						charac = reader.read();
-					} else {
+					} else {*/
 						tokenList
-								.add(new Token(TokenType.OpTokenType.OP_MINUS, temp, new Position(rowCount, colCount)));
-					}
-					temp = "";
+								.add(new Token(TokenType.OpTokenType.OP_MINUS, Character.toString(ch), new Position(rowCount, colCount)));
+						charac = reader.read();
+						/* } 
+					temp = ""; */
 				} else if (ch == '/') {
 					tokenList.add(new Token(TokenType.OpTokenType.OP_DIVIDE, Character.toString(ch),
 							new Position(rowCount, colCount)));

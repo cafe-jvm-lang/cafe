@@ -1,7 +1,7 @@
 package compiler.ast;
 
-import compiler.ast.visitor.Visitor;
 import compiler.lexer.tokentypes.TokenType.OpTokenType;
+import compiler.visitor.Visitor;
 
 public class OperatorNode implements ExprNode {
 	public OpTokenType type;
