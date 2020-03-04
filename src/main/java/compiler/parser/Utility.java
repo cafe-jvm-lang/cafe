@@ -136,13 +136,15 @@ public final class Utility {
 	}
 	
 	protected final static boolean isOpLogAnd() {
-		if (Parser.currT.getTokenType() == TokenType.OpTokenType.OP_LOGAND)
+		if (Parser.currT.getTokenType() == TokenType.OpTokenType.OP_LOGAND
+				|| Parser.currT.getTokenType() == TokenType.KWTokenType.KW_AND)
 			return true;
 		return false;
 	}
 	
 	protected final static boolean isOpLogOr() {
-		if (Parser.currT.getTokenType() == TokenType.OpTokenType.OP_LOGOR)
+		if (Parser.currT.getTokenType() == TokenType.OpTokenType.OP_LOGOR
+				|| Parser.currT.getTokenType() == TokenType.KWTokenType.KW_OR)
 			return true;
 		return false;
 	}

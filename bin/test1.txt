@@ -1,5 +1,5 @@
-var x;
-
+var x = 5*a;
+x = a and b and c or d - 5 / 6/(a*q);
 func x(a,b){
 	var x = z+y/b+5+9*z;
 	return (x+y);
