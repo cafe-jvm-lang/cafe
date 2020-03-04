@@ -19,13 +19,15 @@ public class Main {
 
 		Lexer lex = new TokenGenerator(new File(is));
 		List<Token> tokenL = lex.lex();
-		//tokenL.forEach(e -> System.out.println(e.getTokenType()+" "+e.getTokenValue()));
-		
-		Parser p = new Parser(tokenL);
-		Node root =p.parse();
-		
-		PrettyPrinter print = new PrettyPrinter();
-		print.visit((ProgramNode)root);
+		if (tokenL != null) {
+			//tokenL.forEach(e -> System.out.println(e.getTokenType() + " " + e.getTokenValue()));
+
+			Parser p = new Parser(tokenL);
+			Node root = p.parse();
+
+			PrettyPrinter print = new PrettyPrinter();
+			print.visit((ProgramNode) root);
+		}
 	}
 
 }

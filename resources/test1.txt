@@ -1,7 +1,7 @@
-var "x";
+var x;
 
 func x(a,b){
-	var x;
+	var x = z+y/b+5+9*z;
 	return (x+y);
 }
 

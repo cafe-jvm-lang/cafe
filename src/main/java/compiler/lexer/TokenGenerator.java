@@ -15,7 +15,8 @@ public class TokenGenerator implements Lexer {
 
 	private final List<Token> tokenList;
 	private Reader reader;
-
+	private boolean errorFlag = false;
+	
 	public TokenGenerator(File f) {
 		if (f.exists()) {
 			tokenList = new ArrayList<Token>();
@@ -283,11 +284,18 @@ public class TokenGenerator implements Lexer {
 					rowCount++;
 					colCount = 0;
 					charac = reader.read();
-				} else {
+				} else if(ch == ' ' || ch == '\t' || ch == '\r'){
 					charac = reader.read();
 				}
+				else {
+					errorFlag = true;
+					System.out.println("Illegal character: "+ch);
+					break;
+				}
 			}
-			return tokenList;
+			if(!errorFlag)
+				return tokenList;
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
