@@ -3,9 +3,9 @@ package compiler.ast;
 import compiler.visitor.Visitor;
 
 public class ArgsNode implements Node {
-	public String arg;
+	public IdentifierNode arg;
 	
-	public ArgsNode(String arg) {
+	public ArgsNode(IdentifierNode arg) {
 		this.arg = arg;
 	}
 

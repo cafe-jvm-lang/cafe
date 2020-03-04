@@ -8,11 +8,12 @@ import compiler.ast.BinaryExprNode;
 import compiler.ast.ExprNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
-import compiler.ast.IntegerLiteral;
+import compiler.ast.IntegerLiteralNode;
 import compiler.ast.Node;
 import compiler.ast.NodeWithVarDecl;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
+import compiler.ast.ReturnStmtNode;
 import compiler.ast.StmtNode;
 import compiler.ast.StmtNodeList;
 import compiler.ast.UnaryExprNode;
@@ -45,7 +46,7 @@ public class Parser {
 		if (curr < tokenL.size()) {
 			return tokenL.get(curr++);
 		}
-		System.out.println("Token list empty");
+		//System.out.println("Token list empty");
 		return null;
 	}
 
@@ -92,7 +93,7 @@ public class Parser {
 			currT = getNextToken();
 
 			if ((arg = parseIdentifier()) != null) {
-				argL.addElement((ArgsNode) arg);
+				argL.addElement(new ArgsNode((IdentifierNode) arg));
 				currT = getNextToken();
 			}
 
@@ -101,7 +102,7 @@ public class Parser {
 					currT = getNextToken();
 					arg = parseIdentifier();
 					if (arg != null) {
-						argL.addElement((ArgsNode) arg);
+						argL.addElement(new ArgsNode((IdentifierNode) arg));
 					} else {
 						if (!error)
 							error("expected IDEN");
@@ -234,7 +235,7 @@ public class Parser {
 			return null;
 
 		if (Utility.isNumLiteral()) {
-			return new IntegerLiteral(Integer.parseInt(currT.getTokenValue()));
+			return new IntegerLiteralNode(Integer.parseInt(currT.getTokenValue()));
 		}
 
 		return null;
@@ -460,7 +461,7 @@ public class Parser {
 		if (error)
 			return null;
 
-		StmtNode n1;
+		Node n1;
 
 		if (Utility.isReturnStmt()) {
 			currT = getNextToken();
@@ -469,7 +470,7 @@ public class Parser {
 					currT = getNextToken();
 				if (Utility.isSemi()) {
 					isNextToken = false;
-					return n1;
+					return new ReturnStmtNode((ExprNode) n1);
 				} else {
 					error("';' expected");
 				}
@@ -563,8 +564,8 @@ public class Parser {
 						varL.addElement((VarDeclNode) n);
 					else if (n instanceof VarDeclWithAsgnNode)
 						varL.addElement((VarDeclWithAsgnNode) n);
-					else if (n instanceof StmtNode)
-						stmtL.addElement((StmtNode) n);
+					
+					stmtL.addElement((StmtNode) n);
 				}
 				else {
 					return null;
@@ -686,7 +687,7 @@ public class Parser {
 	 * Parser entry point <br>
 	 *
 	 */
-	public void parse() {
+	public Node parse() {
 
 		currT = getNextToken();
 
@@ -720,6 +721,7 @@ public class Parser {
 
 		mainF = new FuncDeclNode(idM, argsM, stmtM, varM);
 		root.setMainF(mainF);
-		System.out.println("Success");
+		
+		return root;
 	}
 }

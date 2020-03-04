@@ -1,7 +1,8 @@
+var "x";
 
-
-func x(){
-	-x;
+func x(a,b){
 	var x;
 	return (x+y);
 }
+
+var z = 5;

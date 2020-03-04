@@ -2,7 +2,7 @@ package compiler.ast;
 
 import compiler.visitor.Visitor;
 
-public class VarDeclWithAsgnNode implements Node,NodeWithVarDecl{
+public class VarDeclWithAsgnNode implements StmtNode,NodeWithVarDecl{
 	
 	public VarDeclNode nm;
 	public ExprNode val;

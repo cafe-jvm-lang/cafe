@@ -3,10 +3,13 @@ package compiler;
 import java.io.File;
 import java.util.List;
 
+import compiler.ast.Node;
+import compiler.ast.ProgramNode;
 import compiler.lexer.Lexer;
 import compiler.lexer.Token;
 import compiler.lexer.TokenGenerator;
 import compiler.parser.Parser;
+import compiler.visitor.PrettyPrinter;
 
 public class Main {
 
@@ -16,10 +19,13 @@ public class Main {
 
 		Lexer lex = new TokenGenerator(new File(is));
 		List<Token> tokenL = lex.lex();
-		tokenL.forEach(e -> System.out.println(e.getTokenType()+" "+e.getTokenValue()));
+		//tokenL.forEach(e -> System.out.println(e.getTokenType()+" "+e.getTokenValue()));
 		
 		Parser p = new Parser(tokenL);
-		p.parse();
+		Node root =p.parse();
+		
+		PrettyPrinter print = new PrettyPrinter();
+		print.visit((ProgramNode)root);
 	}
 
 }

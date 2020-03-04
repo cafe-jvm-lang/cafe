@@ -4,7 +4,7 @@ import compiler.ast.ArgsNode;
 import compiler.ast.BinaryExprNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
-import compiler.ast.IntegerLiteral;
+import compiler.ast.IntegerLiteralNode;
 import compiler.ast.MethodCall;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
@@ -26,7 +26,7 @@ public interface Visitor {
 	
 	void visit(ReturnStmtNode n);
 	
-	void visit(IntegerLiteral n);
+	void visit(IntegerLiteralNode n);
 	
 	void visit(BinaryExprNode n);
 	

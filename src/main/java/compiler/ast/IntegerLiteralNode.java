@@ -2,11 +2,11 @@ package compiler.ast;
 
 import compiler.visitor.Visitor;
 
-public class IntegerLiteral implements ExprNode{
+public class IntegerLiteralNode implements ExprNode{
 	
 	public int i;
 	
-	public IntegerLiteral(int i) {
+	public IntegerLiteralNode(int i) {
 		this.i = i;
 	}
 	

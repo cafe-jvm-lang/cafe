@@ -1,9 +1,8 @@
 package compiler.ast;
 
-import java.util.Iterator;
 import java.util.Vector;
 
-public class StmtNodeList implements Iterable<StmtNode>{
+public class StmtNodeList{
 	private Vector<StmtNode> list;
 	
 	public StmtNodeList() {
@@ -26,11 +25,5 @@ public class StmtNodeList implements Iterable<StmtNode>{
 	
 	public int size() {
 		return list.size();
-	}
-
-	@Override
-	public Iterator<StmtNode> iterator() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
