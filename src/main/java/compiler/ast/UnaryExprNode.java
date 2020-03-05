@@ -1,7 +1,5 @@
 package compiler.ast;
 
-import compiler.lexer.tokentypes.TokenType;
-import compiler.lexer.tokentypes.TokenType.OpTokenType;
 import compiler.visitor.Visitor;
 
 public class UnaryExprNode implements ExprNode{

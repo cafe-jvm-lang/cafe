@@ -5,8 +5,10 @@ import compiler.ast.ArgsNodeList;
 import compiler.ast.BinaryExprNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
+import compiler.ast.IfElseStmtNode;
+import compiler.ast.IfStmtNode;
 import compiler.ast.IntegerLiteralNode;
-import compiler.ast.MethodCall;
+import compiler.ast.MethodCallNode;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
@@ -20,9 +22,9 @@ public class PrettyPrinter implements Visitor {
 	private int indent = 1;
 
 	private void print(String text) {
-		String format = "%" + indent + "s"+text+"%n";
-		System.out.format(format, ""); 
-		
+		String format = "%" + indent + "s" + text + "%n";
+		System.out.format(format, "");
+
 	}
 
 	@Override
@@ -45,7 +47,7 @@ public class PrettyPrinter implements Visitor {
 			a.elementAt(i).accept(this);
 		}
 		indent -= 4;
-		
+
 		print("StmtNodeList: ");
 		indent += 4;
 		StmtNodeList l = n.stmtL;
@@ -70,7 +72,7 @@ public class PrettyPrinter implements Visitor {
 		indent += 4;
 		n.nm.accept(this);
 		indent -= 4;
-		
+
 		indent += 4;
 		n.val.accept(this);
 		indent -= 4;
@@ -78,7 +80,7 @@ public class PrettyPrinter implements Visitor {
 
 	@Override
 	public void visit(ArgsNode n) {
-		print("ArgsNode: "+n.arg.id);
+		print("ArgsNode: " + n.arg.id);
 	}
 
 	@Override
@@ -117,18 +119,82 @@ public class PrettyPrinter implements Visitor {
 	}
 
 	@Override
-	public void visit(MethodCall n) {
+	public void visit(MethodCallNode n) {
+		print("MethodCallNode:");
 
+		indent += 4;
+		n.iden.accept(this);
+		ArgsNodeList a = n.argsL;
+		print("ArgsNodeList: ");
+		indent += 4;
+		for (int i = 0; i < a.size(); i++) {
+			a.elementAt(i).accept(this);
+		}
+		indent -= 4;
+		indent -= 4;
 	}
 
 	@Override
 	public void visit(IdentifierNode n) {
-		print("IdentifierNode: "+n.id);
+		print("IdentifierNode: " + n.id);
 	}
 
 	@Override
 	public void visit(OperatorNode n) {
-		print("OperatorNode: "+n.type.toString());
+		print("OperatorNode: " + n.type.toString());
 	}
 
+	@Override
+	public void visit(IfStmtNode n) {
+		print("IfStmtNode:");
+
+		indent += 4;
+		print("Condition:");
+		indent += 4;
+		n.cond.accept(this);
+		indent -= 4;
+
+		print("StmtNodeList:");
+		indent += 4;
+		StmtNodeList l = n.stmtL;
+		for (int i = 0; i < l.size(); i++) {
+			l.elementAt(i).accept(this);
+		}
+
+		indent -= 4;
+		indent -= 4;
+	}
+
+	@Override
+	public void visit(IfElseStmtNode n) {
+		print("IfElseStmtNode:");
+
+		indent += 4;
+		print("IF:");
+		indent += 4;
+		print("Condition:");
+		indent += 4;
+		n.ifCond.accept(this);
+		indent -= 4;
+
+		print("StmtNodeList:");
+		indent += 4;
+		StmtNodeList l = n.ifStmtL;
+		for (int i = 0; i < l.size(); i++) {
+			l.elementAt(i).accept(this);
+		}
+
+		indent -= 4;
+		indent -= 4;
+		
+		print("ELSE:");
+		indent += 4;
+		l = n.elseStmtL;
+		for (int i = 0; i < l.size(); i++) {
+			l.elementAt(i).accept(this);
+		}
+
+		indent -= 4;
+		indent -= 4;
+	}
 }

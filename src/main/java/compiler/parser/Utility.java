@@ -160,4 +160,16 @@ public final class Utility {
 			return true;
 		return false;
 	}
+	
+	protected final static boolean isIfStmt() {
+		if (Parser.currT.getTokenType() == TokenType.KWTokenType.KW_IF)
+			return true;
+		return false;
+	}
+	
+	protected final static boolean isElseStmt() {
+		if (Parser.currT.getTokenType() == TokenType.KWTokenType.KW_ELSE)
+			return true;
+		return false;
+	}
 }

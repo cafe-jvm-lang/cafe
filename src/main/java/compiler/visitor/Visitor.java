@@ -4,8 +4,10 @@ import compiler.ast.ArgsNode;
 import compiler.ast.BinaryExprNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
+import compiler.ast.IfElseStmtNode;
+import compiler.ast.IfStmtNode;
 import compiler.ast.IntegerLiteralNode;
-import compiler.ast.MethodCall;
+import compiler.ast.MethodCallNode;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
@@ -32,9 +34,13 @@ public interface Visitor {
 	
 	void visit(UnaryExprNode n);
 	
-	void visit(MethodCall n);
+	void visit(MethodCallNode n);
 	
 	void visit(IdentifierNode n);
 	
 	void visit(OperatorNode n);
+	
+	void visit(IfStmtNode n);
+	
+	void visit(IfElseStmtNode n);
 }

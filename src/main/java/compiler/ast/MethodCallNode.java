@@ -2,12 +2,12 @@ package compiler.ast;
 
 import compiler.visitor.Visitor;
 
-public class MethodCall implements ExprNode{
+public class MethodCallNode implements ExprNode{
 	
-	public String iden;
+	public IdentifierNode iden;
 	public ArgsNodeList argsL;
 	
-	public MethodCall(String iden, ArgsNodeList argsL) {
+	public MethodCallNode(IdentifierNode iden, ArgsNodeList argsL) {
 		this.iden = iden;
 		this.argsL = argsL;
 	}

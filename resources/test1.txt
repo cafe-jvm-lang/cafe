@@ -1,8 +1,24 @@
-var x = 5*a;
-x = a  - 5 / 6/(a*q);
+if(a || r){
+	var x= 5;
+	x = y+z;
+
+}
+else{
+	z(a);
+}
 func x(a,b){
-	var x = z+y/b+5+9*z;
+
+if(a > b || c <D){
+	var x = z+y/b+5+9*x(b,c);
 	return (x+y);
+	}
+	else{
+		return true;
+	}
 }
 
+var x = 5*a;
+x = a  - 5 / 6/(a*q);
+
 var z = 5;
+

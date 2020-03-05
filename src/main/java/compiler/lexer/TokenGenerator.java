@@ -16,7 +16,7 @@ public class TokenGenerator implements Lexer {
 	private final List<Token> tokenList;
 	private Reader reader;
 	private boolean errorFlag = false;
-	
+
 	public TokenGenerator(File f) {
 		if (f.exists()) {
 			tokenList = new ArrayList<Token>();
@@ -52,15 +52,16 @@ public class TokenGenerator implements Lexer {
 			return TokenType.KWTokenType.KW_AND;
 		} else if (keyword.equals("or")) {
 			return TokenType.KWTokenType.KW_OR;
-		} else if (keyword.equals("not")) {
-			return TokenType.KWTokenType.KW_NOT;
-		} else if (keyword.equals("xor")) {
-			return TokenType.KWTokenType.KW_XOR;
-		} else if (keyword.equals("return")) {
+		} /*
+			  else if (keyword.equals("not")) { return TokenType.KWTokenType.KW_NOT; }
+			 */ /*
+				  else if (keyword.equals("xor")) { return TokenType.KWTokenType.KW_XOR; }
+				 */ 
+		else if (keyword.equals("return")) {
 			return TokenType.KWTokenType.KW_RETURN;
-		} else if (keyword.equals("loop")) {
-			return TokenType.KWTokenType.KW_LOOP;
-		} else if (keyword.equals("break")) {
+		} /*
+			  else if (keyword.equals("loop")) { return TokenType.KWTokenType.KW_LOOP; }
+			 */ else if (keyword.equals("break")) {
 			return TokenType.KWTokenType.KW_BREAK;
 		} else if (keyword.equals("continue")) {
 			return TokenType.KWTokenType.KW_CONTINUE;
@@ -107,32 +108,29 @@ public class TokenGenerator implements Lexer {
 							new Position(rowCount, colCount)));
 					charac = reader.read();
 				} else if (ch == '+') {
-					/*temp += ch;
-					ch = (char) (charac = reader.read());
-					if (ch == '+') {
-						temp += ch;
-						colCount++;
-						tokenList.add(new Token(TokenType.OpTokenType.OP_INC, temp, new Position(rowCount, colCount)));
-						charac = reader.read();
-					} else {*/
-						tokenList.add(new Token(TokenType.OpTokenType.OP_PLUS, Character.toString(ch), new Position(rowCount, colCount)));
-						charac = reader.read();
-						/* } 
-					temp = ""; */
+					/*
+					 * temp += ch; ch = (char) (charac = reader.read()); if (ch == '+') { temp +=
+					 * ch; colCount++; tokenList.add(new Token(TokenType.OpTokenType.OP_INC, temp,
+					 * new Position(rowCount, colCount))); charac = reader.read(); } else {
+					 */
+					tokenList.add(new Token(TokenType.OpTokenType.OP_PLUS, Character.toString(ch),
+							new Position(rowCount, colCount)));
+					charac = reader.read();
+					/*
+					 * } temp = "";
+					 */
 				} else if (ch == '-') {
-					/*temp += ch;
-					ch = (char) (charac = reader.read());
-					if (ch == '-') {
-						temp += ch;
-						colCount++;
-						tokenList.add(new Token(TokenType.OpTokenType.OP_DEC, temp, new Position(rowCount, colCount)));
-						charac = reader.read();
-					} else {*/
-						tokenList
-								.add(new Token(TokenType.OpTokenType.OP_MINUS, Character.toString(ch), new Position(rowCount, colCount)));
-						charac = reader.read();
-						/* } 
-					temp = ""; */
+					/*
+					 * temp += ch; ch = (char) (charac = reader.read()); if (ch == '-') { temp +=
+					 * ch; colCount++; tokenList.add(new Token(TokenType.OpTokenType.OP_DEC, temp,
+					 * new Position(rowCount, colCount))); charac = reader.read(); } else {
+					 */
+					tokenList.add(new Token(TokenType.OpTokenType.OP_MINUS, Character.toString(ch),
+							new Position(rowCount, colCount)));
+					charac = reader.read();
+					/*
+					 * } temp = "";
+					 */
 				} else if (ch == '/') {
 					tokenList.add(new Token(TokenType.OpTokenType.OP_DIVIDE, Character.toString(ch),
 							new Position(rowCount, colCount)));
@@ -284,18 +282,17 @@ public class TokenGenerator implements Lexer {
 					rowCount++;
 					colCount = 0;
 					charac = reader.read();
-				} else if(ch == ' ' || ch == '\t' || ch == '\r'){
+				} else if (ch == ' ' || ch == '\t' || ch == '\r') {
 					charac = reader.read();
-				}
-				else {
+				} else {
 					errorFlag = true;
-					System.out.println("Illegal character: "+ch);
+					System.out.println("Illegal character: " + ch);
 					break;
 				}
 			}
-			if(!errorFlag)
+			if (!errorFlag)
 				return tokenList;
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
