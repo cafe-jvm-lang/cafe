@@ -241,14 +241,17 @@ public class Parser {
 		return null;
 	}
 
-	ExprNode parseFactorExp() {
+	ExprNode parseFactorExp(boolean isConditional) {
 
 		ExprNode e1 = null;
 		ExprNode e2 = null;
 
 		if (Utility.isLParen()) {
 			currT = getNextToken();
-			e1 = parseLogOrExp();
+			if(isConditional)
+				e1 = parseLogOrExp();
+			else
+				e1 = parseAddExp(isConditional);
 			if (e1 != null) {
 				if(!isNextToken)
 					currT = getNextToken();
@@ -263,7 +266,7 @@ public class Parser {
 			}
 		} else if ((e1 = parseUnaryOp()) != null) { // RECHECK GRAMMAR  {Accepts ---a,++++++b}
 			currT = getNextToken();
-			e2 = parseFactorExp();
+			e2 = parseFactorExp(isConditional);
 			return new UnaryExprNode((OperatorNode) e1, e2);
 		} else if ((e1 = parseNumLiteral()) != null) {
 			return e1;
@@ -274,19 +277,19 @@ public class Parser {
 		return null;
 	}
 
-	ExprNode parseTermExp() {
+	ExprNode parseTermExp(boolean isConditional) {
 
 		ExprNode e1;
 		ExprNode e2;
 		ExprNode e3;
 
-		if ((e1 = parseFactorExp()) != null) {
+		if ((e1 = parseFactorExp(isConditional)) != null) {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseMulDivOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseTermExp()) != null) {
+				if ((e3 = parseTermExp(isConditional)) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -299,19 +302,19 @@ public class Parser {
 		return null;
 	}
 
-	ExprNode parseAddExp() {
+	ExprNode parseAddExp(boolean isConditional) {
 
 		ExprNode e1;
 		ExprNode e2;
 		ExprNode e3;
 
-		if ((e1 = parseTermExp()) != null) {
+		if ((e1 = parseTermExp(isConditional)) != null) {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseAddSubOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseAddExp()) != null) {
+				if ((e3 = parseAddExp(isConditional)) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -330,7 +333,7 @@ public class Parser {
 		ExprNode e2;
 		ExprNode e3;
 
-		if ((e1 = parseAddExp()) != null) {
+		if ((e1 = parseAddExp(true)) != null) {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseRelOp()) != null) {
@@ -442,7 +445,7 @@ public class Parser {
 			if ((e2 = parseAsgOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseLogOrExp()) != null) {
+				if ((e3 = parseAddExp(false)) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid expr");
@@ -450,9 +453,9 @@ public class Parser {
 			} else {
 				error("'=' expected");
 			}
-		} else if ((e1 = parseLogOrExp()) != null) {
-			return e1;
-		}
+		} /*
+			  else if ((e1 = parseLogOrExp()) != null) { return e1; }
+			 */
 		return null;
 	}
 
@@ -465,7 +468,7 @@ public class Parser {
 
 		if (Utility.isReturnStmt()) {
 			currT = getNextToken();
-			if ((n1 = parseLogOrExp()) != null) {
+			if ((n1 = parseAddExp(false)) != null) {
 				if (!isNextToken)
 					currT = getNextToken();
 				if (Utility.isSemi()) {
@@ -605,7 +608,7 @@ public class Parser {
 				opAsg = parseAsgOp();
 				if (opAsg != null) {
 					currT = getNextToken();
-					e1 = parseLogOrExp();
+					e1 = parseAddExp(false);
 					if (e1 != null) {
 						if (!isNextToken)
 							currT = getNextToken();

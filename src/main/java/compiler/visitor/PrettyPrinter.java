@@ -21,7 +21,8 @@ public class PrettyPrinter implements Visitor {
 
 	private void print(String text) {
 		String format = "%" + indent + "s"+text+"%n";
-		System.out.format(format, "");
+		System.out.format(format, ""); 
+		
 	}
 
 	@Override
