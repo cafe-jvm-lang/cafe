@@ -10,6 +10,7 @@ import compiler.lexer.Token;
 import compiler.lexer.TokenGenerator;
 import compiler.parser.Parser;
 import compiler.visitor.PrettyPrinter;
+import compiler.visitor.SymbolVisitor;
 
 public class Main {
 
@@ -25,8 +26,11 @@ public class Main {
 			Parser p = new Parser(tokenL);
 			Node root = p.parse();
 
-			PrettyPrinter print = new PrettyPrinter();
-			print.visit((ProgramNode) root);
+			//PrettyPrinter print = new PrettyPrinter();
+			//print.visit((ProgramNode) root);
+			
+			SymbolVisitor sym = new SymbolVisitor();
+			sym.visit((ProgramNode) root);
 		}
 	}
 

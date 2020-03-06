@@ -3,12 +3,13 @@ package compiler.visitor;
 import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
 import compiler.ast.BinaryExprNode;
+import compiler.ast.ElseStmtNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
 import compiler.ast.IfElseStmtNode;
 import compiler.ast.IfStmtNode;
 import compiler.ast.IntegerLiteralNode;
-import compiler.ast.MethodCallNode;
+import compiler.ast.FuncCallNode;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
@@ -119,7 +120,7 @@ public class PrettyPrinter implements Visitor {
 	}
 
 	@Override
-	public void visit(MethodCallNode n) {
+	public void visit(FuncCallNode n) {
 		print("MethodCallNode:");
 
 		indent += 4;
@@ -165,6 +166,12 @@ public class PrettyPrinter implements Visitor {
 		indent -= 4;
 	}
 
+	@Override
+	public void visit(ElseStmtNode n) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	@Override
 	public void visit(IfElseStmtNode n) {
 		print("IfElseStmtNode:");

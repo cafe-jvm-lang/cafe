@@ -11,7 +11,7 @@ import compiler.ast.IdentifierNode;
 import compiler.ast.IfElseStmtNode;
 import compiler.ast.IfStmtNode;
 import compiler.ast.IntegerLiteralNode;
-import compiler.ast.MethodCallNode;
+import compiler.ast.FuncCallNode;
 import compiler.ast.Node;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
@@ -277,7 +277,7 @@ public class Parser {
 			currT = getNextToken();
 			ArgsNodeList argsL;
 			if ((argsL = parseArgs()) != null)
-				return new MethodCallNode((IdentifierNode) e1, argsL);
+				return new FuncCallNode((IdentifierNode) e1, argsL);
 			else {
 				isNextToken = true;
 				return e1;
@@ -462,7 +462,8 @@ public class Parser {
 					error("Invalid expr");
 				}
 			} else if ((argsL = parseArgs()) != null) {
-				return new MethodCallNode((IdentifierNode) e1, argsL);
+				isNextToken = false;
+				return new FuncCallNode((IdentifierNode) e1, argsL);
 			} else {
 				error("'=' expected");
 			}
@@ -514,12 +515,10 @@ public class Parser {
 				if (!isNextToken)
 					currT = getNextToken();
 				if ((block = parseBlock(scope)) != null) {
-					isNextToken = false;
 					ifStmtL.addAll(block.u);
 					ifVarL.addAll(block.t);
-
-					if (!isNextToken)
-						currT = getNextToken();
+					
+					currT = getNextToken();
 
 					if (Utility.isElseStmt()) {
 						currT = getNextToken();
@@ -624,6 +623,7 @@ public class Parser {
 					currT = getNextToken();
 			}
 
+			isNextToken = false;
 			b = new Block<>(varL, stmtL);
 			return b;
 		}

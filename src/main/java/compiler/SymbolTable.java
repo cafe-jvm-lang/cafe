@@ -1,23 +1,54 @@
 package compiler;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import compiler.ast.FuncDeclNode;
-import compiler.ast.VarDeclNode;
+import compiler.ast.IdentifierNode;
+import compiler.utils.SymbolType;
 
 public class SymbolTable {
-	private Map<VarDeclNode,FuncDeclNode> map;
+	private List<Symbol> symL;
+	private SymbolTable parent;
 	
 	public SymbolTable() {
-		map = new HashMap<>();
+		symL = new ArrayList<>();
 	}
 	
-	public void put(VarDeclNode var, FuncDeclNode func) {
-		map.put(var, func);
+	
+//	public List<Symbol> getSymbolList(){
+//		return symL;
+//	}
+//	
+	public boolean addSymbol(Symbol sym) {
+		if(!symL.stream()
+		   .anyMatch(e -> e.node.id.equals(sym.node.id) 
+				          && e.symType == sym.symType)) {
+			
+			symL.add(sym);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
-	public FuncDeclNode search(VarDeclNode var) {
-		return map.get(var);
+	public boolean hasSymbol(final IdentifierNode n, final SymbolType type) {
+ 		return symL.stream()
+				   .anyMatch(e -> e.node.id.equals(n.id) && e.symType == type);
+	}
+	
+	public Symbol getSymbol(final IdentifierNode n, final SymbolType type) {
+ 		return symL.stream()
+				   .filter(e -> e.node.id.equals(n.id) && e.symType == type)
+				   .findFirst()
+				   .orElse(null);
+	}
+	
+	public void setParent(SymbolTable parent) {
+		this.parent = parent;
+	}
+	
+	public SymbolTable getParent() {
+		return parent;
 	}
 }
