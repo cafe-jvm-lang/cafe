@@ -23,7 +23,7 @@ public class TokenGenerator implements Lexer {
 			reader = getBufferedReader(f);
 		} else {
 			tokenList = null;
-
+			System.out.println( f.getAbsolutePath());
 			System.out.println("File Doesnt Exists");
 		}
 	}

@@ -4,6 +4,7 @@ func a(a,b){
 
 	var q;
 	var y = 5;
+	
 	if(x == 5){
 		var x;
 		y = 5;
@@ -32,6 +33,8 @@ func a(a,b){
 	
 		a(a,b);
 	}
+	
+	return aaa;
 }
 
 

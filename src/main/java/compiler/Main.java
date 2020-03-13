@@ -15,10 +15,10 @@ import compiler.visitor.SymbolVisitor;
 public class Main {
 
 	public static void main(String[] args) {
-		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		String is = classloader.getResource("test1.txt").getFile();
+//		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+//		String is = classloader.getResource("test1.txt").getFile();
 
-		Lexer lex = new TokenGenerator(new File(is));
+		Lexer lex = new TokenGenerator(new File(args[0]));
 		List<Token> tokenL = lex.lex();
 		if (tokenL != null) {
 			//tokenL.forEach(e -> System.out.println(e.getTokenType() + " " + e.getTokenValue()));
