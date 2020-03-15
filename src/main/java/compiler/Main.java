@@ -9,7 +9,6 @@ import compiler.lexer.Lexer;
 import compiler.lexer.Token;
 import compiler.lexer.TokenGenerator;
 import compiler.parser.Parser;
-import compiler.visitor.PrettyPrinter;
 import compiler.visitor.SymbolVisitor;
 
 public class Main {
