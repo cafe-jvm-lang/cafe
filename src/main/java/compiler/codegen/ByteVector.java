@@ -83,6 +83,17 @@ public class ByteVector {
 		return this;
 	}
 	
+	/**
+	 * Insert into this vector:
+	 * <ul>
+	 * <li>u1</l1>
+	 * <li>u2</li>
+	 * </ul>
+	 * 
+	 * @param byteValue
+	 * @param shortValue
+	 * @return this vector
+	 */
 	ByteVector put12(final int byteValue, final int shortValue) {
 		int currLen = length;
 		if (currLen + 3 > data.length)
@@ -91,6 +102,31 @@ public class ByteVector {
 		currData[currLen++] = (byte) byteValue;
 		currData[currLen++] = (byte) (shortValue >>> 8);
 		currData[currLen++] = (byte) shortValue;
+		length = currLen;
+		return this;
+	}
+	
+	/**
+	 * Insert into this vector:
+	 * <ul>
+	 * <li>u1</l1>
+	 * <li>u2</li>
+	 * </ul>
+	 * 
+	 * @param byteValue
+	 * @param shortValue
+	 * @return this vector
+	 */
+	ByteVector put122(final int byteValue, final int shortValue1, final int shortValue2) {
+		int currLen = length;
+		if (currLen + 5 > data.length)
+			enlarge(5);
+		byte[] currData = data;
+		currData[currLen++] = (byte) byteValue;
+		currData[currLen++] = (byte) (shortValue1 >>> 8);
+		currData[currLen++] = (byte) shortValue1;
+		currData[currLen++] = (byte) (shortValue2 >>> 8);
+		currData[currLen++] = (byte) shortValue2;
 		length = currLen;
 		return this;
 	}
@@ -124,13 +160,13 @@ public class ByteVector {
 			
 			// Range taken from spec: 
 			// https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.4.7
-			if(charValue >= '\u0001' && charValue <= '\u007F') {
+			if(charValue >= '\u0001' && charValue <= '\u007F') { // a range till 1 byte only
 				// 1 char = 16 bits, but since code-points fall in above range, it consumes only 8bits.
 				// so extracting 8bits from char.
 				currData[currLen++] = (byte) charValue; 
 			}
 			else {
-				// if code-point range > above range, we need to encode the string, as given specification.
+				// if code-point range > above range, we need to encode the string, as given in specification.
 				
 				// skipping for now
 			}
@@ -140,6 +176,14 @@ public class ByteVector {
 		return this;
 	}
 	
+	/**
+	 * Copies given array into this vector.
+	 * 
+	 * @param byteArray
+	 * @param offset
+	 * @param byteArrayLength
+	 * @return this vector
+	 */
 	ByteVector putByteArray( final byte[] byteArray, final int offset, final int byteArrayLength) {
 		if(length + byteArrayLength > data.length) 
 			enlarge(byteArrayLength);
