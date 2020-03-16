@@ -83,6 +83,18 @@ public class ByteVector {
 		return this;
 	}
 	
+	ByteVector put12(final int byteValue, final int shortValue) {
+		int currLen = length;
+		if (currLen + 3 > data.length)
+			enlarge(3);
+		byte[] currData = data;
+		currData[currLen++] = (byte) byteValue;
+		currData[currLen++] = (byte) (shortValue >>> 8);
+		currData[currLen++] = (byte) shortValue;
+		length = currLen;
+		return this;
+	}
+	
 	/**
 	 * puts String into this vector. If encoded UTF-8 len exceeds 65535 (2^16), throws error. 
 	 * @param stringValue
@@ -125,6 +137,17 @@ public class ByteVector {
 		}
 		
 		length = currLen;
+		return this;
+	}
+	
+	ByteVector putByteArray( final byte[] byteArray, final int offset, final int byteArrayLength) {
+		if(length + byteArrayLength > data.length) 
+			enlarge(byteArrayLength);
+		
+		if(byteArray != null)
+			System.arraycopy(byteArray, offset, data, length, byteArrayLength);
+		
+		length += byteArrayLength;
 		return this;
 	}
 

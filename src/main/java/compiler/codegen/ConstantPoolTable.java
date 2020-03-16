@@ -30,7 +30,28 @@ public class ConstantPoolTable {
 		}
 
 		constantPool.putByte(Constant.CONSTANT_UTF8_TAG).putUTF8(value);
-		return -1;
+		return put(new Entry(constantPoolCount++, Constant.CONSTANT_UTF8_TAG, value, hashCode)).index;
+	}
+	
+	Constant addConstantUtf8Ref(final int tag, final String value) {
+		int hashCode = hash(tag,value);
+		Entry entry = get(hashCode);
+		while(entry != null) {
+			if(entry.tag == tag && entry.hashCode == hashCode && entry.value.equals(value))
+				return entry;
+			entry = entry.next;
+		}
+		
+		constantPool.put12(tag, addConstantUtf8(value));
+		return put(new Entry(constantPoolCount++, tag, value, hashCode));
+	}
+	
+	Constant addConstantClass(final String className) {
+		return addConstantUtf8Ref(Constant.CONSTANT_CLASS_TAG, className);
+	}
+	
+	void putConstantPool(final ByteVector op) {
+		op.putShort(constantPoolCount).putByteArray(constantPool.data, 0, constantPool.length);
 	}
 
 	Entry put(final Entry entry) {
@@ -40,12 +61,11 @@ public class ConstantPoolTable {
 			int currCap = entries.length;
 			int newCap = currCap * 2 + 1;
 			Entry[] newEntries = new Entry[newCap];
-			// Copy all keys to newEntry
+			// Copy all keys to newEntries
 			for (int i = currCap - 1; i >= 0; --i) { // Check here, --i or i-- ?
 				Entry currEntry = entries[i];
 				while (currEntry != null) {
 					int newCurrEntryInd = currEntry.hashCode % newCap;
-					// Doubts here
 					Entry nextEntry = currEntry.next;
 					currEntry.next = newEntries[newCurrEntryInd];
 					newEntries[newCurrEntryInd] = currEntry;
