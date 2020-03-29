@@ -3,13 +3,13 @@ package compiler.codegen;
 public class ClassWriter {
 	private ByteVector vector;
 	
-	private ConstantPoolTable constantPoolTable;
+	private SymbolTable constantPoolTable;
 	private int version;
 	private String className;
 	private int thisClass;
 	
 	public ClassWriter() {
-		constantPoolTable = new ConstantPoolTable(this);
+		constantPoolTable = new SymbolTable(this);
 	}
 	
 	public void visit(int version,
@@ -17,6 +17,10 @@ public class ClassWriter {
 		this.version = version;
 		this.className = className;
 		this.thisClass = constantPoolTable.addConstantClass(className).index;
+	}
+	
+	public void visitMethod() {
+		
 	}
 	
 	public byte[] toByteArray() {

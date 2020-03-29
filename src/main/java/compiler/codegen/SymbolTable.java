@@ -1,6 +1,6 @@
 package compiler.codegen;
 
-public class ConstantPoolTable {
+public class SymbolTable {
 	private ByteVector constantPool;
 	private int constantPoolCount = 1;
 
@@ -11,7 +11,7 @@ public class ConstantPoolTable {
 	private Entry[] entries;
 	private int entryCount = 0;
 
-	public ConstantPoolTable(ClassWriter classWriter) {
+	public SymbolTable(ClassWriter classWriter) {
 		constantPool = new ByteVector();
 		entries = new Entry[256];
 	}
@@ -50,6 +50,10 @@ public class ConstantPoolTable {
 		return addConstantUtf8Ref(Constant.CONSTANT_CLASS_TAG, className);
 	}
 	
+//	Constant addInvokeDynamic(int bootstrapAttrInd, int nameAndTypeInd) {
+//		
+//	}
+//	
 	void putConstantPool(final ByteVector op) {
 		op.putShort(constantPoolCount).putByteArray(constantPool.data, 0, constantPool.length);
 	}
