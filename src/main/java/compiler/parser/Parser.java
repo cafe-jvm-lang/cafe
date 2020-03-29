@@ -38,10 +38,10 @@ public class Parser {
 	private boolean error = false;
 	private boolean isNextToken = false;
 
-	public Parser(List<Token> tokenL) {
+	public Parser(String fileName,List<Token> tokenL) {
 		this.tokenL = tokenL;
 
-		root = new ProgramNode();
+		root = new ProgramNode(fileName);
 		// createMainFunc();
 	}
 

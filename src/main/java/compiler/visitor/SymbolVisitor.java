@@ -69,7 +69,7 @@ public class SymbolVisitor implements Visitor {
 		for (int i = 0; i < funcL.size(); i++) {
 			mapper.put(funcL.get(i), new SymbolTable());
 			if (!globalSymbolTable.addSymbol(
-					new Symbol(funcL.get(i).nm, SymbolType.FUNC, Scope.GLOBAL, null, funcL.get(i).argL.size()))) {
+					new Symbol(funcL.get(i).nm, SymbolType.FUNC, Scope.GLOBAL, null,funcL.get(i), funcL.get(i).argL.size()))) {
 				System.out.println("Method " + funcL.get(i).nm.id + "() already exists");
 			}
 		}
@@ -142,7 +142,7 @@ public class SymbolVisitor implements Visitor {
 		SymbolType symType = SymbolType.VAR;
 		Type type = Type.NULL;
 
-		Symbol sym = new Symbol(n.nm, symType, scope, type, null);
+		Symbol sym = new Symbol(n.nm, symType, scope, type,n, null);
 		if (!currSymTable.addSymbol(sym)) {
 			System.out.println("Var " + n.nm.id + " already exists");
 		}
@@ -155,7 +155,7 @@ public class SymbolVisitor implements Visitor {
 		// Expression Eval has to be added for determining types
 		Type type = Type.INT;
 
-		Symbol sym = new Symbol(n.nm.nm, symType, scope, type, null);
+		Symbol sym = new Symbol(n.nm.nm, symType, scope, type,n, null);
 		if (!currSymTable.addSymbol(sym)) {
 			System.out.println("Var " + n.nm.nm.id + " already exists");
 		}
@@ -163,7 +163,7 @@ public class SymbolVisitor implements Visitor {
 
 	@Override
 	public void visit(ArgsNode n) {
-		Symbol sym = new Symbol(n.arg, SymbolType.VAR, scope, Type.NULL, null);
+		Symbol sym = new Symbol(n.arg, SymbolType.VAR, scope, Type.NULL,n, null);
 		currSymTable.addSymbol(sym);
 	}
 

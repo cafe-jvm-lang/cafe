@@ -22,7 +22,7 @@ public class Main {
 		if (tokenL != null) {
 			//tokenL.forEach(e -> System.out.println(e.getTokenType() + " " + e.getTokenValue()));
 
-			Parser p = new Parser(tokenL);
+			Parser p = new Parser(args[0],tokenL);
 			Node root = p.parse();
 
 			//PrettyPrinter print = new PrettyPrinter();

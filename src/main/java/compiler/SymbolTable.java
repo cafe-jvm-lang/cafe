@@ -7,7 +7,7 @@ import compiler.ast.IdentifierNode;
 import compiler.utils.SymbolType;
 
 public class SymbolTable {
-	private List<Symbol> symL;
+	private static List<Symbol> symL;
 	private SymbolTable parent;
 	
 	public SymbolTable() {
@@ -32,12 +32,12 @@ public class SymbolTable {
 		}
 	}
 	
-	public boolean hasSymbol(final IdentifierNode n, final SymbolType type) {
+	public static boolean hasSymbol(final IdentifierNode n, final SymbolType type) {
  		return symL.stream()
 				   .anyMatch(e -> e.node.id.equals(n.id) && e.symType == type);
 	}
 	
-	public Symbol getSymbol(final IdentifierNode n, final SymbolType type) {
+	public static Symbol getSymbol(final IdentifierNode n, final SymbolType type) {
  		return symL.stream()
 				   .filter(e -> e.node.id.equals(n.id) && e.symType == type)
 				   .findFirst()

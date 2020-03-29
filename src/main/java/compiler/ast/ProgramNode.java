@@ -6,10 +6,12 @@ import java.util.Vector;
 import compiler.visitor.Visitor;
 
 public class ProgramNode implements Node{
+	public String fileName;
 	private FuncDeclNode mainF;
 	private final Vector<FuncDeclNode> funcDeclL;
 	
-	public ProgramNode() {
+	public ProgramNode(String fileNm) {
+		this.fileName = fileNm;
 		funcDeclL = new Vector<>();
 	}
 	
