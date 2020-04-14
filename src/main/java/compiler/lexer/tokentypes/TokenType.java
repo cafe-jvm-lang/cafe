@@ -2,43 +2,33 @@ package compiler.lexer.tokentypes;
 
 /**
  * A list of all Tokens specified in Language Specification.
- * @author Dhyey 
+ * 
+ * @author Dhyey
  */
 public interface TokenType {
-	public enum KWTokenType implements TokenType{			
-		 KW_VAR,
-		 KW_NULL,
-		 KW_FUNC, 
-		 KW_IF,
-		 KW_ELSE, 
-		 KW_AND,
-		 KW_OR, 
-		 KW_NOT, 
-		 KW_XOR, 
-		 KW_RETURN, 
-		 KW_LOOP,
-		 KW_BREAK, 
-		 KW_CONTINUE, 
-		
-		 TK_IDENTIFIER,
-		 TK_NUMLITERAL; 
+	public enum KWTokenType implements TokenType {
+		KW_VAR, KW_NULL, KW_FUNC, KW_IF, KW_ELSE, KW_AND, KW_OR, KW_NOT, KW_XOR, KW_RETURN, KW_LOOP, KW_BREAK,
+		KW_CONTINUE,
+
+		TK_IDENTIFIER, TK_NUMLITERAL;
 	}
-	
+
 	public enum OpTokenType implements TokenType{
+		 
 		/** "+" */
-		OP_PLUS,
+		OP_PLUS("#add"),
 		
 		/** "-" */
-		 OP_MINUS,
+		 OP_MINUS("#sub"),
 		
 		/** "/" */
-		 OP_DIVIDE,
+		 OP_DIVIDE("#div"),
 		
 		/** "*" */
-		 OP_MULTIPLY ,
+		 OP_MULTIPLY("#mul") ,
 		 
 		 /** "=" */
-		 OP_ASG ,
+		 OP_ASG("="),
 		
 //		/** "+=" */
 //		 OP_PLUS_ASG ,
@@ -53,97 +43,107 @@ public interface TokenType {
 //		 OP_MUL_ASG ,
 		
 		/** "++" */
-		 OP_INC ,
+		 OP_INC("++"),
 		
 		/** "--" */
-		 OP_DEC ,
+		 OP_DEC("--"),
 		
 		
 		/** 
 		 * "&&"
 		 * @category Logical Operators 
 		 */
-		 OP_LOGAND ,
+		 OP_LOGAND("&&") ,
 		
 		/** 
 		 * "||"
 		 * @category Logical Operators 
 		 */
-		 OP_LOGOR ,
+		 OP_LOGOR("||"),
 		
 		/** 
 		 * "!"
 		 * @category Logical Operators 
 		 */
-		 OP_LOGNOT ,
+		 OP_LOGNOT("!"),
 		
 		/** 
 		 * "&"
 		 * @category Bitwise Operators 
 		 */
-		 OP_BITAND ,
+		 OP_BITAND("&"),
 		
 		/** 
 		 * "|"
 		 * @category Bitwise Operators 
 		 */
-		 OP_BITOR ,
+		 OP_BITOR("OR"),
 		
 		/** 
 		 * "^"
 		 * @category Bitwise Operators 
 		 */
-		 OP_BITXOR,
+		 OP_BITXOR("^"),
 		
 		/** 
 		 * "~"
 		 * @category Bitwise Operators 
 		 */
-		 OP_BITCOMPLIMENT,
+		 OP_BITCOMPLIMENT("~"),
 		
 		/** 
 		 * "<<"
 		 * @category Bitwise Operators 
 		 */
-		 OP_BITLEFTSHIFT,
+		 OP_BITLEFTSHIFT("<<"),
 		
 		/** 
 		 * ">>"
 		 * @category Bitwise Operators 
 		 */
-		 OP_BITRIGHTSHIFT,
+		 OP_BITRIGHTSHIFT(">>"),
 		
 		/** 
 		 * "<"
 		 * @category Relational Operators 
 		 */
-		 OP_RELLT,
-		 OP_RELGT,
-		 OP_RELLE,
-		 OP_RELGE,
-		 OP_RELEE,
-		 OP_RELNE
+		 OP_RELLT("<"),
+		 OP_RELGT(">"),
+		 OP_RELLE("<="),
+		 OP_RELGE(">="),
+		 OP_RELEE("=="),
+		 OP_RELNE("!=");
+		 
+		private String op;
+		OpTokenType(String string) {
+			op = string;
+		}
+		
+		public String getOp() {
+			return op;
+		}
 	}
-	
-	public enum SepTokenType implements TokenType{
+
+	public enum SepTokenType implements TokenType {
 		/**
 		 * "{"
+		 * 
 		 * @category Seperators
 		 */
 		SEP_LBRACE,
-		
+
 		/** "}" */
 		SEP_RBRACE,
-		
+
 		/** "(" */
 		SEP_LPAREN,
-		
+
 		/** ")" */
 		SEP_RPAREN,
-		
+
 		/** ";" */
 		SEP_SEMI,
-		
+
 		/** "," */
 		SEP_COMMA
 	}

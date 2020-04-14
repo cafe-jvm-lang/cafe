@@ -13,6 +13,7 @@ import compiler.ast.IfStmtNode;
 import compiler.ast.IntegerLiteralNode;
 import compiler.ast.FuncCallNode;
 import compiler.ast.Node;
+import compiler.ast.NodeWithArgsType;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
@@ -84,31 +85,41 @@ public class Parser {
 		return null;
 	}
 
-	ArgsNodeList parseArgs() {
+	ArgsNodeList parseArgs(boolean isDecl) {
 
 		if (error)
 			return null;
 
 		Node arg;
 		ArgsNodeList argL = new ArgsNodeList();
-
 		if (Utility.isLParen()) {
 			currT = getNextToken();
 
 			if ((arg = parseIdentifier()) != null) {
-				argL.addElement(new ArgsNode((IdentifierNode) arg));
+				argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg));
 				currT = getNextToken();
+			}
+			else if((arg = parseNumLiteral()) != null && !isDecl) {
+				argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
+				currT = getNextToken();
+			}
+			else {
+				error = true;
+				error("Args Error");
 			}
 
 			while (!Utility.isRParen()) {
 				if (Utility.isComma()) {
 					currT = getNextToken();
-					arg = parseIdentifier();
+					arg = ((arg=parseNumLiteral()) != null && !isDecl) ? arg :parseIdentifier() ;
 					if (arg != null) {
-						argL.addElement(new ArgsNode((IdentifierNode) arg));
+						if(arg instanceof IdentifierNode)
+							argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg));
+						else
+							argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
 					} else {
 						if (!error)
-							error("expected IDEN");
+							error("Parser:expected IDEN || Int");
 						return null;
 					}
 				} else {
@@ -276,7 +287,7 @@ public class Parser {
 		} else if ((e1 = parseIdentifier()) != null) {
 			currT = getNextToken();
 			ArgsNodeList argsL;
-			if ((argsL = parseArgs()) != null)
+			if ((argsL = parseArgs(false)) != null)
 				return new FuncCallNode((IdentifierNode) e1, argsL);
 			else {
 				isNextToken = true;
@@ -461,7 +472,7 @@ public class Parser {
 				} else {
 					error("Invalid expr");
 				}
-			} else if ((argsL = parseArgs()) != null) {
+			} else if ((argsL = parseArgs(false)) != null) {
 				isNextToken = false;
 				return new FuncCallNode((IdentifierNode) e1, argsL);
 			} else {
@@ -688,7 +699,7 @@ public class Parser {
 	/**
 	 * <pre>
 	 * GOAL ::= FUNCDECL
-	 * FUNCDECL ::= "func" IDEN "(" ARGS ")" "{" BLOCK "}"
+	 * FUNCDECL ::= "func" IDEN "(" PARAMS ")" "{" BLOCK "}"
 	 * </pre>
 	 * 
 	 * @return Node
@@ -712,7 +723,7 @@ public class Parser {
 		idM = parseIdentifier();
 		if (idM != null) {
 			currT = getNextToken();
-			if ((argsM = parseArgs()) != null) {
+			if ((argsM = parseArgs(true)) != null) {
 				currT = getNextToken();
 				if ((block = parseBlock(Scope.LOCAL)) != null) {
 					varM.addAll(block.t);

@@ -1,8 +1,9 @@
 package compiler.ast;
 
+import java.util.Iterator;
 import java.util.Vector;
 
-public class VarDeclNodeList {
+public class VarDeclNodeList implements Iterable<NodeWithVarDecl>{
 	private Vector<NodeWithVarDecl> list;
 
 	public VarDeclNodeList() {
@@ -25,5 +26,24 @@ public class VarDeclNodeList {
 	
 	public int size() {
 		return list.size();
+	}
+
+	@Override
+	public Iterator<NodeWithVarDecl> iterator() {
+		return new Iterator<NodeWithVarDecl>() {
+			int i = 0;
+			@Override
+			public boolean hasNext() {
+				if(i < size()) 
+					return true;
+				return false;
+			}
+
+			@Override
+			public NodeWithVarDecl next() {
+				return elementAt(i++);
+			}
+			
+		};
 	}
 }

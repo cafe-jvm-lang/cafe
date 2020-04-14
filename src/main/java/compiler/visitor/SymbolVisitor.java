@@ -68,8 +68,8 @@ public class SymbolVisitor implements Visitor {
 
 		for (int i = 0; i < funcL.size(); i++) {
 			mapper.put(funcL.get(i), new SymbolTable());
-			if (!globalSymbolTable.addSymbol(
-					new Symbol(funcL.get(i).nm, SymbolType.FUNC, Scope.GLOBAL, null,funcL.get(i), funcL.get(i).argL.size()))) {
+			if (!globalSymbolTable.addSymbol(new Symbol(funcL.get(i).nm, SymbolType.FUNC, Scope.GLOBAL, null,
+					funcL.get(i), funcL.get(i).argL.size()))) {
 				System.out.println("Method " + funcL.get(i).nm.id + "() already exists");
 			}
 		}
@@ -142,7 +142,7 @@ public class SymbolVisitor implements Visitor {
 		SymbolType symType = SymbolType.VAR;
 		Type type = Type.NULL;
 
-		Symbol sym = new Symbol(n.nm, symType, scope, type,n, null);
+		Symbol sym = new Symbol(n.nm, symType, scope, type, n, null);
 		if (!currSymTable.addSymbol(sym)) {
 			System.out.println("Var " + n.nm.id + " already exists");
 		}
@@ -155,16 +155,19 @@ public class SymbolVisitor implements Visitor {
 		// Expression Eval has to be added for determining types
 		Type type = Type.INT;
 
-		Symbol sym = new Symbol(n.nm.nm, symType, scope, type,n, null);
+		Symbol sym = new Symbol(n.nm.nm, symType, scope, type, n, null);
 		if (!currSymTable.addSymbol(sym)) {
 			System.out.println("Var " + n.nm.nm.id + " already exists");
 		}
 	}
 
 	@Override
-	public void visit(ArgsNode n) {
-		Symbol sym = new Symbol(n.arg, SymbolType.VAR, scope, Type.NULL,n, null);
-		currSymTable.addSymbol(sym);
+	public <T> void visit(ArgsNode<T> n) {
+		if (n.arg instanceof IdentifierNode) {
+			Symbol sym = new Symbol((IdentifierNode) n.arg, SymbolType.VAR, scope, Type.NULL, n, null);
+			currSymTable.addSymbol(sym);
+		}
+
 	}
 
 	@Override
@@ -203,8 +206,11 @@ public class SymbolVisitor implements Visitor {
 		if ((sym = globalSymbolTable.getSymbol(n.iden, SymbolType.FUNC)) != null) {
 			if (n.argsL.size() == sym.args) {
 				for (int i = 0; i < n.argsL.size(); i++) {
-					if (!checkSymbol(currSymTable, n.argsL.elementAt(i).arg, SymbolType.VAR)) {
-						System.out.println("Unknown Arg Var: " + n.argsL.elementAt(i).arg.id);
+					ArgsNode<?> arg = n.argsL.elementAt(i);
+					if (arg.arg instanceof IdentifierNode) {
+						if (!checkSymbol(currSymTable, (IdentifierNode) arg.arg, SymbolType.VAR)) {
+							System.out.println("Unknown Arg Var: " + arg.arg);
+						}
 					}
 				}
 			} else {

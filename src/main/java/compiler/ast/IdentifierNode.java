@@ -1,8 +1,9 @@
 package compiler.ast;
 
+import compiler.visitor.GenericVisitor;
 import compiler.visitor.Visitor;
 
-public class IdentifierNode implements ExprNode {
+public class IdentifierNode implements ExprNode, NodeWithArgsType, NodeWithTerminalExpr{
 
 	public String id;
 
@@ -14,5 +15,11 @@ public class IdentifierNode implements ExprNode {
 	public void accept(Visitor v) {
 		v.visit(this);
 
+	}
+
+	@Override
+	public <R> R accept(GenericVisitor v) {
+		// TODO Auto-generated method stub
+		return v.visit(this);
 	}
 }

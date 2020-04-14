@@ -1,7 +1,9 @@
 package compiler.ast;
 
+import compiler.visitor.GenericVisitor;
 import compiler.visitor.Visitor;
 
 public interface Node {
-	public void accept(Visitor v);
+	void accept(Visitor v);
+	<R> R accept(GenericVisitor v);
 }

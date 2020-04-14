@@ -25,7 +25,7 @@ public interface Visitor {
 	
 	void visit(VarDeclWithAsgnNode n);
 	
-	void visit(ArgsNode n);
+	<T> void visit(ArgsNode<T> n);
 	
 	void visit(ReturnStmtNode n);
 	

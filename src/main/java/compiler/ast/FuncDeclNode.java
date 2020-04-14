@@ -1,5 +1,6 @@
 package compiler.ast;
 
+import compiler.visitor.GenericVisitor;
 import compiler.visitor.Visitor;
 
 public class FuncDeclNode implements StmtNode{
@@ -18,5 +19,11 @@ public class FuncDeclNode implements StmtNode{
 	@Override
 	public void accept(Visitor v) {
 		v.visit(this);
+	}
+
+	@Override
+	public <R> R accept(GenericVisitor v) {
+		// TODO Auto-generated method stub
+		return v.visit(this);
 	}
 }

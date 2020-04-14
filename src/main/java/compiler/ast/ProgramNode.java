@@ -3,6 +3,7 @@ package compiler.ast;
 import java.util.List;
 import java.util.Vector;
 
+import compiler.visitor.GenericVisitor;
 import compiler.visitor.Visitor;
 
 public class ProgramNode implements Node{
@@ -34,5 +35,11 @@ public class ProgramNode implements Node{
 	
 	public void addFuncDeclNode(FuncDeclNode node) {
 		funcDeclL.add(node);
+	}
+
+	@Override
+	public <R> R accept(GenericVisitor v) {
+		// TODO Auto-generated method stub
+		return v.visit(this);
 	}
 }

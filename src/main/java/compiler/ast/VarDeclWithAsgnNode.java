@@ -1,5 +1,6 @@
 package compiler.ast;
 
+import compiler.visitor.GenericVisitor;
 import compiler.visitor.Visitor;
 
 public class VarDeclWithAsgnNode implements StmtNode,NodeWithVarDecl{
@@ -15,5 +16,11 @@ public class VarDeclWithAsgnNode implements StmtNode,NodeWithVarDecl{
 	@Override
 	public void accept(Visitor v) {
 		v.visit(this);
+	}
+
+	@Override
+	public <R> R accept(GenericVisitor v) {
+		// TODO Auto-generated method stub
+		return v.visit(this);
 	}
 }

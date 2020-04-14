@@ -80,8 +80,8 @@ public class PrettyPrinter implements Visitor {
 	}
 
 	@Override
-	public void visit(ArgsNode n) {
-		print("ArgsNode: " + n.arg.id);
+	public <T> void visit(ArgsNode<T> n) {
+		print("ArgsNode: " + n.arg);
 	}
 
 	@Override

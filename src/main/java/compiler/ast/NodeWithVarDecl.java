@@ -1,5 +1,7 @@
 package compiler.ast;
 
-public interface NodeWithVarDecl {
+import compiler.visitor.Visitor;
 
+public interface NodeWithVarDecl extends Node{
+	void accept(Visitor v);
 }

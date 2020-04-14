@@ -9,6 +9,8 @@ import compiler.lexer.Lexer;
 import compiler.lexer.Token;
 import compiler.lexer.TokenGenerator;
 import compiler.parser.Parser;
+import compiler.visitor.CodegenVisitor;
+import compiler.visitor.PrettyPrinter;
 import compiler.visitor.SymbolVisitor;
 
 public class Main {
@@ -22,14 +24,17 @@ public class Main {
 		if (tokenL != null) {
 			//tokenL.forEach(e -> System.out.println(e.getTokenType() + " " + e.getTokenValue()));
 
-			Parser p = new Parser(args[0],tokenL);
+			Parser p = new Parser(args[0].split("\\.")[0],tokenL);
 			Node root = p.parse();
 
-			//PrettyPrinter print = new PrettyPrinter();
-			//print.visit((ProgramNode) root);
+			PrettyPrinter print = new PrettyPrinter();
+			print.visit((ProgramNode) root);
 			
 			SymbolVisitor sym = new SymbolVisitor();
 			sym.visit((ProgramNode) root);
+			
+			CodegenVisitor codegen = new CodegenVisitor();
+			codegen.visit((ProgramNode) root);
 		}
 	}
 
