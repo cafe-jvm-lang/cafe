@@ -73,6 +73,7 @@ public class CodegenVisitor implements GenericVisitor {
 		currStack = currExpr.getExprStack();
 		n.val.accept(this);
 		currExpr.genExprFunc();
+		currFunc.visitVarAsgn(nm, currExpr);
 		return null;
 	}
 
@@ -104,12 +105,15 @@ public class CodegenVisitor implements GenericVisitor {
 			currStack.push(n.op.type.getOp());
 			currStack.push(n.expr1.accept(this));
 			currStack.push(n.expr2.accept(this));
+
 		} else if (isExpr1Term) {
 			currStack.push(n.op.type.getOp());
-			currStack.push(n.expr2.accept(this));
+			currStack.push(n.expr1.accept(this));
+			n.expr2.accept(this);
 		} else if (isExpr2Term) {
 			currStack.push(n.op.type.getOp());
-			currStack.push(n.expr1.accept(this));
+			n.expr1.accept(this);
+			currStack.push(n.expr2.accept(this));
 		} else {
 			currStack.push(n.op.type.getOp());
 			n.expr1.accept(this);

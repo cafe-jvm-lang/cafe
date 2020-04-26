@@ -1,24 +1,25 @@
 package compiler.codegen.assembly;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 
-public class SimpleFunc implements Func{
+public class SimpleFunc implements Func {
 
 	private final ClassWriter cw;
 	protected final MethodVisitor mv;
-	
+
 	protected SimpleFunc(final ClassWriter cw, final String name, final String descriptor) {
-		this(cw,name, descriptor,ACC_PUBLIC);
+		this(cw, name, descriptor, ACC_PUBLIC);
 	}
-	
+
 	protected SimpleFunc(final ClassWriter cw, final String name, final String descriptor, int modifiers) {
 		this.cw = cw;
 		mv = cw.visitMethod(modifiers, name, descriptor, null, null);
 	}
-	
+
 	@Override
 	public Func visitCode() {
 		mv.visitCode();
@@ -32,7 +33,7 @@ public class SimpleFunc implements Func{
 	}
 
 	@Override
-	public Func visitFuncInvk() {
+	public Func visitFuncInvk(String name, String descriptor, Handle handle, Object... args) {
 		// TODO Auto-generated method stub
 		return null;
 	}

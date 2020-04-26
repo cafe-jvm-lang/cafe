@@ -1,6 +1,6 @@
 package compiler.codegen.assembly;
 
-import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
+import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.ARETURN;
 import static org.objectweb.asm.Opcodes.H_INVOKESTATIC;
@@ -16,10 +16,12 @@ public class ExprFunc extends SimpleFunc{
 	
 	private final MethodVisitor mv;
 	private Stack stack;
-	private final String descriptor = "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;";
-
-	 private static final Handle OPERATOR_HANDLE = makeHandle(
-		      "OperatorSupport", "I");
+	final String operatorDescriptor = "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;";
+	String exprFuncDescriptor = "()Ljava/lang/Object;";
+	String name;
+	
+	static final Handle OPERATOR_HANDLE = makeHandle(
+		      "OperatorInvocation", "I");
 	
 	public class Stack{
 		int top=-1;
@@ -46,26 +48,45 @@ public class ExprFunc extends SimpleFunc{
 	
 	ExprFunc(ClassWriter cw, String name) {
 		super(cw, name, "()Ljava/lang/Object;",ACC_PRIVATE | ACC_STATIC );
+		this.name = name;
 		this.mv = super.mv;
 		stack = new Stack();
 		mv.visitCode();
 	}
 	
 	public void genExprFunc() {
-		stack.pop();
 		Object ob = stack.pop();
 		String opFuncName;
+		int i=-1,load=0;
 		while(ob!= null ) {
-			if(ob.toString().charAt(0) != '#')
-				loadObject(ob);
-			else {
-				//System.out.println(Arrays.asList( ob.toString().split("#")[1]));
-				opFuncName = ob.toString().split("#")[1];
-				visitFuncInvk(opFuncName, descriptor);
+			List<Object> tmp1 = new ArrayList<Object>();
+			while(ob.toString().charAt(0)!= '#') {
+				tmp1.add(ob);
+				load++;
+				ob = stack.pop();
 			}
+			
+			for(int itr= tmp1.size()-1; itr>= 0 ;itr--) {
+				loadObject(tmp1.get(itr));
+			}
+//			if(ob.toString().charAt(0) != '#') {
+//				loadObject(ob);
+//				load++;
+//			}
+//			else {
+				int j = i;
+				while(load < 2 && j >-1) {
+					mv.visitVarInsn(ALOAD, j--);
+					load++;
+				}
+				opFuncName = ob.toString().split("#")[1];
+				visitFuncInvk(opFuncName, operatorDescriptor);
+				mv.visitVarInsn(ASTORE, ++i);
+				load = 0;
+			//}
 			ob = stack.pop();
 		}
-	
+		mv.visitVarInsn(ALOAD, i);
 		mv.visitInsn(ARETURN);
 		mv.visitMaxs(0,0);
 		mv.visitEnd();
@@ -90,7 +111,7 @@ public class ExprFunc extends SimpleFunc{
 		return this;
 	}
 	
-	private static Handle makeHandle(String className, String description) {
+	static Handle makeHandle(String className, String description) {
 	    return new Handle(H_INVOKESTATIC,
 	      "compiler/codegen/runtime/" + className,
 	      "bootstrap",

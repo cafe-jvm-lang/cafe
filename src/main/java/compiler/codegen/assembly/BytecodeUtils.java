@@ -18,14 +18,17 @@ final class BytecodeUtils {
 			return;
 		}
 		if( value instanceof Integer) {
-			int i = (Integer) value;
+			Integer i = Integer.valueOf((Integer)value) ;
 			
 			if(i>-1 && i<6) {
 				mv.visitInsn(ICONST[i]);
-				
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+	//			mv.visitVarInsn(ASTORE, astore);
 			}
 			else {
 				mv.visitIntInsn(BIPUSH, i);
+				mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
+	//			mv.visitVarInsn(ASTORE, astore);
 			}
 			return;
 		}

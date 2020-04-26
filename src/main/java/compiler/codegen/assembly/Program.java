@@ -15,7 +15,7 @@ import org.objectweb.asm.FieldVisitor;
 
 public class Program{
 	private final ClassWriter cw;
-	private final String className;
+	public final String className;
 
 	private final Map<String, FieldVisitor> fields;
 	private final Map<String, SimpleFunc> functions;
@@ -32,7 +32,7 @@ public class Program{
 		fields = new HashMap<>();
 		functions = new HashMap<>();
 		constructor = new Constructor(cw);
-		mainFunc = new MainFunc(cw);
+		mainFunc = new MainFunc(cw,className);
 	}
 	
 	public Func visitConstructor() {
