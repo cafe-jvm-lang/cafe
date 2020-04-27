@@ -93,6 +93,30 @@ public class ExprFunc extends SimpleFunc{
 		
 	}
 	
+	public void genExprFunc1() {
+		Object ob = stack.pop();
+		String opFuncName;
+		
+		
+		while(ob != null) {
+			while(ob!=null && ob.toString().charAt(0)!= '#' ) {
+				loadObject(ob);
+				ob = stack.pop();
+			}
+			
+			while(ob!=null && ob.toString().charAt(0)== '#' ) {
+				opFuncName = ob.toString().split("#")[1];
+				visitFuncInvk(opFuncName, operatorDescriptor);
+				ob = stack.pop();
+			}
+		}
+		
+		mv.visitInsn(ARETURN);
+		mv.visitMaxs(0,0);
+		mv.visitEnd();
+	}
+	
+	
 	private void visitFuncInvk(String name,String descriptor) {
 		mv.visitInvokeDynamicInsn(name, descriptor, OPERATOR_HANDLE,(Integer) 2);
 	}

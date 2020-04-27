@@ -6,14 +6,13 @@ import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
 import compiler.ast.BinaryExprNode;
 import compiler.ast.ExprNode;
+import compiler.ast.FuncCallNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
 import compiler.ast.IfElseStmtNode;
 import compiler.ast.IfStmtNode;
 import compiler.ast.IntegerLiteralNode;
-import compiler.ast.FuncCallNode;
 import compiler.ast.Node;
-import compiler.ast.NodeWithArgsType;
 import compiler.ast.OperatorNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
@@ -39,7 +38,7 @@ public class Parser {
 	private boolean error = false;
 	private boolean isNextToken = false;
 
-	public Parser(String fileName,List<Token> tokenL) {
+	public Parser(String fileName, List<Token> tokenL) {
 		this.tokenL = tokenL;
 
 		root = new ProgramNode(fileName);
@@ -98,12 +97,10 @@ public class Parser {
 			if ((arg = parseIdentifier()) != null) {
 				argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg));
 				currT = getNextToken();
-			}
-			else if((arg = parseNumLiteral()) != null && !isDecl) {
+			} else if ((arg = parseNumLiteral()) != null && !isDecl) {
 				argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
 				currT = getNextToken();
-			}
-			else {
+			} else {
 				error = true;
 				error("Args Error");
 			}
@@ -111,9 +108,9 @@ public class Parser {
 			while (!Utility.isRParen()) {
 				if (Utility.isComma()) {
 					currT = getNextToken();
-					arg = ((arg=parseNumLiteral()) != null && !isDecl) ? arg :parseIdentifier() ;
+					arg = ((arg = parseNumLiteral()) != null && !isDecl) ? arg : parseIdentifier();
 					if (arg != null) {
-						if(arg instanceof IdentifierNode)
+						if (arg instanceof IdentifierNode)
 							argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg));
 						else
 							argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
@@ -202,16 +199,21 @@ public class Parser {
 		return null;
 	}
 
-	ExprNode parseMulDivOp() {
+	ExprNode parseMulOp() {
 		if (error)
 			return null;
 
 		if (Utility.isOpMultiply()) {
 			return new OperatorNode(TokenType.OpTokenType.OP_MULTIPLY);
-		} else if (Utility.isOpDivide()) {
-			return new OperatorNode(TokenType.OpTokenType.OP_DIVIDE);
 		}
 
+		return null;
+	}
+
+	ExprNode parseDivOp() {
+		if (Utility.isOpDivide()) {
+			return new OperatorNode(TokenType.OpTokenType.OP_DIVIDE);
+		}
 		return null;
 	}
 
@@ -298,7 +300,7 @@ public class Parser {
 		return null;
 	}
 
-	ExprNode parseTermExp(boolean isConditional) {
+	ExprNode parseTerm2Exp(boolean isConditional) {
 
 		ExprNode e1;
 		ExprNode e2;
@@ -307,10 +309,35 @@ public class Parser {
 		if ((e1 = parseFactorExp(isConditional)) != null) {
 			if (!isNextToken)
 				currT = getNextToken();
-			if ((e2 = parseMulDivOp()) != null) {
+			if ((e2 = parseDivOp()) != null) {
 				isNextToken = false;
 				currT = getNextToken();
-				if ((e3 = parseTermExp(isConditional)) != null) {
+				if ((e3 = parseTerm2Exp(isConditional)) != null) {
+					return new BinaryExprNode(e3, (OperatorNode) e2, e1);
+				} else {
+					error("Invalid Expr");
+				}
+			} else {
+				isNextToken = true;
+				return e1;
+			}
+		}
+		return null;
+	}
+
+	ExprNode parseTerm1Exp(boolean isConditional) {
+
+		ExprNode e1;
+		ExprNode e2;
+		ExprNode e3;
+
+		if ((e1 = parseTerm2Exp(isConditional)) != null) {
+			if (!isNextToken)
+				currT = getNextToken();
+			if ((e2 = parseMulOp()) != null) {
+				isNextToken = false;
+				currT = getNextToken();
+				if ((e3 = parseTerm1Exp(isConditional)) != null) {
 					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
@@ -329,17 +356,23 @@ public class Parser {
 		ExprNode e2;
 		ExprNode e3;
 
-		if ((e1 = parseTermExp(isConditional)) != null) {
+		if ((e1 = parseTerm1Exp(isConditional)) != null) {
 			if (!isNextToken)
 				currT = getNextToken();
 			if ((e2 = parseAddSubOp()) != null) {
-				isNextToken = false;
-				currT = getNextToken();
-				if ((e3 = parseAddExp(isConditional)) != null) {
-					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
-				} else {
-					error("Invalid Expr");
+				while (e2 != null) {
+					isNextToken = false;
+					currT = getNextToken();
+
+					if ((e3 = parseTerm1Exp(isConditional)) != null) {
+						e1 = new BinaryExprNode(e3, (OperatorNode) e2, e1);		
+					}
+					else {
+						error("Invalid Expr");
+					}
+					e2 = parseAddSubOp();
 				}
+				return e1;
 			} else {
 				isNextToken = true;
 				return e1;
@@ -528,7 +561,7 @@ public class Parser {
 				if ((block = parseBlock(scope)) != null) {
 					ifStmtL.addAll(block.u);
 					ifVarL.addAll(block.t);
-					
+
 					currT = getNextToken();
 
 					if (Utility.isElseStmt()) {
@@ -773,8 +806,8 @@ public class Parser {
 
 		while (currT != null) {
 			/*
-			  if ((n1 = parseFuncDecl()) != null) { root.addFuncDeclNode((FuncDeclNode)
-			  n1); stmtM.addElement((StmtNode) n1); currT = getNextToken(); } else
+			 * if ((n1 = parseFuncDecl()) != null) { root.addFuncDeclNode((FuncDeclNode)
+			 * n1); stmtM.addElement((StmtNode) n1); currT = getNextToken(); } else
 			 */
 			if ((n1 = parseStmt(Scope.GLOBAL)) != null) {
 				if (n1 instanceof VarDeclNode)

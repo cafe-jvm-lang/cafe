@@ -72,7 +72,7 @@ public class CodegenVisitor implements GenericVisitor {
 		currExpr = currFunc.visitExpr("calc"+nm);
 		currStack = currExpr.getExprStack();
 		n.val.accept(this);
-		currExpr.genExprFunc();
+		currExpr.genExprFunc1();
 		currFunc.visitVarAsgn(nm, currExpr);
 		return null;
 	}
@@ -103,9 +103,14 @@ public class CodegenVisitor implements GenericVisitor {
 
 		if (isExpr1Term && isExpr2Term) {
 			currStack.push(n.op.type.getOp());
-			currStack.push(n.expr1.accept(this));
-			currStack.push(n.expr2.accept(this));
-
+			//if(n.op.type.getOp().equals("#div") ) {
+				currStack.push(n.expr1.accept(this));
+				currStack.push(n.expr2.accept(this));
+//			}
+//			else {	// for #add & #sub
+//				currStack.push(n.expr1.accept(this));
+//				currStack.push(n.expr2.accept(this));	
+//			}
 		} else if (isExpr1Term) {
 			currStack.push(n.op.type.getOp());
 			currStack.push(n.expr1.accept(this));
@@ -125,7 +130,19 @@ public class CodegenVisitor implements GenericVisitor {
 
 	@Override
 	public <R> R visit(UnaryExprNode n) {
-		// TODO Auto-generated method stub
+		boolean isExpr1Term = n.expr instanceof NodeWithTerminalExpr;
+		
+		if(isExpr1Term) {
+			currStack.push("#mul");
+			currStack.push(-1);
+			currStack.push(n.expr.accept(this));
+		}
+		else {
+			currStack.push("#mul");
+			currStack.push(-1);
+			currStack.push(n.expr.accept(this));
+		}
+		
 		return null;
 	}
 

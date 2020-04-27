@@ -1,6 +1,10 @@
+unnamed package
 compiler
 compiler.ast
 compiler.codegen
+compiler.codegen.assembly
+compiler.codegen.runtime
+compiler.error
 compiler.lexer
 compiler.lexer.tokentypes
 compiler.parser
