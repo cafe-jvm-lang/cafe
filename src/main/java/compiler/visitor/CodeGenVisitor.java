@@ -132,15 +132,14 @@ public class CodegenVisitor implements GenericVisitor {
 	public <R> R visit(UnaryExprNode n) {
 		boolean isExpr1Term = n.expr instanceof NodeWithTerminalExpr;
 		
+		currStack.push("#mul");
+		currStack.push(-1);
+		
 		if(isExpr1Term) {
-			currStack.push("#mul");
-			currStack.push(-1);
 			currStack.push(n.expr.accept(this));
 		}
 		else {
-			currStack.push("#mul");
-			currStack.push(-1);
-			currStack.push(n.expr.accept(this));
+			n.expr.accept(this);
 		}
 		
 		return null;
