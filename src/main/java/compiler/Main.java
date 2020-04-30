@@ -14,11 +14,13 @@ import compiler.visitor.PrettyPrinter;
 import compiler.visitor.SymbolVisitor;
 
 public class Main {
-
+	
 	public static void main(String[] args) {
 //		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 //		String is = classloader.getResource("test1.txt").getFile();
 
+		SymbolTableMapper symbolTableMapper = new SymbolTableMapper();
+		
 		Lexer lex = new TokenGenerator(new File(args[0]));
 		List<Token> tokenL = lex.lex();
 		if (tokenL != null) {
@@ -30,7 +32,7 @@ public class Main {
 			PrettyPrinter print = new PrettyPrinter();
 			print.visit((ProgramNode) root);
 			
-			SymbolVisitor sym = new SymbolVisitor();
+			SymbolVisitor sym = new SymbolVisitor(symbolTableMapper);
 			sym.visit((ProgramNode) root);
 			
 			CodegenVisitor codegen = new CodegenVisitor();

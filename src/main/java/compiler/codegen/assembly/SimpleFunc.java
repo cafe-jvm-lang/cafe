@@ -6,6 +6,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 
+import compiler.utils.HandleType;
+
 public class SimpleFunc implements Func {
 
 	private final ClassWriter cw;
@@ -27,18 +29,6 @@ public class SimpleFunc implements Func {
 	}
 
 	@Override
-	public Func visitVarAsgn(String var, Object value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Func visitFuncInvk(String name, String descriptor, Handle handle, Object... args) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Func visitEnd() {
 		// TODO Auto-generated method stub
 		return null;
@@ -47,5 +37,35 @@ public class SimpleFunc implements Func {
 	@Override
 	public ExprFunc visitExpr(String funcName) {
 		return new ExprFunc(cw, funcName);
+	}
+
+	@Override
+	public Func visitVarAsgn(String var) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Func visitVarAsgnEnd() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Func visitFuncInvk(String name, int args, HandleType handleType, Object... extraArgs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Func loadLiteral(Object num) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Func loadIdentifier(String idName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

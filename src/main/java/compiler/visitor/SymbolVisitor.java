@@ -6,6 +6,7 @@ import java.util.Map;
 
 import compiler.Symbol;
 import compiler.SymbolTable;
+import compiler.SymbolTableMapper;
 import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
 import compiler.ast.BinaryExprNode;
@@ -38,11 +39,10 @@ public class SymbolVisitor implements Visitor {
 
 	private Map<Node, SymbolTable> mapper;
 
-	public SymbolVisitor() {
-		globalSymbolTable = new SymbolTable();
-		globalSymbolTable.setParent(null);
-
+	public SymbolVisitor(SymbolTableMapper symbolTableMapper) {
 		mapper = new HashMap<>();
+		globalSymbolTable = SymbolTableMapper.globalSymbolTable;
+
 	}
 
 	void genSymbolTableMapping() {
@@ -51,8 +51,9 @@ public class SymbolVisitor implements Visitor {
 
 	boolean checkSymbol(SymbolTable symTable, IdentifierNode n, SymbolType type) {
 		if (symTable != null) {
-			if (symTable.hasSymbol(n, type))
+			if (symTable.hasSymbol(n, type)) {
 				return true;
+			}
 			else
 				return checkSymbol(symTable.getParent(), n, type);
 		}
@@ -67,7 +68,10 @@ public class SymbolVisitor implements Visitor {
 		List<FuncDeclNode> funcL = n.getFuncList();
 
 		for (int i = 0; i < funcL.size(); i++) {
-			mapper.put(funcL.get(i), new SymbolTable());
+			SymbolTable table = new SymbolTable();
+			
+			SymbolTableMapper.addSymbolTable(funcL.get(i).nm.id, table);
+			mapper.put(funcL.get(i), table);
 			if (!globalSymbolTable.addSymbol(new Symbol(funcL.get(i).nm, SymbolType.FUNC, Scope.GLOBAL, null,
 					funcL.get(i), funcL.get(i).argL.size()))) {
 				System.out.println("Method " + funcL.get(i).nm.id + "() already exists");
@@ -102,7 +106,7 @@ public class SymbolVisitor implements Visitor {
 		// stmt is visited
 
 		funcSym = globalSymbolTable.getSymbol(n.nm, SymbolType.FUNC);
-
+		
 		StmtNodeList stmtL = n.stmtL;
 		ArgsNodeList argL = n.argL;
 
@@ -159,6 +163,7 @@ public class SymbolVisitor implements Visitor {
 		if (!currSymTable.addSymbol(sym)) {
 			System.out.println("Var " + n.nm.nm.id + " already exists");
 		}
+		n.val.accept(this);
 	}
 
 	@Override
@@ -204,6 +209,7 @@ public class SymbolVisitor implements Visitor {
 		Symbol sym;
 
 		if ((sym = globalSymbolTable.getSymbol(n.iden, SymbolType.FUNC)) != null) {
+			sym.print();
 			if (n.argsL.size() == sym.args) {
 				for (int i = 0; i < n.argsL.size(); i++) {
 					ArgsNode<?> arg = n.argsL.elementAt(i);

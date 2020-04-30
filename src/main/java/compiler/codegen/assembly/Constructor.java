@@ -7,6 +7,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 
+import compiler.utils.HandleType;
+
 public class Constructor implements Func {
 	private final ClassWriter cw;
 	private final MethodVisitor mv;
@@ -25,15 +27,33 @@ public class Constructor implements Func {
 	}
 
 	@Override
-	public Func visitVarAsgn(String var, Object value) {
-
+	public Func loadIdentifier(String idName) {
+		// TODO Auto-generated method stub
 		return this;
 	}
 
 	@Override
-	public Func visitFuncInvk(String name, String descriptor, Handle handle, Object... args) {
+	public Func loadLiteral(Object num) {
 		// TODO Auto-generated method stub
-		return null;
+		return this;
+	}
+
+	@Override
+	public Func visitFuncInvk(String name, int args, HandleType handleType, Object... extraArgs) {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
+	@Override
+	public Func visitVarAsgn(String var) {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
+	@Override
+	public Func visitVarAsgnEnd() {
+		// TODO Auto-generated method stub
+		return this;
 	}
 
 	@Override

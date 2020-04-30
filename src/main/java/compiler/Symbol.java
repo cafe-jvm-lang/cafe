@@ -12,7 +12,7 @@ public class Symbol {
 	Scope scope;
 	Type type;
 	public Node ogNode;
-	public Integer args;
+	public Integer args; 
 
 	public Symbol(IdentifierNode node, SymbolType symType, Scope scope, Type type, Node ogNode,Integer args) {
 		this.node = node;
@@ -25,5 +25,14 @@ public class Symbol {
 	
 	public void setType(Type type) {
 		this.type = type;
+	}
+	
+	public void print() {
+		System.out.println("Identifier Node:"+node.id);
+		System.out.println("Symbol Type:"+symType);
+		System.out.println("Scope:"+scope);
+		System.out.println("Type:"+type);
+		System.out.println("Og Node:"+ogNode);
+		System.out.println("Args:"+args);
 	}
 }

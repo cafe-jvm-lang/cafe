@@ -49,12 +49,12 @@ public class Program{
 		return func.visitCode();
 	}
 	
-	public Func visitField(String name, Object value) {
-		if(value instanceof Integer) {
-			
-		}
-		return constructor.visitVarAsgn(name,value);
-	}
+//	public Func visitField(String name, Object value) {
+//		if(value instanceof Integer) {
+//			
+//		}
+//		return constructor.visitVarAsgn(name,value);
+//	}
 	
 	public void visitEnd() {
 		cw.visitEnd();

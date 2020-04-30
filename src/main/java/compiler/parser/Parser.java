@@ -100,10 +100,11 @@ public class Parser {
 			} else if ((arg = parseNumLiteral()) != null && !isDecl) {
 				argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
 				currT = getNextToken();
-			} else {
-				error = true;
-				error("Args Error");
-			}
+			} 
+//			else {
+//				error = true;
+//				error("Args Error");
+//			}
 
 			while (!Utility.isRParen()) {
 				if (Utility.isComma()) {
@@ -313,7 +314,7 @@ public class Parser {
 				isNextToken = false;
 				currT = getNextToken();
 				if ((e3 = parseTerm2Exp(isConditional)) != null) {
-					return new BinaryExprNode(e3, (OperatorNode) e2, e1);
+					return new BinaryExprNode(e1, (OperatorNode) e2, e3);
 				} else {
 					error("Invalid Expr");
 				}
@@ -365,7 +366,7 @@ public class Parser {
 					currT = getNextToken();
 
 					if ((e3 = parseTerm1Exp(isConditional)) != null) {
-						e1 = new BinaryExprNode(e3, (OperatorNode) e2, e1);		
+						e1 = new BinaryExprNode(e1, (OperatorNode) e2, e3);		
 					}
 					else {
 						error("Invalid Expr");

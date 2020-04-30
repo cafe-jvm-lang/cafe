@@ -16,19 +16,19 @@ public interface TokenType {
 	public enum OpTokenType implements TokenType{
 		 
 		/** "+" */
-		OP_PLUS("#add"),
+		OP_PLUS("add"),
 		
 		/** "-" */
-		 OP_MINUS("#sub"),
+		 OP_MINUS("sub"),
 		
 		/** "/" */
-		 OP_DIVIDE("#div"),
+		 OP_DIVIDE("div"),
 		
 		/** "*" */
-		 OP_MULTIPLY("#mul") ,
+		 OP_MULTIPLY("mul") ,
 		 
 		 /** "=" */
-		 OP_ASG("="),
+		 OP_ASG("asg"),
 		
 //		/** "+=" */
 //		 OP_PLUS_ASG ,

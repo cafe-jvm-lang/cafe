@@ -22,7 +22,8 @@ public class SymbolTable {
 	public boolean addSymbol(Symbol sym) {
 		if(!symL.stream()
 		   .anyMatch(e -> e.node.id.equals(sym.node.id) 
-				          && e.symType == sym.symType)) {
+				          && e.symType == sym.symType
+				          && e.scope == sym.scope)) {
 			
 			symL.add(sym);
 			return true;
@@ -32,12 +33,13 @@ public class SymbolTable {
 		}
 	}
 	
-	public static boolean hasSymbol(final IdentifierNode n, final SymbolType type) {
+	public boolean hasSymbol(final IdentifierNode n, final SymbolType type) {
  		return symL.stream()
-				   .anyMatch(e -> e.node.id.equals(n.id) && e.symType == type);
+				   .anyMatch(e -> e.node.id.equals(n.id) 
+						   && e.symType == type);
 	}
 	
-	public static Symbol getSymbol(final IdentifierNode n, final SymbolType type) {
+	public Symbol getSymbol(final IdentifierNode n, final SymbolType type) {
  		return symL.stream()
 				   .filter(e -> e.node.id.equals(n.id) && e.symType == type)
 				   .findFirst()
