@@ -1,8 +1,0 @@
-var x = 10;
-
-func hello(z){
-	var y = x+1;
-}
-
-
-hello(5);

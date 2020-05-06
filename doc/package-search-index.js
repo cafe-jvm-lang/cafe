@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"compiler"},{"l":"compiler.ast"},{"l":"compiler.codegen"},{"l":"compiler.codegen.assembly"},{"l":"compiler.codegen.runtime"},{"l":"compiler.error"},{"l":"compiler.lexer"},{"l":"compiler.lexer.tokentypes"},{"l":"compiler.parser"},{"l":"compiler.utils"},{"l":"compiler.visitor"}]
