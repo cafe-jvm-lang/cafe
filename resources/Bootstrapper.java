@@ -1,16 +1,13 @@
 
 
-import static java.lang.invoke.MethodHandles.catchException;
-import static java.lang.invoke.MethodHandles.dropArguments;
 import static java.lang.invoke.MethodType.methodType;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.MutableCallSite;
-import java.util.*;
+import java.util.Arrays;
 
 public class Bootstrapper {
 	public static CallSite bootstrap(Lookup caller, String name, MethodType type, int arity) throws Throwable{

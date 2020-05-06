@@ -18,15 +18,16 @@ public interface Func {
 	int FLAG_PRIVATE_STATIC = ACC_PRIVATE | ACC_STATIC;
 	int FLAG_PUBLIC_STATIC = ACC_PUBLIC | ACC_STATIC;
 	
-	Func visitCode();
-	Func visitVarAsgn(String var);
-	Func visitVarAsgnEnd();
-	Func visitFuncInvk(String name, int args,HandleType handleType,Object... extraArgs);
+	Func init();
+	Func declareVar(String var);
+	Func initVarAsgn(String var);
+	Func initVarAsgnEnd();
+	Func invokeFunc(String name, int args,HandleType handleType);
 	Func loadLiteral(Object num);
 	Func loadIdentifier(String idName);
-	Func visitEnd();
-	
-	ExprFunc visitExpr(String funcName);
+	Func loadReturnValue();
+	Func declareIfCondition();
+	Func end();
 	
 	static String functionSignature(int x) {
 		return MethodType.genericMethodType(x).toMethodDescriptorString();

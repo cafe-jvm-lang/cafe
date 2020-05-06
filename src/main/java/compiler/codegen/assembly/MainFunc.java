@@ -22,44 +22,41 @@ public class MainFunc implements Func {
 	private final MethodVisitor mv;
 	
 	private final String clazz;
-	private final String packageCLazz;
 	
 	private MethodVisitor clinit= null;
 	private MethodVisitor currMv;
 	
 	private String currGetterSetterMethodName;
 	
-	private final SymbolTable globalSymbolTable = SymbolTableMapper.globalSymbolTable;
-	
 	private List<String> fieldsList;
 	
-	protected MainFunc(final ClassWriter cw, final String className) {
+	private MainFunc(final ClassWriter cw, final String className) {
 		this.cw = cw;
 		clazz = className;
-		packageCLazz = clazz.split("/")[0]+"."+clazz.split("/")[1];
 		mv = currMv = this.cw.visitMethod(Func.FLAG_PUBLIC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
 	
 		fieldsList = new ArrayList<>();
 	}
 
+	static MainFunc mainFunc(ClassWriter cw, String className) {
+		return new MainFunc(cw, className);
+	}
+	
 	@Override
-	public Func visitCode() {
+	public Func init() {
 		currMv.visitCode();
 		return this;
 	}
 
 	@Override
-	public Func visitVarAsgn(String var) {
-//		ExprFunc expr = (ExprFunc) e;
-//		createGetterSetter(var);
-//		String packageCLazz = clazz.split("/")[0]+"."+clazz.split("/")[1];
-//		visitFuncInvk(expr.name, expr.exprFuncDescriptor, ExprFunc.makeHandle("MethodInvocation", "[Ljava/lang/Object;"), packageCLazz);
-////		mv.visitVarInsn(ASTORE, arr++);
-////		mv.visitVarInsn(ALOAD, arr-1);
-//		
-//		visitFuncInvk(var, "(Ljava/lang/Object;)V", ExprFunc.makeHandle("MethodInvocation", "[Ljava/lang/Object;"),packageCLazz);
-		
-		
+	public Func declareVar(String var) {
+		initVarAsgn(var);
+		currMv = mv;
+		return this;
+	}
+	
+	@Override
+	public Func initVarAsgn(String var) {
 		if(!fieldsList.contains(var)) {
 			cw.visitField(Func.FLAG_PRIVATE_STATIC, var, "Ljava/lang/Object;", null, null).visitEnd();
 			createGetterSetter(var);
@@ -76,38 +73,50 @@ public class MainFunc implements Func {
 	}
 	
 	@Override
-	public Func visitVarAsgnEnd() {
-		currMv.visitInvokeDynamicInsn("#"+currGetterSetterMethodName, "(Ljava/lang/Object;)V", Func.FUNCTION_HANDLE,packageCLazz);
+	public Func initVarAsgnEnd() {
+		currMv.visitInvokeDynamicInsn("#"+currGetterSetterMethodName, "(Ljava/lang/Object;)V", Func.FUNCTION_HANDLE,Program.packageClazz);
 		
 		currMv = mv;
 		return this;
 	}
 
 	@Override
-	public Func visitFuncInvk(String name, int args,HandleType handleType, Object... extraArgs) {
+	public Func invokeFunc(String name, int args,HandleType handleType) {
 		if(handleType == HandleType.OPERATOR_HANDLE_TYPE)
-			currMv.visitInvokeDynamicInsn(name, Func.functionSignature(args), Func.OPERATOR_HANDLE, extraArgs);
+			currMv.visitInvokeDynamicInsn(name, Func.functionSignature(args), Func.OPERATOR_HANDLE, 2);
 		else
-			currMv.visitInvokeDynamicInsn(name, Func.functionSignature(args), Func.FUNCTION_HANDLE, extraArgs);
+			currMv.visitInvokeDynamicInsn(name, Func.functionSignature(args), Func.FUNCTION_HANDLE,  Program.packageClazz);
 		return this;
 	}
 
 	@Override
 	public Func loadLiteral(Object ob) {
-		BytecodeUtils.loadToOperandStack(currMv, ob);
+		BytecodeUtils.loadLiteralToOperandStack(currMv, ob);
 		return this;
 	}
 	
 	@Override
 	public Func loadIdentifier(String idName) {
 		
-		currMv.visitInvokeDynamicInsn("#"+idName, "()Ljava/lang/Object;", Func.FUNCTION_HANDLE, packageCLazz);
+		currMv.visitInvokeDynamicInsn("#"+idName, "()Ljava/lang/Object;", Func.FUNCTION_HANDLE, Program.packageClazz);
 		
 		return this;
 	}
 	
 	@Override
-	public Func visitEnd() {
+	public Func loadReturnValue() {
+	
+		return this;
+	}
+	
+	@Override
+	public Func declareIfCondition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Func end() {
 		if(clinit != null) {
 			clinit.visitInsn(RETURN);
 			clinit.visitMaxs(0,0);
@@ -119,12 +128,7 @@ public class MainFunc implements Func {
 		currMv.visitEnd();
 		return this;
 	}
-
-	@Override
-	public ExprFunc visitExpr(String funcName) {
-		return new ExprFunc(cw, funcName);
-	}
-
+	
 	private void createGetterSetter(String name) {
 		
 		String methodName = "#"+name;

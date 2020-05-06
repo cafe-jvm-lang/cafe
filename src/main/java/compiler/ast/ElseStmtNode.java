@@ -5,13 +5,18 @@ import compiler.visitor.Visitor;
 
 public class ElseStmtNode implements StmtNode {
 
-	public StmtNodeList elseStmtL;
-	public VarDeclNodeList elseVarL;
+//	public StmtNodeList elseStmtL;
+//	public VarDeclNodeList elseVarL;
+	
+	public Block block;
 
-	public ElseStmtNode(StmtNodeList elseStmtL, VarDeclNodeList elseVarL) {
-		this.elseStmtL = elseStmtL;
-		this.elseVarL = elseVarL;
+	public ElseStmtNode(Block block) {
+//		this.elseStmtL = elseStmtL;
+//		this.elseVarL = elseVarL;
+		
+		this.block = block;
 	}
+	
 
 	@Override
 	public void accept(Visitor v) {

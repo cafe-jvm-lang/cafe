@@ -5,15 +5,19 @@ import compiler.visitor.Visitor;
 
 public class FuncDeclNode implements StmtNode{
 	public IdentifierNode nm;
-	public ArgsNodeList argL;
-	public StmtNodeList stmtL;
-	public VarDeclNodeList varL;
+	public ParameterNodeList argL;
+//	public StmtNodeList stmtL;
+//	public VarDeclNodeList varL;
+
+	public Block block;
 	
-	public FuncDeclNode(IdentifierNode name,ArgsNodeList argsList,StmtNodeList stmtList,VarDeclNodeList varList) {
+	public FuncDeclNode(IdentifierNode name,ParameterNodeList argsList,Block block) {
 		nm = name;
 		argL = argsList;
-		stmtL = stmtList;
-		varL = varList;
+//		stmtL = stmtList;
+//		varL = varList;
+		
+		this.block = block;
 	}
 	
 	@Override

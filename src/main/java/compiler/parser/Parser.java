@@ -1,19 +1,23 @@
 package compiler.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
 import compiler.ast.BinaryExprNode;
+import compiler.ast.Block;
 import compiler.ast.ExprNode;
 import compiler.ast.FuncCallNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
 import compiler.ast.IfElseStmtNode;
 import compiler.ast.IfStmtNode;
-import compiler.ast.IntegerLiteralNode;
+import compiler.ast.LiteralNode;
 import compiler.ast.Node;
 import compiler.ast.OperatorNode;
+import compiler.ast.ParameterNode;
+import compiler.ast.ParameterNodeList;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
 import compiler.ast.StmtNode;
@@ -64,11 +68,12 @@ public class Parser {
 
 	void createMainFunc() {
 		IdentifierNode id1 = new IdentifierNode("main");
-		ArgsNodeList args = null;
+		ParameterNodeList args = null;
 		StmtNodeList stmt = null;
 		VarDeclNodeList var = null;
 
-		mainF = new FuncDeclNode(id1, args, stmt, var);
+		//mainF = new FuncDeclNode(id1, args, stmt, var);
+		mainF = new FuncDeclNode(id1, args, null);
 	}
 
 	ExprNode parseIdentifier() {
@@ -95,10 +100,10 @@ public class Parser {
 			currT = getNextToken();
 
 			if ((arg = parseIdentifier()) != null) {
-				argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg));
+				argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg,isDecl));
 				currT = getNextToken();
 			} else if ((arg = parseNumLiteral()) != null && !isDecl) {
-				argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
+				argL.addElement(new ArgsNode<LiteralNode>((LiteralNode) arg,isDecl));
 				currT = getNextToken();
 			} 
 //			else {
@@ -112,9 +117,9 @@ public class Parser {
 					arg = ((arg = parseNumLiteral()) != null && !isDecl) ? arg : parseIdentifier();
 					if (arg != null) {
 						if (arg instanceof IdentifierNode)
-							argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg));
+							argL.addElement(new ArgsNode<IdentifierNode>((IdentifierNode) arg,isDecl));
 						else
-							argL.addElement(new ArgsNode<IntegerLiteralNode>((IntegerLiteralNode) arg));
+							argL.addElement(new ArgsNode<LiteralNode>((LiteralNode) arg,isDecl));
 					} else {
 						if (!error)
 							error("Parser:expected IDEN || Int");
@@ -252,7 +257,7 @@ public class Parser {
 			return null;
 
 		if (Utility.isNumLiteral()) {
-			return new IntegerLiteralNode(Integer.parseInt(currT.getTokenValue()));
+			return new LiteralNode(Integer.parseInt(currT.getTokenValue()));
 		}
 
 		return null;
@@ -547,36 +552,37 @@ public class Parser {
 			return null;
 
 		ExprNode ifCond = null;
-		StmtNodeList ifStmtL = new StmtNodeList();
-		VarDeclNodeList ifVarL = new VarDeclNodeList();
-		Block<VarDeclNodeList, StmtNodeList> block;
-
-		StmtNodeList elseStmtL = new StmtNodeList();
-		VarDeclNodeList elseVarL = new VarDeclNodeList();
+//		StmtNodeList ifStmtL = new StmtNodeList();
+//		VarDeclNodeList ifVarL = new VarDeclNodeList();
+		Block ifBlock;
+		Block elseBlock;
+		
+//		StmtNodeList elseStmtL = new StmtNodeList();
+//		VarDeclNodeList elseVarL = new VarDeclNodeList();
 
 		if (Utility.isIfStmt()) {
 			currT = getNextToken();
 			if ((ifCond = parseCondExpr()) != null) {
 				if (!isNextToken)
 					currT = getNextToken();
-				if ((block = parseBlock(scope)) != null) {
-					ifStmtL.addAll(block.u);
-					ifVarL.addAll(block.t);
+				if ((ifBlock = parseBlock(scope)) != null) {
+//					ifStmtL.addAll(block.u);
+//					ifVarL.addAll(block.t);
 
 					currT = getNextToken();
 
 					if (Utility.isElseStmt()) {
 						currT = getNextToken();
-						if ((block = parseBlock(scope)) != null) {
-							elseStmtL.addAll(block.u);
-							elseVarL.addAll(block.t);
-							return new IfElseStmtNode(ifCond, ifStmtL, ifVarL, elseStmtL, elseVarL);
+						if ((elseBlock = parseBlock(scope)) != null) {
+//							elseStmtL.addAll(block.u);
+//							elseVarL.addAll(block.t);
+							return new IfElseStmtNode(ifCond, ifBlock, elseBlock);
 						} else {
 							error("Illegal Block ELSE");
 						}
 					} else {
 						isNextToken = true;
-						return new IfStmtNode(ifCond, ifStmtL, ifVarL);
+						return new IfStmtNode(ifCond, ifBlock);
 					}
 				} else {
 					error("Illegal Block stmt IF");
@@ -641,9 +647,9 @@ public class Parser {
 		return null;
 	}
 
-	Block<VarDeclNodeList, StmtNodeList> parseBlock(Scope scope) {
+	Block parseBlock(Scope scope) {
 
-		Block<VarDeclNodeList, StmtNodeList> b;
+		Block b;
 		VarDeclNodeList varL = new VarDeclNodeList();
 		StmtNodeList stmtL = new StmtNodeList();
 
@@ -669,13 +675,53 @@ public class Parser {
 			}
 
 			isNextToken = false;
-			b = new Block<>(varL, stmtL);
+			b = new Block(varL, stmtL);
 			return b;
 		}
 
 		return null;
 	}
 
+	ParameterNodeList parseParameters() {
+		
+		Node identifier;
+		ParameterNodeList parameterNodeList = new ParameterNodeList();
+		
+		if (Utility.isLParen()) {
+			currT = getNextToken();
+
+			if ((identifier = parseIdentifier()) != null) {
+				ParameterNode paramNode = new ParameterNode((IdentifierNode) identifier);
+				parameterNodeList.addElement(paramNode);
+				currT = getNextToken();
+			}
+
+			while (!Utility.isRParen()) {
+				if (Utility.isComma()) {
+					currT = getNextToken();
+					identifier =  parseIdentifier();
+					if (identifier != null) {
+						ParameterNode paramNode = new ParameterNode((IdentifierNode) identifier);
+						parameterNodeList.addElement(paramNode);
+					} else {
+						if (!error)
+							error("Parser:expected IDEN ");
+						return null;
+					}
+				} else {
+					if (!error)
+						error("',' expected");
+					return null;
+				}
+
+				currT = getNextToken();
+			}
+			return parameterNodeList;
+		}
+		
+		return null;
+	}
+	
 	Node parseVarDecl() {
 
 		if (error)
@@ -747,23 +793,23 @@ public class Parser {
 			return null;
 
 		Node idM;
-		ArgsNodeList argsM;
+		ParameterNodeList parameterNodeList;
 		StmtNodeList stmtM = new StmtNodeList();
 		VarDeclNodeList varM = new VarDeclNodeList();
-		Block<VarDeclNodeList, StmtNodeList> block;
+		Block block;
 
 		currT = getNextToken();
 
 		idM = parseIdentifier();
 		if (idM != null) {
 			currT = getNextToken();
-			if ((argsM = parseArgs(true)) != null) {
+			if ((parameterNodeList = parseParameters()) != null) {
 				currT = getNextToken();
 				if ((block = parseBlock(Scope.LOCAL)) != null) {
-					varM.addAll(block.t);
-					stmtM.addAll(block.u);
+//					varM.addAll(block.t);
+//					stmtM.addAll(block.u);
 
-					return new FuncDeclNode((IdentifierNode) idM, argsM, stmtM, varM);
+					return new FuncDeclNode((IdentifierNode) idM, parameterNodeList, block);
 				} else {
 					if (!error)
 						error("Invalid block");
@@ -778,7 +824,7 @@ public class Parser {
 		}
 
 		idM = null;
-		argsM = null;
+		parameterNodeList = null;
 		stmtM = null;
 		varM = null;
 		block = null;
@@ -799,7 +845,6 @@ public class Parser {
 		currT = getNextToken();
 
 		IdentifierNode idM = new IdentifierNode("main");
-		ArgsNodeList argsM = null;
 		StmtNodeList stmtM = new StmtNodeList();
 		VarDeclNodeList varM = new VarDeclNodeList();
 
@@ -827,7 +872,7 @@ public class Parser {
 			}
 		}
 
-		mainF = new FuncDeclNode(idM, argsM, stmtM, varM);
+		mainF = new FuncDeclNode(idM, null, new Block(varM,stmtM));
 		root.setMainF(mainF);
 
 		return root;

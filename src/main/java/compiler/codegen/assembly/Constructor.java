@@ -13,16 +13,26 @@ public class Constructor implements Func {
 	private final ClassWriter cw;
 	private final MethodVisitor mv;
 
-	protected Constructor(final ClassWriter cw) {
+	private Constructor(final ClassWriter cw) {
 		this.cw = cw;
 		mv = this.cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 	}
+	
+	static Constructor constructor(ClassWriter cw) {
+		return new Constructor(cw);
+	}
 
 	@Override
-	public Func visitCode() {
+	public Func init() {
 		mv.visitCode();
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+		return this;
+	}
+	
+	@Override
+	public Func declareVar(String var) {
+		initVarAsgn(var);
 		return this;
 	}
 
@@ -39,35 +49,40 @@ public class Constructor implements Func {
 	}
 
 	@Override
-	public Func visitFuncInvk(String name, int args, HandleType handleType, Object... extraArgs) {
+	public Func invokeFunc(String name, int args, HandleType handleType) {
 		// TODO Auto-generated method stub
 		return this;
 	}
 
 	@Override
-	public Func visitVarAsgn(String var) {
+	public Func initVarAsgn(String var) {
 		// TODO Auto-generated method stub
 		return this;
 	}
 
 	@Override
-	public Func visitVarAsgnEnd() {
+	public Func initVarAsgnEnd() {
 		// TODO Auto-generated method stub
 		return this;
 	}
+	
+	@Override
+	public Func loadReturnValue() {
+		return null;
+	}
 
 	@Override
-	public Func visitEnd() {
+	public Func declareIfCondition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Func end() {
 		mv.visitInsn(RETURN);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 		return this;
-	}
-
-	@Override
-	public ExprFunc visitExpr(String funcName) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 //	public Constructor(ClassWriter cw) {

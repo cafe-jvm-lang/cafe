@@ -6,8 +6,11 @@ import compiler.visitor.Visitor;
 public class ArgsNode<T> implements Node {
 	//public IdentifierNode arg;
 	public T arg;
-	public ArgsNode(T arg) {
+	public boolean isDecl;
+	
+	public ArgsNode(T arg, boolean isDecl) {
 		this.arg = arg;
+		this.isDecl = isDecl;
 	}
 
 	@Override

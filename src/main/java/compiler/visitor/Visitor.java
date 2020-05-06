@@ -2,14 +2,16 @@ package compiler.visitor;
 
 import compiler.ast.ArgsNode;
 import compiler.ast.BinaryExprNode;
+import compiler.ast.Block;
 import compiler.ast.ElseStmtNode;
 import compiler.ast.FuncCallNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
 import compiler.ast.IfElseStmtNode;
 import compiler.ast.IfStmtNode;
-import compiler.ast.IntegerLiteralNode;
+import compiler.ast.LiteralNode;
 import compiler.ast.OperatorNode;
+import compiler.ast.ParameterNode;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
 import compiler.ast.UnaryExprNode;
@@ -27,9 +29,11 @@ public interface Visitor {
 	
 	<T> void visit(ArgsNode<T> n);
 	
+	void visit (ParameterNode n);
+	
 	void visit(ReturnStmtNode n);
 	
-	void visit(IntegerLiteralNode n);
+	void visit(LiteralNode n);
 	
 	void visit(BinaryExprNode n);
 	
@@ -46,4 +50,6 @@ public interface Visitor {
 	void visit(ElseStmtNode n);
 	
 	void visit(IfElseStmtNode n);
+	
+	void visit(Block n);
 }

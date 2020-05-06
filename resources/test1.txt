@@ -1,3 +1,8 @@
-var y = 1+10; 
-var x = y+100-10;
-y = y-1;
+var x = 10;
+
+func hello(z){
+	var y = x+1;
+}
+
+
+hello(5);

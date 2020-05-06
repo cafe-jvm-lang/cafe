@@ -3,14 +3,17 @@ package compiler.visitor;
 import compiler.ast.ArgsNode;
 import compiler.ast.ArgsNodeList;
 import compiler.ast.BinaryExprNode;
+import compiler.ast.Block;
 import compiler.ast.ElseStmtNode;
+import compiler.ast.FuncCallNode;
 import compiler.ast.FuncDeclNode;
 import compiler.ast.IdentifierNode;
 import compiler.ast.IfElseStmtNode;
 import compiler.ast.IfStmtNode;
-import compiler.ast.IntegerLiteralNode;
-import compiler.ast.FuncCallNode;
+import compiler.ast.LiteralNode;
 import compiler.ast.OperatorNode;
+import compiler.ast.ParameterNode;
+import compiler.ast.ParameterNodeList;
 import compiler.ast.ProgramNode;
 import compiler.ast.ReturnStmtNode;
 import compiler.ast.StmtNodeList;
@@ -30,10 +33,7 @@ public class PrettyPrinter implements Visitor {
 
 	@Override
 	public void visit(ProgramNode n) {
-		StmtNodeList l = n.getMainF().stmtL;
-		for (int i = 0; i < l.size(); i++) {
-			l.elementAt(i).accept(this);
-		}
+		n.getMainF().block.accept(this);
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class PrettyPrinter implements Visitor {
 		print("FuncDeclNode:");
 		indent += 4;
 		n.nm.accept(this);
-		ArgsNodeList a = n.argL;
+		ParameterNodeList a = n.argL;
 		print("ArgsNodeList: ");
 		indent += 4;
 		for (int i = 0; i < a.size(); i++) {
@@ -51,10 +51,10 @@ public class PrettyPrinter implements Visitor {
 
 		print("StmtNodeList: ");
 		indent += 4;
-		StmtNodeList l = n.stmtL;
-		for (int i = 0; i < l.size(); i++) {
-			l.elementAt(i).accept(this);
-		}
+		n.block.accept(this);
+//		for (int i = 0; i < l.size(); i++) {
+//			l.elementAt(i).accept(this);
+//		}
 		indent -= 4;
 		indent -= 4;
 	}
@@ -94,7 +94,7 @@ public class PrettyPrinter implements Visitor {
 	}
 
 	@Override
-	public void visit(IntegerLiteralNode n) {
+	public void visit(LiteralNode n) {
 		print("IntegerLiteralNode: " + n.i);
 	}
 
@@ -157,10 +157,10 @@ public class PrettyPrinter implements Visitor {
 
 		print("StmtNodeList:");
 		indent += 4;
-		StmtNodeList l = n.stmtL;
-		for (int i = 0; i < l.size(); i++) {
-			l.elementAt(i).accept(this);
-		}
+		n.block.accept(this);
+//		for (int i = 0; i < l.size(); i++) {
+//			l.elementAt(i).accept(this);
+//		}
 
 		indent -= 4;
 		indent -= 4;
@@ -186,22 +186,28 @@ public class PrettyPrinter implements Visitor {
 
 		print("StmtNodeList:");
 		indent += 4;
-		StmtNodeList l = n.ifStmtL;
-		for (int i = 0; i < l.size(); i++) {
-			l.elementAt(i).accept(this);
-		}
+		n.ifBlock.accept(this);
 
 		indent -= 4;
 		indent -= 4;
 		
 		print("ELSE:");
 		indent += 4;
-		l = n.elseStmtL;
-		for (int i = 0; i < l.size(); i++) {
-			l.elementAt(i).accept(this);
-		}
+		
+		n.elseBlock.accept(this);
 
 		indent -= 4;
 		indent -= 4;
+	}
+
+	@Override
+	public void visit(ParameterNode n) {
+		n.n.accept(this);
+		
+	}
+
+	@Override
+	public void visit(Block n) {
+		n.stmtL.forEach(e -> e.accept(this));
 	}
 }

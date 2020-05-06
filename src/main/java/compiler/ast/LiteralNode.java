@@ -3,11 +3,11 @@ package compiler.ast;
 import compiler.visitor.GenericVisitor;
 import compiler.visitor.Visitor;
 
-public class IntegerLiteralNode implements ExprNode, NodeWithArgsType, NodeWithTerminalExpr{
+public class LiteralNode implements ExprNode, NodeWithArgsType, NodeWithTerminalExpr{
 	
-	public Number i;
+	public Object i;
 	
-	public IntegerLiteralNode(Number i) {
+	public LiteralNode(Object i) {
 		this.i = i;
 	}
 	

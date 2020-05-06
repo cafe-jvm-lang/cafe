@@ -1,37 +1,41 @@
 package compiler;
 
-import compiler.ast.IdentifierNode;
 import compiler.ast.Node;
 import compiler.utils.Scope;
 import compiler.utils.SymbolType;
-import compiler.utils.Type;
 
+/**
+ * @author Dhyey
+ *
+ */
 public class Symbol {
-	IdentifierNode node;
-	SymbolType symType;
-	Scope scope;
-	Type type;
+	public String name;
+	public SymbolType symType;
+	//public Scope scope;
 	public Node ogNode;
-	public Integer args; 
+	
+	
+	/**
+	 * For SymbolType - Func
+	 * 		stores number of args of that function
+	 * For SymbolType - var
+	 * 		stores position of variable in local variable array
+	 */
+	public Integer args;
+	
 
-	public Symbol(IdentifierNode node, SymbolType symType, Scope scope, Type type, Node ogNode,Integer args) {
-		this.node = node;
+	public Symbol(String name, SymbolType symType, Node ogNode,Integer args) {
+		this.name = name;
 		this.symType = symType;
-		this.scope = scope;
-		this.type = type;
+		//this.scope = scope;
 		this.ogNode = ogNode;
 		this.args = args;
 	}
 	
-	public void setType(Type type) {
-		this.type = type;
-	}
-	
 	public void print() {
-		System.out.println("Identifier Node:"+node.id);
+		System.out.println("Identifier Node:"+name);
 		System.out.println("Symbol Type:"+symType);
-		System.out.println("Scope:"+scope);
-		System.out.println("Type:"+type);
+		//System.out.println("Scope:"+scope);
 		System.out.println("Og Node:"+ogNode);
 		System.out.println("Args:"+args);
 	}

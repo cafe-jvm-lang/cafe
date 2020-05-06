@@ -6,13 +6,17 @@ import compiler.visitor.Visitor;
 public class IfStmtNode implements StmtNode{
 	
 	public ExprNode cond;
-	public VarDeclNodeList varL;
-	public StmtNodeList stmtL;
+//	public VarDeclNodeList varL;
+//	public StmtNodeList stmtL;
+
+	public Block block;
 	
-	public IfStmtNode(ExprNode cond, StmtNodeList stmtL, VarDeclNodeList varL) {
+	public IfStmtNode(ExprNode cond, Block block) {
 		this.cond = cond;
-		this.varL = varL;
-		this.stmtL = stmtL;
+//		this.varL = varL;
+//		this.stmtL = stmtL;
+		
+		this.block = block;
 	}
 	
 	@Override
