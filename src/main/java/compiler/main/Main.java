@@ -1,5 +1,7 @@
 package compiler.main;
 
+import compiler.util.Context;
+
 /**
  * @author Dhyey
  * @version 1.0
@@ -21,11 +23,19 @@ public class Main {
 		public final int exitCode;
 	}
 
+	
+	public Main() {
+		Context context = new Context();
+
+		Compiler c = Compiler.instance(context);
+		c.compile();
+	}
+	
 	/**
 	 * Entry point into the compiler
 	 * @param args expects a file-name.txt file
 	 */
 	public static void main(String[] args) {
-		
+		new Main();
 	}
 }
