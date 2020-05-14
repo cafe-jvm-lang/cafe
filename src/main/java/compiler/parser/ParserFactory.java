@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import compiler.util.Context;
+import compiler.util.Log;
 
 public class ParserFactory {
 	protected final static Context.Key<ParserFactory> parserFactoryKey = new Context.Key<>();
 
 	private final static Map<ParserType, Parser> parsers = new HashMap<>();
+
+	final Log log;
 
 	public static ParserFactory instance(Context context) {
 		ParserFactory instance = context.get(parserFactoryKey);
@@ -30,6 +33,8 @@ public class ParserFactory {
 	private ParserFactory(Context context) {
 		context.put(parserFactoryKey, this);
 		ParserType.init();
+
+		this.log = Log.instance(context);
 	}
 
 	public Parser newParser(ParserType type) {
