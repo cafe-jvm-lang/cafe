@@ -14,6 +14,9 @@ public class Log {
 	private final List<Error> errorList;
 	private final List<Warning> warningList;
 
+	public int nerrors = 0;
+	public int nwarnings = 0;
+
 	protected Log(Context context) {
 		context.put(logKey, this);
 
@@ -29,26 +32,26 @@ public class Log {
 	}
 
 	public void error(Position pos, Errors err) {
+		nerrors++;
 		errorList.add(new Error(pos, err));
 	}
 
 	public void warning(Position pos, Warnings warn) {
+		nwarnings++;
 		warningList.add(new Warning(pos, warn));
 	}
 
 	public void printErrorLog() {
-		int errorCount = errorList.size();
-		if (errorCount > 0) {
-			System.out.println("Total Errors: " + errorCount);
+		if (nerrors > 0) {
+			System.out.println("Total Errors: " + nerrors);
 			errorList.stream().forEach(e -> System.out.println(e.toString()));
 		}
 	}
 
 	public void printWarningLog() {
-		int warnCount = warningList.size();
-		if (warnCount > 0) {
-			System.out.println("Total Errors: " + warnCount);
-			warningList.stream().forEach(e -> System.out.println(e.toString()));
+		if (nwarnings > 0) {
+			System.err.println("Total Errors: " + nwarnings);
+			warningList.stream().forEach(e -> System.err.println(e.toString()));
 		}
 	}
 }

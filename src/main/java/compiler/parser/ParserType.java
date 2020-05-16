@@ -1,5 +1,11 @@
 package compiler.parser;
 
+/**
+ * A registry of the concrete implementation of parsers.
+ * 
+ * @author Dhyey
+ *
+ */
 public enum ParserType {
 	MAINPARSER("MainParser");
 

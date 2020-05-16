@@ -23,19 +23,15 @@ public class Main {
 		public final int exitCode;
 	}
 
-	
 	public Main() {
 		Context context = new Context();
 
 		Compiler c = Compiler.instance(context);
 		c.compile();
 	}
-	
-	/**
-	 * Entry point into the compiler
-	 * @param args expects a file-name.txt file
-	 */
-	public static void main(String[] args) {
-		new Main();
+
+	public Result compile() {
+		return null;
 	}
+
 }

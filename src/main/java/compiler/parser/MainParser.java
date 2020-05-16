@@ -1,6 +1,6 @@
 package compiler.parser;
 
-public class MainParser extends Parser{
+public class MainParser extends Parser {
 	static {
 		ParserFactory.registerParser(ParserType.MAINPARSER, new MainParser());
 	}

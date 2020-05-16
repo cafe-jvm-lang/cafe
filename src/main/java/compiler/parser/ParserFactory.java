@@ -6,6 +6,21 @@ import java.util.Map;
 import compiler.util.Context;
 import compiler.util.Log;
 
+/**
+ * A factory to generate parsers. To register a new concrete parser the
+ * following steps have to be followed:
+ * <ol>
+ * <li>Create a concrete class that implements <code>Parser</code> interface.
+ * <li>Add the parser name in the <code>ParserType</code> with the class name of
+ * the above created new parser as its argument.
+ * <li>In the newly created parser class, inside static block, call the method
+ * <code>ParserFactory.registerParser(...)</code>, to register the newly created
+ * parser.
+ * </ol>
+ * 
+ * @author Dhyey
+ *
+ */
 public class ParserFactory {
 	protected final static Context.Key<ParserFactory> parserFactoryKey = new Context.Key<>();
 

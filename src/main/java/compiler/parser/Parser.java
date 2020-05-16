@@ -1,5 +1,5 @@
 package compiler.parser;
 
 public abstract class Parser {
-	protected abstract Parser instance(ParserFactory factory);
+	abstract Parser instance(ParserFactory factory);
 }
