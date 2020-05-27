@@ -44,7 +44,7 @@ public class Log {
 	public void printErrorLog() {
 		if (nerrors > 0) {
 			System.out.println("Total Errors: " + nerrors);
-			errorList.stream().forEach(e -> System.out.println(e.toString()));
+			errorList.stream().forEach(e -> System.err.println(e.toString()));
 		}
 	}
 

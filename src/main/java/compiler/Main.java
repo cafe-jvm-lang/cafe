@@ -13,6 +13,6 @@ public class Main {
 
 	public static int compile(String[] args) {
 		compiler.main.Main compiler = new compiler.main.Main();
-		return compiler.compile().exitCode;
+		return compiler.compile(args).exitCode;
 	}
 }
