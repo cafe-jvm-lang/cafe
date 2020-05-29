@@ -1,8 +1,9 @@
 var x = 10;
 
-func hello(z){
-	var y = x+1;
+func hello(){
+	var y = x+1/5*4;
+	return y;
 }
 
 
-hello(5);
+var z = hello()+5;
