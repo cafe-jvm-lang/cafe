@@ -1,5 +1,7 @@
 package compiler.parser;
 
+import java.util.List;
+
 import compiler.util.Context;
 import compiler.util.Log;
 
@@ -36,8 +38,8 @@ public class ScannerFactory {
 		scanner = sc;
 	}
 
-	public Lexer newScanner() {
-		return scanner.instance();
+	public Lexer newScanner(List<Character> input) {
+		return scanner.instance(this,input);
 	}
 
 }

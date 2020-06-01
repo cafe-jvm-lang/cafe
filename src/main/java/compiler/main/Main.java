@@ -10,6 +10,8 @@ import compiler.util.Log;
 public class Main {
 
 	private Log log;
+	private SourceFileManager fileManager;
+	private CLIArguments arguments;
 
 	public enum Result {
 		OK(0), // Compilation completed with no errors.
@@ -34,6 +36,14 @@ public class Main {
 		Context context = new Context();
 		log = Log.instance(context);
 
+		fileManager = SourceFileManager.instance(context);
+		
+		arguments = CLIArguments.instance(context);
+		arguments.checkArgs(args);
+		
+		if(log.nerrors > 0)
+			return Result.CMDERR;
+		
 		Compiler c = Compiler.instance(context);
 		c.compile();
 

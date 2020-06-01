@@ -11,7 +11,10 @@ public class Compiler {
 
 	private ParserFactory parserFactory;
 	private Log log;
-
+	private SourceFileManager fileManager;
+	
+	private Parser parser;
+	
 	public static Compiler instance(Context context) {
 		Compiler instance = context.get(compilerKey);
 		if (instance == null)
@@ -23,12 +26,13 @@ public class Compiler {
 		context.put(compilerKey, this);
 
 		log = Log.instance(context);
+		fileManager = SourceFileManager.instance(context);
+		
 		parserFactory = ParserFactory.instance(context);
-
-		Parser p = parserFactory.newParser(ParserType.MAINPARSER);
+		parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.getSourceFileCharList());
 	}
 
 	public void compile() {
-
+		
 	}
 }

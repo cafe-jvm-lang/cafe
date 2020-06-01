@@ -1,7 +1,8 @@
 package compiler.parser;
 
+import java.util.List;
+
 import compiler.parser.Tokens.Token;
-import compiler.util.Position;
 
 public class Scanner implements Lexer {
 
@@ -9,41 +10,38 @@ public class Scanner implements Lexer {
 		ScannerFactory.registerScanner(new Scanner());
 	}
 
-	private Scanner() {
-
+	private Tokens tokens;
+	private Token token;
+	private Token prevToken;
+	
+	private Tokenizer tokenizer;
+	
+	private Scanner() {}
+	
+	private Scanner(ScannerFactory scannerFactory, List<Character> buff) {
+		this.tokens = scannerFactory.tokens;
+		token = prevToken = null;
+		
+		tokenizer = new Tokenizer(scannerFactory, buff);
 	}
-
-	protected Scanner instance() {
-		return new Scanner();
+	
+	protected Scanner instance(ScannerFactory scannerFactory, List<Character> input) {
+		return new Scanner(scannerFactory, input);
 	}
 
 	@Override
 	public void nextToken() {
-
+		prevToken = token;
+		token = tokenizer.readToken();
 	}
 
 	@Override
 	public Token token() {
-		// TODO Auto-generated method stub
-		return null;
+		return token;
 	}
 
 	@Override
 	public Token prevToken() {
-		// TODO Auto-generated method stub
-		return null;
+		return prevToken;
 	}
-
-	@Override
-	public Position position() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void position(Position position) {
-		// TODO Auto-generated method stub
-
-	}
-
 }

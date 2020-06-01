@@ -1,11 +1,15 @@
 package compiler.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class CharReader {
 
 	/**
 	 * Input Buffer
 	 */
-	protected char[] buff;
+	protected List<Character> buff;
 
 	/**
 	 * Input Buffer pointer
@@ -20,7 +24,7 @@ public class CharReader {
 	/**
 	 * Saved buffer
 	 */
-	protected char[] sbuff;
+	protected List<Character> sbuff;
 
 	/**
 	 * Saved Buffer pointer
@@ -36,56 +40,48 @@ public class CharReader {
 	 * Current character
 	 */
 	protected char ch;
+//
+//	protected CharReader(CharSequence input) {
+//		this(input.toString().toCharArray());
+//	}
 
-	protected CharReader(CharSequence input) {
-		this(input.toString().toCharArray());
-	}
-
-	protected CharReader(char[] input) {
+	protected CharReader(List<Character> input) {
 		buff = input;
-		buffLen = buff.length;
+		buffLen = buff.size();
 		scanChar();
 
-		sbuff = new char[sbuffCapacity];
+		sbuff = new ArrayList<>(sbuffCapacity);
 	}
 
 	protected void scanChar() {
 		if (bp < buffLen)
-			ch = buff[++bp];
+			ch = buff.get(++bp);
 	}
 
 	protected void putChar(char c) {
-		if (sp > sbuffCapacity) {
-			sbuffCapacity *= 2;
-			char[] newSbuff = new char[sbuffCapacity];
-			System.arraycopy(sbuff, 0, newSbuff, 0, sbuffCapacity);
-			sbuff = newSbuff;
-		}
-		sbuff[++sp] = c;
+		sbuff.add(c);
 	}
 
 	/**
 	 * @param clearSavedBuffer - if true, clears sbuff
 	 * @return saved buffer char array
 	 */
-	protected char[] getSavedBuffer(boolean clearSavedBuffer) {
+	protected List<Character> getSavedBuffer(boolean clearSavedBuffer) {
 		if (clearSavedBuffer) {
 			clearSavedBufer();
 		}
 		return sbuff;
 	}
 
-	protected String getSavedBufferString(boolean clearSavedBuffer) {
+	protected String getSavedBufferAsString(boolean clearSavedBuffer) {
 		if (clearSavedBuffer) {
 			clearSavedBufer();
 		}
-		return new String(sbuff);
+		return sbuff.stream().map(e->e.toString()).collect(Collectors.joining());
 	}
 
 	private void clearSavedBufer() {
-		sbuffCapacity = 128;
-		sbuff = new char[sbuffCapacity];
-		sp = -1;
+		sbuff = new ArrayList<>(sbuffCapacity);
 	}
 
 }

@@ -3,8 +3,8 @@ package compiler.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import compiler.util.LogType.Errors;
 import compiler.util.LogType.Error;
+import compiler.util.LogType.Errors;
 import compiler.util.LogType.Warning;
 import compiler.util.LogType.Warnings;
 
@@ -40,7 +40,7 @@ public class Log {
 		nwarnings++;
 		warningList.add(new Warning(pos, warn));
 	}
-
+	
 	public void printErrorLog() {
 		if (nerrors > 0) {
 			System.out.println("Total Errors: " + nerrors);

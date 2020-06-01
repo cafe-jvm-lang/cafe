@@ -36,10 +36,14 @@ public class LogType {
 			super(pos, Type.WARNING, warn);
 		}
 	}
-
+	
 	public static enum Errors {
+		
+		NO_FILE_PATH_GIVEN_IN_CLI("No file path provided in arguments"),
+		INVALID_CLI_FILE_PATH("File not found or invalid file path"),
+		
 		SEMICOLON_MISSING("SemiColon ';' missing");
-
+		
 		Errors(String desc) {
 			this.desc = desc;
 		}
@@ -66,5 +70,4 @@ public class LogType {
 
 		String desc;
 	}
-
 }

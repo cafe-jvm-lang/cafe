@@ -22,8 +22,18 @@ public class Tokens {
 		context.put(tokensKey, this);
 	}
 
+	/**
+	 * Add all tokens here
+	 *
+	 */
 	public enum TokenKind {
-		SEMICOLON, PLUS
+		SEMICOLON(";");
+		
+		TokenKind(String val){
+			this.val = val;
+		}
+		
+		String val;
 	}
 
 	public static class Token {

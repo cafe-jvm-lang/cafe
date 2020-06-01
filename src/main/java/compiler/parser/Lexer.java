@@ -11,8 +11,4 @@ public interface Lexer {
 
 	Token prevToken();
 
-	Position position();
-
-	void position(Position position);
-
 }

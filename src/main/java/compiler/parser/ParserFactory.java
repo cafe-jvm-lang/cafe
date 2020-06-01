@@ -1,6 +1,7 @@
 package compiler.parser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import compiler.util.Context;
@@ -27,6 +28,7 @@ public class ParserFactory {
 	private final static Map<ParserType, Parser> parsers = new HashMap<>();
 
 	final Log log;
+	final ScannerFactory scannerFactory;
 
 	public static ParserFactory instance(Context context) {
 		ParserFactory instance = context.get(parserFactoryKey);
@@ -50,14 +52,17 @@ public class ParserFactory {
 		ParserType.init();
 
 		this.log = Log.instance(context);
+		this.scannerFactory = ScannerFactory.instance(context);
 	}
 
-	public Parser newParser(ParserType type) {
+	public Parser newParser(ParserType type, List<Character> input) {
 		Parser p = parsers.get(type);
 		if (p == null) {
 			throw new AssertionError("Parser of type " + type + " is not registered");
 		}
 
-		return p.instance(this);
+		Lexer lexer = scannerFactory.newScanner(input);
+		
+		return p.instance(this,lexer);
 	}
 }
