@@ -14,7 +14,7 @@ public class CharReader {
 	/**
 	 * Input Buffer pointer
 	 */
-	private int bp = -1;
+	protected int bp = -1;
 
 	/**
 	 * Input Buffer Length
