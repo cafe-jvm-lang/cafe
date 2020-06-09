@@ -19,6 +19,9 @@ public class LogType {
 
 		@Override
 		public String toString() {
+			if(pos == null) {
+				return issue.toString();
+			}
 			String error = issue.toString() + " at " + pos.toString();
 			return error;
 		}

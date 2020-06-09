@@ -32,7 +32,26 @@ public class Compiler {
 		parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.getSourceFileCharList());
 	}
 
+	enum Phase{
+		PARSE,
+	}
+	
+	boolean checkErrors() {
+		if(log.nerrors > 0) {
+			return true;
+		}
+		return false;
+	}
+	
 	public void compile() {
-		
+	LOOP:for(Phase phase : Phase.values()) {
+			switch(phase) {
+			case PARSE:
+				parser.parse();
+				if(checkErrors()) {
+					break LOOP;
+				}
+			}
+		}
 	}
 }

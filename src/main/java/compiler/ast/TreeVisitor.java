@@ -1,5 +1,4 @@
 package compiler.ast;
 
-public class TreeVisitor {
-
+public interface TreeVisitor {
 }

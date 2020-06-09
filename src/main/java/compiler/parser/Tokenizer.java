@@ -291,8 +291,10 @@ public class Tokenizer {
             	reader.scanChar();tokenKind=TokenKind.SQOUTE;break LOOP;
             case '"':
             	reader.scanChar();tokenKind=TokenKind.DQOUTE;break LOOP;
+            case '\0':
+            	tokenKind = TokenKind.END;break LOOP;
 			default:
-				log.error(pos, Errors.ILLEGAL_CHARACTER);
+				log.error(pos, Errors.ILLEGAL_CHARACTER);break LOOP;
 			}	
 		}
 		int endPosBp = reader.bp;

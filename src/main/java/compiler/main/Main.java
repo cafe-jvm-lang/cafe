@@ -53,7 +53,7 @@ public class Main {
 			return Result.ERROR;
 		}
 
-		return null;
+		return Result.OK;
 	}
 
 }

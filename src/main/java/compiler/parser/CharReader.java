@@ -54,8 +54,10 @@ public class CharReader {
 	}
 
 	protected void scanChar() {
-		if (bp < buffLen)
+		if (bp < buffLen-1)
 			ch = buff.get(++bp);
+		else
+			ch = Character.MIN_VALUE;
 	}
 
 	protected void putChar(char c) {

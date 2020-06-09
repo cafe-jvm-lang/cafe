@@ -200,7 +200,8 @@ public class Tokens {
 		THIS("this",Tag.NAMED),
 		CONTINUE("continue",Tag.NAMED),
 		RET("return",Tag.NAMED),
-		BREAK("break",Tag.NAMED);
+		BREAK("break",Tag.NAMED),
+		END;
 		
 		
 		TokenKind(){

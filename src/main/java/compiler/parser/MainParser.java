@@ -1,5 +1,8 @@
 package compiler.parser;
 
+import compiler.parser.Tokens.Token;
+import compiler.parser.Tokens.TokenKind;
+
 public class MainParser extends Parser {
 	static {
 		ParserFactory.registerParser(ParserType.MAINPARSER, new MainParser());
@@ -18,6 +21,17 @@ public class MainParser extends Parser {
 	@Override
 	protected MainParser instance(ParserFactory factory,Lexer lexer) {
 		return new MainParser(factory,lexer);
+	}
+
+	@Override
+	public void parse() {
+		lexer.nextToken();
+		Token s = lexer.token();
+		while(s.kind != TokenKind.END) {
+			System.out.println(s.kind);
+			lexer.nextToken();
+			s = lexer.token();
+		}
 	}
 }
 

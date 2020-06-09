@@ -43,7 +43,7 @@ public class SourceFileManager {
 		if (f.exists() && !f.isDirectory()) {
 			this.file = f;
 		} else {
-			log.error(new Position(0, 1, 1), Errors.INVALID_CLI_FILE_PATH);
+			log.error(Errors.INVALID_CLI_FILE_PATH);
 		}
 	}
 
@@ -59,10 +59,11 @@ public class SourceFileManager {
 		try {
 			br = new BufferedReader(new FileReader(file));
 
-			ch = (char) br.read();
-			while (ch != -1) {
+			int c = br.read();
+			while (c != -1) {
+				ch = (char) c;
 				list.add(ch);
-				ch = (char) br.read();
+				c =  br.read();
 			}
 			br.close();
 		} catch (FileNotFoundException e) {
