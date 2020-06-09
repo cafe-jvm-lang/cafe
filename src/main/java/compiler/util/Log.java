@@ -31,6 +31,16 @@ public class Log {
 		return instance;
 	}
 
+	public void error(Errors err) {
+		nerrors++;
+		errorList.add(new Error(null, err));
+	}
+	
+	public void error(int strtPos, Errors err) {
+		nerrors++;
+		errorList.add(new Error(new Position(strtPos), err));
+	}
+	
 	public void error(Position pos, Errors err) {
 		nerrors++;
 		errorList.add(new Error(pos, err));

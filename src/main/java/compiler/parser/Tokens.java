@@ -101,8 +101,8 @@ public class Tokens {
 //			return TokenKind.POWER;
 		case "is":
 			return TokenKind.IS;
-		case "is not":
-			return TokenKind.ISNOT;
+//		case "is not":
+//			return TokenKind.ISNOT;
 		case "in":
 			return TokenKind.IN;
 		case "loop":
@@ -123,6 +123,8 @@ public class Tokens {
 //			return TokenKind.LCOMMENT;
 //		case "*/":
 //			return TokenKind.RCOMMENT;
+		case "this":
+			return TokenKind.THIS;
 		case "continue":
 			return TokenKind.CONTINUE;
 		case "return":
@@ -184,7 +186,7 @@ public class Tokens {
 		MOD("%"),
 		POWER("**"),
 		IS("is",Tag.NAMED),
-		ISNOT("is not",Tag.NAMED),
+//		ISNOT("is not",Tag.NAMED),
 		IN("in",Tag.NAMED),
 		LOOP("loop",Tag.NAMED),
 		FOR("for",Tag.NAMED),
@@ -195,9 +197,7 @@ public class Tokens {
 		SINGLECOMMENT("#"),
 		LCOMMENT("/*"),
 		RCOMMENT("*/"),
-		
-		
-		
+		THIS("this",Tag.NAMED),
 		CONTINUE("continue",Tag.NAMED),
 		RET("return",Tag.NAMED),
 		BREAK("break",Tag.NAMED);

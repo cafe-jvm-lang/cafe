@@ -42,7 +42,10 @@ public class LogType {
 		NO_FILE_PATH_GIVEN_IN_CLI("No file path provided in arguments"),
 		INVALID_CLI_FILE_PATH("File not found or invalid file path"),
 		
-		SEMICOLON_MISSING("SemiColon ';' missing");
+		SEMICOLON_MISSING("SemiColon ';' missing"),
+		
+		// Lex error
+		ILLEGAL_CHARACTER("Illegal character");
 		
 		Errors(String desc) {
 			this.desc = desc;
