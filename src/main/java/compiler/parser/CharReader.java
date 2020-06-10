@@ -76,10 +76,11 @@ public class CharReader {
 	}
 
 	protected String getSavedBufferAsString(boolean clearSavedBuffer) {
+		String s = sbuff.stream().map(e->e.toString()).collect(Collectors.joining());
 		if (clearSavedBuffer) {
 			clearSavedBufer();
 		}
-		return sbuff.stream().map(e->e.toString()).collect(Collectors.joining());
+		return s;
 	}
 
 	private void clearSavedBufer() {

@@ -48,7 +48,10 @@ public class LogType {
 		SEMICOLON_MISSING("SemiColon ';' missing"),
 		
 		// Lex error
-		ILLEGAL_CHARACTER("Illegal character");
+		ILLEGAL_CHARACTER("Illegal character"),
+		INVALID_IDENTIFIER("Invalid identifier"),
+		INVALID_FRACTIONAL_VAL("Invalid fractional value"),
+		EOF_PARSING_COMMENT("Reached EOF while parsing comment");
 		
 		Errors(String desc) {
 			this.desc = desc;

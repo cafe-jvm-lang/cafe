@@ -125,6 +125,8 @@ public class Tokens {
 //			return TokenKind.RCOMMENT;
 		case "this":
 			return TokenKind.THIS;
+		case "var":
+			return TokenKind.VAR;
 		case "continue":
 			return TokenKind.CONTINUE;
 		case "return":
@@ -147,6 +149,7 @@ public class Tokens {
 		COLON(":"),
 		NUMLIT(Tag.NUMERIC),
 		STRLIT(Tag.STRING),
+		VAR("var",Tag.NAMED),
 		IDENTIFIER(Tag.NAMED),
 		IF("if",Tag.NAMED),
 		ELSE("else",Tag.NAMED),
@@ -195,12 +198,14 @@ public class Tokens {
 		DOT("."),
 		IMPORT("@"),
 		SINGLECOMMENT("#"),
-		LCOMMENT("/*"),
-		RCOMMENT("*/"),
+		MULTICOMMENT("/* */"),
 		THIS("this",Tag.NAMED),
 		CONTINUE("continue",Tag.NAMED),
 		RET("return",Tag.NAMED),
 		BREAK("break",Tag.NAMED),
+		VARARGS("..."),
+		RANGE(".."),
+		ERROR,
 		END;
 		
 		
@@ -236,12 +241,16 @@ public class Tokens {
 		
 		public final TokenKind kind;
 		public final Position pos;
-		public final List<String> comments;
-
-		public Token(TokenKind kind, Position pos, List<String> comments) {
+		public final String comment;
+		
+		public Token(TokenKind kind, Position pos, String comment) {
 			this.kind = kind;
 			this.pos = pos;
-			this.comments = comments;
+			this.comment = comment;
+		}
+		
+		public String value() {
+			return kind.toString();
 		}
 
 	}
@@ -249,27 +258,42 @@ public class Tokens {
 	public final static class NamedToken extends Token{
 		public String name;
 		
-		public NamedToken(TokenKind kind, String name,Position pos, List<String> comments) {
+		public NamedToken(TokenKind kind, String name,Position pos, String comments) {
 			super(kind, pos, comments);
 			this.name = name;
+		}
+		
+		@Override
+		public String value() {
+			return name;
 		}
 	}
 	
 	public final static class StringToken extends Token{
 		public String string;
 		
-		public StringToken(TokenKind kind, String string, Position pos, List<String> comments) {
+		public StringToken(TokenKind kind, String string, Position pos, String comments) {
 			super(kind, pos, comments);
 			this.string = string;
+		}
+		
+		@Override
+		public String value() {
+			return string;
 		}
 	}
 	
 	public final static class NumericToken extends Token{
 		public String number;
 		
-		public NumericToken(TokenKind kind, String number,Position pos, List<String> comments) {
+		public NumericToken(TokenKind kind, String number,Position pos, String comments) {
 			super(kind, pos, comments);
 			this.number = number;
+		}
+		
+		@Override
+		public String value() {
+			return number;
 		}
 	}
 }

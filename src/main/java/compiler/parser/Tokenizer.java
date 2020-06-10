@@ -1,5 +1,6 @@
 package compiler.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import compiler.parser.Tokens.NamedToken;
@@ -24,6 +25,8 @@ public class Tokenizer {
 	
 	private int lineNum = 1;
 	private int linePos = 1;
+	
+	private List<String> comment=null;
 	
 	protected Tokenizer(ScannerFactory scannerFactory, List<Character> buff) {
 		this(scannerFactory, new CharReader(buff));
@@ -71,26 +74,6 @@ public class Tokenizer {
 		}
 	}
 	
-	void scanFractional() {
-		boolean isFractional = true;
-		
-		while(true) {
-			reader.scanChar();
-			switch(reader.ch) {
-			case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9':
-            	reader.putChar(reader.ch);
-            	continue;
-            default:
-            	isFractional = false;
-			}
-			
-			if(!isFractional) {
-				return;
-			}
-		}
-	}
-	
 	void scanNum() {
 		reader.putChar(reader.ch);
 		boolean isNum = true;
@@ -102,25 +85,51 @@ public class Tokenizer {
             case '5': case '6': case '7': case '8': case '9':
             	reader.putChar(reader.ch);
             	continue;
-            case '.':
-            	reader.putChar(reader.ch);
-            	scanFractional();
-            	isNum = false;
-            	break;
             default:
             	isNum = false;
 			}
 			
 			if(!isNum) {
+				// eg: 5a , 555abcd
+				if(Character.isLetter(reader.ch)) {
+					lexicalError(linePos,lineNum, Errors.INVALID_IDENTIFIER);
+					return;
+				}
 				litValue = reader.getSavedBufferAsString(true);
 				tokenKind = TokenKind.NUMLIT;
+				return;
 			}
+		}
+	}
+	
+	void scanComment() {
+		reader.scanChar();
+		comment = new ArrayList<>();
+		while(true) {
+			if(reader.ch == '*') {
+				reader.scanChar();
+				if(reader.ch == '/') {
+					reader.scanChar();
+					return;
+				}
+				continue;
+			}
+			else if(reader.ch == ' ' || reader.ch == '\t' || reader.ch == '\n' || reader.ch=='\r') {
+				String word = reader. getSavedBufferAsString(true);
+				comment.add(word);
+			}
+			else if(reader.ch == '\0') {
+				lexicalError(linePos, lineNum, Errors.EOF_PARSING_COMMENT);
+				return;
+			}
+			reader.scanChar();
+			reader.putChar(reader.ch);
 		}
 	}
 	
 	Token readToken() {
 		int posBp = reader.bp;
-		int pos=1;
+		int pos=linePos;
 	LOOP: while(true) {	
 			switch(reader.ch) {
 			// Ignore white spaces
@@ -162,7 +171,17 @@ public class Tokenizer {
             	scanNum();
             	break LOOP;
             case '.':
-            	reader.scanChar(); tokenKind = TokenKind.DOT; break LOOP;
+            	reader.scanChar(); 
+            	if(reader.ch == '.') {
+            		reader.scanChar();
+            		if(reader.ch == '.') {
+            			reader.scanChar();tokenKind = TokenKind.VARARGS; break LOOP;
+            		}
+            		else {
+            			tokenKind = TokenKind.RANGE; break LOOP;
+            		}
+            	}
+            	tokenKind = TokenKind.DOT; break LOOP;
             case ',':
                 reader.scanChar(); tokenKind = TokenKind.COMMA; break LOOP;
             case ':':
@@ -255,26 +274,24 @@ public class Tokenizer {
             	reader.scanChar();tokenKind=TokenKind.SUB;break LOOP;
             case '*':
             	// **
-            	// */
             	reader.scanChar();
             	if(reader.ch == '*') {
             		reader.scanChar();tokenKind=TokenKind.POWER;break LOOP; 
-            	}
-            	else if(reader.ch == '/') {
-            		reader.scanChar();tokenKind=TokenKind.RCOMMENT;break LOOP;
             	}
             	else {
             		tokenKind=TokenKind.MUL;break LOOP;
             	}
             case '/' :
-             // "//"
-             // /*	
+             // "//"	
+             // "/*"
             	reader.scanChar();
             	if(reader.ch == '/') {
             		reader.scanChar();tokenKind=TokenKind.FLOORDIV;break LOOP;
             	}
             	else if(reader.ch == '*') {
-            		reader.scanChar();tokenKind=TokenKind.LCOMMENT;break LOOP;
+            		scanComment();
+            		tokenKind=TokenKind.MULTICOMMENT;
+            		break LOOP;
             	}
             	else {
             		tokenKind=TokenKind.DIV;break LOOP;	
@@ -297,17 +314,28 @@ public class Tokenizer {
 				log.error(pos, Errors.ILLEGAL_CHARACTER);break LOOP;
 			}	
 		}
-		int endPosBp = reader.bp;
-		linePos = pos + (posBp - endPosBp);
+		int endPosBp = reader.bp+1;
+		linePos = pos + (endPosBp - posBp);
 		Position p = new Position(lineNum, pos, linePos);
 		
 		switch(tokenKind.tag) {
-			case DEFAULT: return new Token(tokenKind, p, null);
+			case DEFAULT:
+				String c = null;
+				if(comment != null) {
+					c = String.join(" ", comment);
+					comment = null;
+				}
+				return new Token(tokenKind, p, c);
 			case NAMED: return new NamedToken(tokenKind,litValue,p,null);
 			case STRING: return new StringToken(tokenKind,litValue,p,null);
 			case NUMERIC: return new NumericToken(tokenKind,litValue,p,null);
 			default:
 				throw new AssertionError();
 		}
+	}
+	
+	private void lexicalError(int strtPos,int lineNum,Errors error) {
+		log.error(strtPos,lineNum,error);
+		tokenKind = TokenKind.ERROR;
 	}
 }

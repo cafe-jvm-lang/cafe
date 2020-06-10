@@ -41,6 +41,11 @@ public class Log {
 		errorList.add(new Error(new Position(strtPos), err));
 	}
 	
+	public void error(int strtPos,int lineNum, Errors err) {
+		nerrors++;
+		errorList.add(new Error(new Position(lineNum, strtPos), err));
+	}
+	
 	public void error(Position pos, Errors err) {
 		nerrors++;
 		errorList.add(new Error(pos, err));

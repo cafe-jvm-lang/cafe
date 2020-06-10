@@ -28,7 +28,10 @@ public class MainParser extends Parser {
 		lexer.nextToken();
 		Token s = lexer.token();
 		while(s.kind != TokenKind.END) {
-			System.out.println(s.kind);
+			if(s.kind == TokenKind.ERROR) {
+				return;
+			}
+			System.out.println(s.kind+" "+s.value()+" "+s.pos);
 			lexer.nextToken();
 			s = lexer.token();
 		}
