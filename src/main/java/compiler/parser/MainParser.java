@@ -1,15 +1,18 @@
 package compiler.parser;
 
+import java.util.List;
+
 import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
+import compiler.parser.Tokens.TokenKind.*;
 
 public class MainParser extends Parser {
 	static {
 		ParserFactory.registerParser(ParserType.MAINPARSER, new MainParser());
 	}
-
-	private Lexer lexer;
 	
+	private Lexer lexer;
+	private Token token;
 	private MainParser() {
 	}
 
@@ -17,37 +20,28 @@ public class MainParser extends Parser {
 		System.out.println("PARSING");
 		this.lexer = lexer;
 	}
-
+	
 	@Override
 	protected MainParser instance(ParserFactory factory,Lexer lexer) {
 		return new MainParser(factory,lexer);
 	}
-
-	@Override
-	public void parse() {
-		lexer.nextToken();
-		Token s = lexer.token();
-		while(s.kind != TokenKind.END) {
-			if(s.kind == TokenKind.ERROR) {
-				return;
-			}
-			System.out.println(s.kind+" "+s.value()+" "+s.pos);
-			lexer.nextToken();
-			s = lexer.token();
-		}
-	}
-}
-
-class ParserMethods{
 	
-	void accept(/*TokenType tokenType*/) {
-		/*
-		 * if( tokenType == currentToken.tokenType)
-		 * 		token = nextToken()
-		 * 
-		 * else
-		 * 		throw Error
-		 */
+	public Token token() {
+        return token;
+    }
+
+	void nextToken(){
+		lexer.nextToken();
+		token  = lexer.token();
+	}
+
+	void accept(TokenKind kind) {
+		if( kind == token.kind){
+			nextToken();
+		}
+		else{
+			// TODO: throw Error
+		}
 	}
 	void parseLogicalOrExpression() {
 		/*
@@ -696,10 +690,16 @@ class ParserMethods{
 	
 	void parseBlockStatement() {
 		/*
-		 * List of block Statements
+		 * List of Statement
 		 * 
 		 * parse Grammar, checks type of Statement and calls block() 
 		 */
+
+		/*
+		   switch(token.kind){
+			   case VAR
+		   }
+		*/
 	}
 	
 	// return Block Statement Node
@@ -713,27 +713,72 @@ class ParserMethods{
 	// return Import Statement Node
 	void parseImportStatement() {
 		/* List of Imports */
-		
+
+		// accept('@');
+		// boolean valid = checkFilePathRegex(token.value());
+		// if(valid) return ImportStatement(token.value())
+		// else Throw Error
 	}
 	
 	// return Statement Node
 	void parseStatement() {
 		
-		/* List of */ 
+		/* StatementNode node*/ 
+		
+		// switch(token.kind){
+		// 		case IMPORT:
+		//			node = parseImportStatement();
+		//			return node;
+		//		default:
+		//			node = parseBlockStatement();
+		//			return node;
+		// }
 	}
 	
 	// return List Of Statements
 	void parseStatements() {
-		/* List of Statements
+		/* List of Statement stats
 		 * 
 		 * calls parseStatement()
 		*/ 
+
+		// nextToken();
+		// while(token.kind != END){
+		//	 StatementNode  stat= parseStatement();
+		// 	 stats.add(stat);
+		//	 nextToken();
+		// }
+		// return ProgramNode(stats);
 	}
 	
-	// return Root Node
-	public void  parse() {
-		/* List of Statement Nodes */
-		
+	void parseStatementAsBlock(){
+		/*
+		* switch(token.kind){
+			case IF: case FOR: case 
+		}
+		*/
+	}
+
+	void parseProgram(){
+		// TODO: ProgramNode node; 
+		// node = parseStatements()
+		// return node
+	}
+
+	@Override
+	public void parse() {
+		// while(token.kind != TokenKind.END) {
+		// 	if(token.kind == TokenKind.ERROR) {
+		// 		return;
+		// 	}
+		// 	System.out.println(token.kind+" "+token.value()+" "+token.pos);
+		// 	lexer.nextToken();
+		// 	token = lexer.token();
+		// }
+
+		//Parser p = parseProgram();
+		// return p;
 	}
 }
+
 

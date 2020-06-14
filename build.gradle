@@ -32,3 +32,6 @@ application {
     // Define the main class for the application.
     mainClassName = 'compiler.Main'
 }
+run {
+    args = ["D:/compiler/file.txt"]
+}
