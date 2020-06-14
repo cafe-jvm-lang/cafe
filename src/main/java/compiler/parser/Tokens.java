@@ -127,6 +127,10 @@ public class Tokens {
 			return TokenKind.THIS;
 		case "var":
 			return TokenKind.VAR;
+		case "const":
+			return TokenKind.CONST;
+		case "func":
+			return TokenKind.FUNC;
 		case "continue":
 			return TokenKind.CONTINUE;
 		case "return":
@@ -150,6 +154,8 @@ public class Tokens {
 		NUMLIT(Tag.NUMERIC),
 		STRLIT(Tag.STRING),
 		VAR("var",Tag.NAMED),
+		CONST("const", Tag.NAMED),
+		FUNC("func", Tag.NAMED),
 		IDENTIFIER(Tag.NAMED),
 		IF("if",Tag.NAMED),
 		ELSE("else",Tag.NAMED),
