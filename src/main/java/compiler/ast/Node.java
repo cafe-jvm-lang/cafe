@@ -1,6 +1,7 @@
 package compiler.ast;
 
-import static compiler.ast.Node.Tag.*;
+import static compiler.ast.Node.Tag.IDEN;
+import static compiler.ast.Node.Tag.VARDECL;
 
 public abstract class Node{
 	

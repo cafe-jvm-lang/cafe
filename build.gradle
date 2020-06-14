@@ -28,6 +28,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+run {
+    args = ["D:\\Dhyey\\compiler\\cp.txt"]
+}
+
 application {
     // Define the main class for the application.
     mainClassName = 'compiler.Main'
