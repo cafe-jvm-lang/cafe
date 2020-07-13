@@ -55,5 +55,4 @@ public class Main {
 
 		return Result.OK;
 	}
-
 }
