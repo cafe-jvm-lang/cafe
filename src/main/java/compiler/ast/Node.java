@@ -15,7 +15,8 @@ public abstract class Node {
 
 	enum Tag {
 		VARDECL, IDEN, CONSTDECL, NUMLIT, STRLIT, BOOLLIT, FUNCDECL, OBJCREATION, BLOCK, ANNFUNC, 
-		LIST,SET,LINKEDLIST,MAP;
+		LIST,SET,LINKEDLIST,MAP, BINEXPR, UNEXPR, THIS, NULL, FUNCCALL,SUBSCRIPT,SLICE, OBJACCESS
+		,ARGSLIST,PARAMLIST,IMPORT,ASGN,IF,ELSE,FOR,LOOP, RETURN,CONTINUE,BREAK;
 	}
 
 	public static abstract class StmtNode extends Node {
@@ -193,339 +194,398 @@ public abstract class Node {
 	public static class BinaryExprNode extends ExprNode{
 		public ExprNode e1;
 		public ExprNode e2;
+		public String op;
+		public BinaryExprNode(ExprNode n1,ExprNode n2,String op) {
+			e1 = n1;
+			e2 = n2;
+			this.op = op;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return BINEXPR;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitBinaryExpr(this);
 		}
-		
 	}
 	
 	public static class UnaryExprNode extends ExprNode{
-
+		public ExprNode e;
+		public String op;
+		public UnaryExprNode(ExprNode n,String op) {
+			e = n;
+			this.op = op;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return UNEXPR;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitUnaryExpr(this);
 		}
-		
 	}
 	
 	public static class ThisNode extends ExprNode{
-
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return THIS;
 		}
 
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitThis(this);
 		}
-		
 	}
 	
 	public static class NullNode extends ExprNode{
-
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return NULL;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitNull(this);
 		}
-		
 	}
 	
 	/** 
 	 *  
 	 */
 	public static class FuncCallNode extends ExprNode{
-/*		
+		/*		
 			Ex		| invoked-on | args
 		   sum(5,x)	|	sum		 | (5,x);
 		   a[2](10)	|	a[5]	 | (10);
-*/		
+		*/	
+		public ExprNode invokedOn;
+		public ParameterListNode parmas;
+		public FuncCallNode(ExprNode e, ParameterListNode p) {
+			invokedOn = e;
+			parmas = p;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return FUNCCALL;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
-		}
-		
+			v.visitFuncCall(this);
+		}	
 	}
 	
 	public static class SubscriptNode extends ExprNode{
-/*		
+	/*		
 		Ex		|subscript-on| subscript-index
 	   sum()[5]	|	sum()	 | [5];
 	   a[2]		|	a		 | [2];
-*/
+	 */
+		public ExprNode subscriptOf;
+		public ExprNode index;
+		public SubscriptNode(ExprNode s,ExprNode i) {
+			subscriptOf = s;
+			index = i;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return SUBSCRIPT;
 		}
-
 		@Override
-		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+		public void accept(Visitor v) {	
+			v.visitSubscript(this);
 		}
-		
 	}
 	
 	public static class ObjectAccessNode extends ExprNode{
-
+		public ExprNode accessedOn;
+		public ExprNode prop;
+		public ObjectAccessNode(ExprNode e, ExprNode p) {
+			accessedOn = e;
+			prop = p;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return OBJACCESS;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitObjAccess(this);
 		}
-		
 	}
 	
 	public static class SliceNode extends ExprNode{
-
+		public ExprNode slicedOn;
+		public ExprNode start;
+		public ExprNode end;
+		public SliceNode(ExprNode slicedOn, ExprNode start, ExprNode end) {
+			this.slicedOn = slicedOn;
+			this.start = start;
+			this.end = end;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return SLICE;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitSlice(this);
 		}
-		
 	}
 	
 	public static class ArgsListNode extends Node{
-
+		public List<ExprNode> args = new ArrayList<>();
+		public ArgsListNode() {}
+		public ArgsListNode(List<ExprNode> l) { args = l; }
+		public void addArgs(ExprNode n) {
+			args.add(n);
+		}
+		public void setArgs(List<ExprNode> l) { args = l; }
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return ARGSLIST;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitArgsList(this);
 		}
-		
 	}
 	
 	public static class VarDeclNode extends DeclNode {
-
+		public IdenNode var;
+		public ExprNode value;
+		public VarDeclNode(IdenNode var) {
+			this(var,null);
+		}
+		public VarDeclNode(IdenNode var, ExprNode value) {
+			this.var = var;
+			this.value = value;
+		}
 		@Override
 		public Tag getTag() {
 			return VARDECL;
 		}
-		
 		@Override
 		public void accept(Visitor v) {
 			v.visitVarDecl(this);
 		}
-
 	}
-
+	
 	public static class ConstDeclNode extends DeclNode{
-
+		public IdenNode var;
+		public ExprNode val;
+		public ConstDeclNode(IdenNode v,ExprNode e) {
+			var = v;
+			val = e;
+		}
 		@Override
 		public Tag getTag() {
 			return CONSTDECL;
 		}
-
 		@Override
 		public void accept(Visitor v) {
 			v.visitConstDecl(this);
 		}
-		
 	}
 	
 	public static class FuncDeclNode extends DeclNode{
-
+		public IdenNode name;
+		public ParameterListNode params;
+		public BlockNode block;
+		public FuncDeclNode(IdenNode name, ParameterListNode params, BlockNode block) {
+			this.name = name;
+			this.params = params;
+			this.block = block;
+		}
 		@Override
 		public Tag getTag() {
 			return FUNCDECL;
 		}
-
 		@Override
 		public void accept(Visitor v) {
 			v.visitFuncDecl(this);
 		}
-		
 	}
 	
 	public static class ParameterListNode extends Node{
-
+		public List<IdenNode> params = new ArrayList<>();
+		public ParameterListNode() {}
+		public ParameterListNode(List<IdenNode> l) { params = l; }
+		public void addParam(IdenNode n) {
+			params.add(n);
+		}
+		public void setArgs(List<IdenNode> l) { params = l; }
 		@Override
 		public Tag getTag() {
-			return null;
+			return PARAMLIST;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			
+			v.visitParamList(this);
 		}
-		
 	}
 	
 	public static class ImportStmtNode extends StmtNode{
-
+		public String path;
+		public ImportStmtNode(String path) {
+			this.path = path;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return IMPORT;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitImportStmt(this);
 		}
-		
 	}
 	
 	public static class AsgnStmtNode extends StmtNode{
-
+		public IdenNode lhs;
+		public ExprNode rhs;
+		public AsgnStmtNode(IdenNode lhs, ExprNode rhs) {
+			this.lhs = lhs;
+			this.rhs = rhs;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return ASGN;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitAsgnStmt(this);
 		}
-		
 	}
 
 	public static class IfStmtNode extends StmtNode{
-
+		public ExprNode ifCond;
+		public BlockNode ifBlock;
+		public StmtNode elsePart;
+		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock) {
+			this(ifCond,ifBlock,null);
+		}
+		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock, StmtNode elsePart) {
+			this.ifCond = ifCond;
+			this.ifBlock = ifBlock;
+			this.elsePart = elsePart;
+		}
+		// can be another if block or else block;
+		public void setElsePart(StmtNode n) {
+			elsePart = n;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return IF;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitIfStmt(this);
 		}
-		
+	}
+	
+	public static class ElseStmtNode extends StmtNode{
+		public StmtNode parentIf;
+		public StmtNode elsePart;
+		public ElseStmtNode(StmtNode parentIf, StmtNode elsePart) {
+			this.parentIf = parentIf;
+			this.elsePart = elsePart;
+		}
+		@Override
+		public Tag getTag() {
+			return ELSE;
+		}
+		@Override
+		public void accept(Visitor v) {
+			v.visitElseStmt(this);
+		}
 	}
 	
 	public static class ForStmtNode extends StmtNode{
-
+		public List<StmtNode> init;
+		public ExprNode cond;
+		public List<AsgnStmtNode> counters;
+		public BlockNode block;
+		public ForStmtNode(ExprNode cond,BlockNode block) {
+			this(null,cond,null,block);
+		}
+		public ForStmtNode(List<StmtNode> init,ExprNode cond,BlockNode block) {
+			this(init,cond,null,block);
+		}
+		public ForStmtNode(ExprNode cond, List<AsgnStmtNode> counters, BlockNode block) {
+			this(null,cond,counters,block);
+		}
+		public ForStmtNode(List<StmtNode> init, ExprNode cond, List<AsgnStmtNode> counters,BlockNode block) {
+			this.init = init;
+			this.cond = cond;
+			this.counters = counters;
+			this.block = block;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return FOR;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
-		}
-		
+			v.visitForStmt(this);
+		}		
 	}
 	
 	public static class LoopStmtNode extends StmtNode{
-
+		public IdenNode var1;
+		public IdenNode var2;
+		public ExprNode collection;
+		public LoopStmtNode(IdenNode var1, ExprNode collection) {
+			this(var1,null,collection);
+		}
+		public LoopStmtNode(IdenNode var1, IdenNode var2, ExprNode collection) {
+			this.var1 = var1;
+			this.var2 = var2;
+			this.collection = collection;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return LOOP;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitLoopStmt(this);
 		}
-		
 	}
 	
 	public static class ReturnStmtNode extends StmtNode{
-
+		ExprNode expr;
+		public ReturnStmtNode(ExprNode expr) {
+			this.expr = expr;
+		}
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return RETURN;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitReturnStmt(this);	
 		}
-		
 	}
 	
 	public static class ContinueStmtNode extends StmtNode{
-
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return CONTINUE;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitContinueStmt(this);
 		}
-		
 	}
 	
 	public static class BreakStmtNode extends StmtNode{
-
 		@Override
 		public Tag getTag() {
-			// TODO Auto-generated method stub
-			return null;
+			return BREAK;
 		}
-
 		@Override
 		public void accept(Visitor v) {
-			// TODO Auto-generated method stub
-			
+			v.visitBreakStmt(this);
 		}
 	}
 	
@@ -572,5 +632,43 @@ public abstract class Node {
 		void visitLinkColl(LinkCollNode n);
 		
 		void visitMapColl(MapCollNode n);
+		
+		void visitBinaryExpr(BinaryExprNode n);
+		
+		void visitUnaryExpr(UnaryExprNode n);
+		
+		void visitThis(ThisNode n);
+		
+		void visitNull(NullNode n);
+		
+		void visitFuncCall(FuncCallNode n);
+		
+		void visitSubscript(SubscriptNode n);
+		
+		void visitObjAccess(ObjectAccessNode n);
+		
+		void visitSlice(SliceNode n);
+		
+		void visitArgsList(ArgsListNode n);
+		
+		void visitParamList(ParameterListNode n);
+		
+		void visitImportStmt(ImportStmtNode n);
+		
+		void visitAsgnStmt(AsgnStmtNode n);
+		
+		void visitIfStmt(IfStmtNode n);
+		
+		void visitElseStmt(ElseStmtNode n);
+		
+		void visitForStmt(ForStmtNode n);
+		
+		void visitLoopStmt(LoopStmtNode n);
+		
+		void visitReturnStmt(ReturnStmtNode n);
+		
+		void visitContinueStmt(ContinueStmtNode n);
+		
+		void visitBreakStmt(BreakStmtNode n);
 	}
 }
