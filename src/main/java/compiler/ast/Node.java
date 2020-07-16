@@ -16,7 +16,8 @@ public abstract class Node {
 	enum Tag {
 		VARDECL, IDEN, CONSTDECL, NUMLIT, STRLIT, BOOLLIT, FUNCDECL, OBJCREATION, BLOCK, ANNFUNC, 
 		LIST,SET,LINKEDLIST,MAP, BINEXPR, UNEXPR, THIS, NULL, FUNCCALL,SUBSCRIPT,SLICE, OBJACCESS
-		,ARGSLIST,PARAMLIST,IMPORT,ASGN,IF,ELSE,FOR,LOOP, RETURN,CONTINUE,BREAK;
+		,ARGSLIST,PARAMLIST,IMPORT,ASGN,IF,ELSE,FOR,LOOP, RETURN,CONTINUE,BREAK,
+		LISTCOMP,SETCOMP,LINKCOMP,MAPCOMP,COMPLOOP,COMPIF;
 	}
 
 	public static abstract class StmtNode extends Node {
@@ -188,6 +189,99 @@ public abstract class Node {
 		@Override
 		public void accept(Visitor v) {
 			v.visitMapColl(this);
+		}
+	}
+	
+	public static abstract class CompNode extends ExprNode{}
+	
+	public static class CompLoopNode extends CompNode{
+		public IdenNode var1;
+		public IdenNode var2;
+		public ExprNode collection;
+		public CompLoopNode(IdenNode var1, ExprNode collection) {
+			this(var1,null,collection);
+		}
+		public CompLoopNode(IdenNode var1, IdenNode var2, ExprNode collection) {
+			this.var1 = var1;
+			this.var2 = var2;
+			this.collection = collection;
+		}
+		@Override
+		public Tag getTag() {
+			return COMPLOOP;
+		}
+		@Override
+		public void accept(Visitor v) {
+			v.visitCompLoop(this);
+		}
+	}
+	
+	public static class CompIfNode extends CompNode{
+		public ExprNode ifCond;
+		public CompIfNode(ExprNode ifCond) {
+			this.ifCond = ifCond;
+		}
+		@Override
+		public Tag getTag() {
+			return COMPIF;
+		}
+		@Override
+		public void accept(Visitor v) {
+			
+		}	
+	}
+	
+	public static abstract class CompTypeNode extends ExprNode{
+		List<CompNode> nested;
+		public CompTypeNode() { nested = new ArrayList<>(); }
+		public CompTypeNode(List<CompNode> n) { nested = n; }
+		public void addExpr(CompNode n) {
+			nested.add(n);
+		}
+		public void setComp(List<CompNode> n) { nested = n; }
+	}
+	
+	public static class ListCompNode extends CompTypeNode{
+		@Override
+		public Tag getTag() {
+			return LISTCOMP;
+		}
+		@Override
+		public void accept(Visitor v) {
+			v.visitListComp(this);
+		}
+	}
+	
+	public static class LinkCompNode extends CompTypeNode{
+		@Override
+		public Tag getTag() {
+			return LINKCOMP;
+		}
+		@Override
+		public void accept(Visitor v) {
+			v.visitLinkComp(this);
+		}
+	}
+	
+	public static class SetCompNode extends CompTypeNode{
+		@Override
+		public Tag getTag() {
+			return SETCOMP;
+		}
+		@Override
+		public void accept(Visitor v) {
+			v.visitSetComp(this);
+		}
+	}
+	
+	public static class MapCompNode extends CompTypeNode{
+		@Override
+		public Tag getTag() {
+			return MAPCOMP;
+		}
+		@Override
+		public void accept(Visitor v) {
+			v.visitMapComp(this);
 		}
 	}
 	
@@ -534,13 +628,15 @@ public abstract class Node {
 		public IdenNode var1;
 		public IdenNode var2;
 		public ExprNode collection;
-		public LoopStmtNode(IdenNode var1, ExprNode collection) {
-			this(var1,null,collection);
+		public BlockNode block;
+		public LoopStmtNode(IdenNode var1, ExprNode collection,BlockNode block) {
+			this(var1,null,collection,block);
 		}
-		public LoopStmtNode(IdenNode var1, IdenNode var2, ExprNode collection) {
+		public LoopStmtNode(IdenNode var1, IdenNode var2, ExprNode collection,BlockNode block) {
 			this.var1 = var1;
 			this.var2 = var2;
 			this.collection = collection;
+			this.block = block;
 		}
 		@Override
 		public Tag getTag() {
@@ -590,7 +686,7 @@ public abstract class Node {
 	}
 	
 	public static class BlockNode extends Node{
-		List<StmtNode> block = new ArrayList<>();
+		public List<StmtNode> block = new ArrayList<>();
 		public void addStmt(StmtNode n) {
 			block.add(n);
 		}
@@ -670,5 +766,15 @@ public abstract class Node {
 		void visitContinueStmt(ContinueStmtNode n);
 		
 		void visitBreakStmt(BreakStmtNode n);
+		
+		void visitListComp(ListCompNode n);
+		
+		void visitLinkComp(LinkCompNode n);
+		
+		void visitSetComp(SetCompNode n);
+		
+		void visitMapComp(MapCompNode n);
+		
+		void visitCompLoop(CompLoopNode n);
 	}
 }
