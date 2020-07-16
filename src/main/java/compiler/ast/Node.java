@@ -594,6 +594,9 @@ public abstract class Node {
 		public void addStmt(StmtNode n) {
 			block.add(n);
 		}
+		public void setStmt(List<StmtNode> n){
+			block = n;
+		}
 		@Override
 		public Tag getTag() {
 			return BLOCK;
