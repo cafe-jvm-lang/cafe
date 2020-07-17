@@ -227,7 +227,7 @@ public abstract class Node {
 		}
 		@Override
 		public void accept(Visitor v) {
-			
+			v.visitCompIf(this);
 		}	
 	}
 	
@@ -779,5 +779,7 @@ public abstract class Node {
 		void visitMapComp(MapCompNode n);
 		
 		void visitCompLoop(CompLoopNode n);
+		
+		void visitCompIf(CompIfNode n);
 	}
 }

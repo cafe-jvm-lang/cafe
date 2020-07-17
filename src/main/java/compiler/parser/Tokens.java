@@ -1,7 +1,5 @@
 package compiler.parser;
 
-import java.util.List;
-
 import compiler.parser.Tokens.Token.Tag;
 import compiler.util.Context;
 import compiler.util.Position;
@@ -129,6 +127,10 @@ public class Tokens {
 //			return TokenKind.RCOMMENT;
 		case "this":
 			return TokenKind.THIS;
+		case "true":
+			return TokenKind.TRUE;
+		case "false":
+			return TokenKind.FALSE;
 		case "var":
 			return TokenKind.VAR;
 		case "const":
@@ -217,6 +219,8 @@ public class Tokens {
 		BREAK("break",Tag.NAMED),
 		VARARGS("..."),
 		RANGE(".."),
+		TRUE("true",Tag.NAMED),
+		FALSE("false", Tag.NAMED),
 		ERROR,
 		END;
 		
