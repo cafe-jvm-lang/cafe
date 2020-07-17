@@ -29,6 +29,10 @@ public class Tokens {
 			return TokenKind.IF;
 		case "else":
 			return TokenKind.ELSE;
+		case "true":
+			return TokenKind.TRUE;
+		case "false":
+			return TokenKind.FALSE;
 //		case "(":
 //			return TokenKind.LPAREN;
 //		case ")":
@@ -157,6 +161,8 @@ public class Tokens {
 		CONST("const", Tag.NAMED),
 		FUNC("func", Tag.NAMED),
 		IDENTIFIER(Tag.NAMED),
+		TRUE("true", Tag.NAMED),
+		FALSE("false", Tag.NAMED),
 		IF("if",Tag.NAMED),
 		ELSE("else",Tag.NAMED),
 		LPAREN("("),

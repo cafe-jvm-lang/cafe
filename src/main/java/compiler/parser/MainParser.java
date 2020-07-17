@@ -1,5 +1,7 @@
 package compiler.parser;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 
 import compiler.ast.Node.*;
@@ -35,6 +37,10 @@ public class MainParser extends Parser {
 
 	Token token() {
 		return token;
+	}
+
+	Token prevToken() {
+		return lexer.prevToken();
 	}
 
 	void nextToken() {
@@ -186,30 +192,53 @@ public class MainParser extends Parser {
 		 */
 	}
 
-	void parseIdentifier() {
+	ExprNode parseIdentifier() {
 		/*
 		 * Create Identifier Node. return IdentNode()
 		 */
+		Token prev = token;
+		accept(TokenKind.IDENTIFIER);
+		return new IdenNode(prev.value());
 
 	}
 
-	void parseStringLiteral() {
+	ExprNode parseStringLiteral() {
 		/*
 		 * check Quotes accept(STRING LITERAL)
 		 * 
 		 */
+		return new StrLitNode(token.value());
 	}
 
-	void parseNumberLiteral() {
+	ExprNode parseNumberLiteral() throws ParseException {
 		/*
 		 * 
 		 */
+		Token prevToken = token;
+		nextToken();
+		Number num;
+		if (token.kind == TokenKind.DOT) {
+			nextToken();
+			num = NumberFormat.getInstance().parse(prevToken.value() + '.' + token.value());
+			nextToken();
+			return new NumLitNode(num);
+		}
+		num = NumberFormat.getInstance().parse(prevToken.value());
+		return new NumLitNode(num);
 	}
 
-	void parseBoolLiteral() {
+	ExprNode parseBoolLiteral() {
 		/*
 		 * 
 		 */
+
+		if (token.kind == TokenKind.TRUE)
+			return new BoolLitNode(true);
+		else if (token.kind == TokenKind.FALSE)
+			return new BoolLitNode(false);
+
+		return null;
+
 	}
 
 	void parseSubscriptList() {
@@ -228,10 +257,17 @@ public class MainParser extends Parser {
 		 */
 	}
 
-	void parseArgList() {
+	List<ExprNode> parseArgList() {
 		/*
 		 * parseArg() while(COMMA) parseArg()
 		 */
+		List<ExprNode> args = new ArrayList<ExprNode>();
+		while (token.kind != TokenKind.RPAREN) {
+			args.add(parseValue());
+			nextToken();
+		}
+		return args;
+
 	}
 
 	void parseArg() {
@@ -398,16 +434,14 @@ public class MainParser extends Parser {
 		 * return List
 		 */
 		List<ExprNode> listNode = new ArrayList<ExprNode>();
-		accept(TokenKind.LSQU);
-		// listNode.add(parseValue());
-		// accept(TokenKind.COMMA);
-		if (token.kind == TokenKind.COMMA) {
-			accept(TokenKind.COMMA);
-			// listNode.add(parseValue());
-		} else if (token.kind == TokenKind.RANGE) {
-			accept(TokenKind.RANGE);
-			// listNode.add(parseForComprehension());
+		while (token.kind != TokenKind.RSQU) {
+			listNode.add(parseValue());
+			if (token.kind == TokenKind.COMMA)
+				accept(TokenKind.COMMA);
+			else
+				nextToken();
 		}
+
 		return new ListCollNode(listNode);
 	}
 
@@ -421,6 +455,7 @@ public class MainParser extends Parser {
 		 * 
 		 * 
 		 */
+		accept(TokenKind.LSQU);
 		if (token.kind == TokenKind.RSQU) {
 			accept(TokenKind.RSQU);
 			return new ListCollNode();
@@ -429,7 +464,7 @@ public class MainParser extends Parser {
 		}
 	}
 
-	void parseMap() {		// NOT Used by MapColl
+	void parseMap() { // NOT Used by MapColl
 		/*
 		 * List of Map<dynamic, dynamic>
 		 * 
@@ -460,16 +495,16 @@ public class MainParser extends Parser {
 			if (token.kind == TokenKind.RSQU) {
 				pairs.put(exp1, exp2);
 				accept(TokenKind.RSQU);
-				if(token.kind == TokenKind.COMMA){
+				if (token.kind == TokenKind.COMMA) {
 					accept(TokenKind.COMMA);
 				}
 				continue;
-			} else if(token.kind == TokenKind.LOOP){
-				// parseForComprehension()
+			} else if (token.kind == TokenKind.LOOP) {
+				// parseForComprehension();
 			}
-			// exp1 = parseValue();
+			exp1 = parseValue();
 			accept(TokenKind.COMMA);
-			// exp2 = parseValue();
+			exp2 = parseValue();
 			accept(TokenKind.RSQU);
 
 			pairs.put(exp1, exp2);
@@ -479,7 +514,92 @@ public class MainParser extends Parser {
 
 	}
 
-	void parseCollection() {
+	ExprNode parseSet() {
+		/*
+		 * List of Values
+		 * 
+		 * accept(LBRACKET) List.add(parseValue()) if(COMMA or DOTDOT)
+		 * List.add(parseValue()) else if(LOOP_KEYWORD)
+		 * List.add(parseForComprehension())
+		 * 
+		 * return List
+		 */
+		List<ExprNode> setNode = new ArrayList<ExprNode>();
+		while (token.kind != TokenKind.RSQU) {
+			setNode.add(parseValue());
+			if (token.kind == TokenKind.COMMA)
+				accept(TokenKind.COMMA);
+			else
+				nextToken();
+		}
+
+		return new SetCollNode(setNode);
+	}
+
+	ExprNode parseSetCollection() {
+		/*
+		 * List of Collection
+		 * 
+		 * if (RBRACKET){ return SetNode() }
+		 * 
+		 * else { return parseSet(); }
+		 * 
+		 * 
+		 */
+		nextToken();
+		accept(TokenKind.LSQU);
+		if (token.kind == TokenKind.RSQU) {
+			accept(TokenKind.RSQU);
+			return new SetCollNode();
+		} else {
+			return parseSet();
+		}
+	}
+
+	ExprNode parseLink() {
+		/*
+		 * List of Values
+		 * 
+		 * accept(LBRACKET) List.add(parseValue()) if(COMMA or DOTDOT)
+		 * List.add(parseValue()) else if(LOOP_KEYWORD)
+		 * List.add(parseForComprehension())
+		 * 
+		 * return List
+		 */
+		List<ExprNode> listNode = new ArrayList<ExprNode>();
+		while (token.kind != TokenKind.RSQU) {
+			listNode.add(parseValue());
+			if (token.kind == TokenKind.COMMA)
+				accept(TokenKind.COMMA);
+			else
+				nextToken();
+		}
+
+		return new LinkCollNode(listNode);
+	}
+
+	ExprNode parseLinkCollection() {
+		/*
+		 * List of Collection
+		 * 
+		 * if (RBRACKET){ return ListNode() }
+		 * 
+		 * else { return parseList(); }
+		 * 
+		 * 
+		 */
+		nextToken();
+		accept(TokenKind.LSQU);
+		if (token.kind == TokenKind.RSQU) {
+			accept(TokenKind.RSQU);
+			return new LinkCollNode();
+		} else {
+			return parseLink();
+		}
+	}
+
+
+	ExprNode parseCollection() {
 		/*
 		 * List of Collection
 		 * 
@@ -488,12 +608,30 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		ExprNode collExpr = null ;
+
+		switch(token.kind){
+			case LSQU:
+				collExpr= parseListCollection();
+				break;
+			case LINK:
+				collExpr = parseLinkCollection();
+				break;
+			case SET:
+				collExpr = parseSetCollection();
+				break;
+			case MAP:
+				collExpr = parseMapCollection();
+				break;
+		}
+		 return collExpr;
+		 
 	}
 
 	/* Parse Collection Done */
 
 	/* Parse Values */
-	void parseObjectCreation() {
+	ExprNode parseObjectCreation() {
 		/*
 		 * List of ObjectNode
 		 * 
@@ -504,10 +642,25 @@ public class MainParser extends Parser {
 		 */
 
 		Map<IdenNode, ExprNode> object = new HashMap<>();
+		IdenNode idenNode;
+		ExprNode exprNode;
+
+		accept(TokenKind.LCURLY);
+		while (token.kind != TokenKind.RCURLY) {
+			idenNode = (IdenNode) parseIdentifier();
+			accept(TokenKind.COLON);
+			exprNode = parseValue();
+			object.put(idenNode, exprNode);
+			if(token.kind == TokenKind.COMMA)
+				accept(TokenKind.COMMA);
+			else
+				nextToken();
+		}
+		return new ObjCreationNode(object);
 
 	}
 
-	void parseObject() {
+	void parseObject() { // Not Used
 		/*
 		 * accept(LCURLY) parseIdentifier()
 		 * 
@@ -527,13 +680,20 @@ public class MainParser extends Parser {
 		 * accept(FUNC) isAnnFunmc = true parseFunction()
 		 * 
 		 */
-		ArgsListNode args = new ArgsListNode();
-		BlockNode block = new BlockNode();
+		accept(TokenKind.FUNC);
+		accept(TokenKind.LPAREN);
+		List<ExprNode> arg = parseArgList();
+		accept(TokenKind.RPAREN);
+		ArgsListNode args = new ArgsListNode(arg);
 
+		accept(TokenKind.LCURLY);
+		// List<StmtNode> stmt = parseBlockStatement();
+		accept(TokenKind.RCURLY);
+		BlockNode block = new BlockNode();
 		return new AnnFuncNode(args, block);
 	}
 
-	void parseValue() {
+	ExprNode parseValue() {
 		/*
 		 * ValueNode
 		 * 
@@ -544,6 +704,27 @@ public class MainParser extends Parser {
 		 * 
 		 * return ValueNode
 		 */
+		ExprNode valExpr = null;
+		switch(token.kind){
+			case LCURLY:
+				valExpr = parseObjectCreation();
+				break;
+			case LSQU:
+			case LINK:
+			case SET:
+			case MAP:
+				valExpr = parseCollection();
+				break;
+			
+			case FUNC:
+				valExpr = parseAnnFunction();
+				break;
+			
+			case BITOR:
+				break;
+
+		}
+		return valExpr;
 	}
 
 	/* Parse Values DOne */
