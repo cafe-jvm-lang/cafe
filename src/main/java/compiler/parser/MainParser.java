@@ -4,6 +4,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 
+import com.google.errorprone.annotations.Var;
+
 import compiler.ast.Node.*;
 import compiler.ast.Node.ListCollNode;
 import compiler.ast.Node.IdenNode;
@@ -103,6 +105,11 @@ public class MainParser extends Parser {
 		/*
 		 * parseBitXorExpression() while(TokenType == '|'){ parseBitXorExpression() }
 		 */
+	
+		ExprNode exp1 = null;
+		ExprNode exp2 = null;
+
+
 	}
 
 	void parseBitXorExpression() {
@@ -190,6 +197,13 @@ public class MainParser extends Parser {
 		 * NUMLiteral: parseNumberLiteral() case BOOLLiteral: parseBoolLiteral() case
 		 * NULL: parseNull() case THIS: parseThis()
 		 */
+	}
+
+	ExprNode parseNull(){
+		return new NullNode();
+	}
+	ExprNode parseThis(){
+		return new ThisNode();
 	}
 
 	ExprNode parseIdentifier() {
@@ -436,12 +450,10 @@ public class MainParser extends Parser {
 		List<ExprNode> listNode = new ArrayList<ExprNode>();
 		while (token.kind != TokenKind.RSQU) {
 			listNode.add(parseValue());
-			if (token.kind == TokenKind.COMMA)
+			if (token.kind != TokenKind.RSQU)
 				accept(TokenKind.COMMA);
-			else
-				nextToken();
 		}
-
+		accept(TokenKind.RSQU);
 		return new ListCollNode(listNode);
 	}
 
@@ -495,9 +507,8 @@ public class MainParser extends Parser {
 			if (token.kind == TokenKind.RSQU) {
 				pairs.put(exp1, exp2);
 				accept(TokenKind.RSQU);
-				if (token.kind == TokenKind.COMMA) {
-					accept(TokenKind.COMMA);
-				}
+				accept(TokenKind.COMMA);
+				
 				continue;
 			} else if (token.kind == TokenKind.LOOP) {
 				// parseForComprehension();
@@ -508,8 +519,8 @@ public class MainParser extends Parser {
 			accept(TokenKind.RSQU);
 
 			pairs.put(exp1, exp2);
-
 		}
+		accept(TokenKind.RSQU);
 		return new MapCollNode(pairs);
 
 	}
@@ -527,12 +538,10 @@ public class MainParser extends Parser {
 		List<ExprNode> setNode = new ArrayList<ExprNode>();
 		while (token.kind != TokenKind.RSQU) {
 			setNode.add(parseValue());
-			if (token.kind == TokenKind.COMMA)
+			if (token.kind != TokenKind.RSQU)
 				accept(TokenKind.COMMA);
-			else
-				nextToken();
 		}
-
+		accept(TokenKind.RSQU);
 		return new SetCollNode(setNode);
 	}
 
@@ -569,11 +578,10 @@ public class MainParser extends Parser {
 		List<ExprNode> listNode = new ArrayList<ExprNode>();
 		while (token.kind != TokenKind.RSQU) {
 			listNode.add(parseValue());
-			if (token.kind == TokenKind.COMMA)
+			if (token.kind != TokenKind.RSQU)
 				accept(TokenKind.COMMA);
-			else
-				nextToken();
 		}
+		accept(TokenKind.RSQU);
 
 		return new LinkCollNode(listNode);
 	}
@@ -651,11 +659,10 @@ public class MainParser extends Parser {
 			accept(TokenKind.COLON);
 			exprNode = parseValue();
 			object.put(idenNode, exprNode);
-			if(token.kind == TokenKind.COMMA)
+			if( TokenKind.RCURLY != token.kind)
 				accept(TokenKind.COMMA);
-			else
-				nextToken();
 		}
+		accept(TokenKind.RCURLY);
 		return new ObjCreationNode(object);
 
 	}
@@ -689,7 +696,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.LCURLY);
 		// List<StmtNode> stmt = parseBlockStatement();
 		accept(TokenKind.RCURLY);
-		BlockNode block = new BlockNode();
+		BlockNode block = new BlockNode(); // BlockNode(stmt);
 		return new AnnFuncNode(args, block);
 	}
 
@@ -739,7 +746,7 @@ public class MainParser extends Parser {
 
 	}
 
-	void parseVariable() {
+	List<VarDeclNode> parseVariable() {
 		/*
 		 * List Variables checks grammar for variable Declaration
 		 * 
@@ -748,9 +755,48 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		List<VarDeclNode> varDeclNodes = new ArrayList<>();
+		accept(TokenKind.VAR);
+		while(token.kind != TokenKind.SEMICOLON){
+			IdenNode idenNode = (IdenNode) parseIdentifier();
+			ExprNode exp= null;
+			if(token.kind == TokenKind.EQU){
+				nextToken();
+				exp = parseValue();
+			}
+			if(token.kind != TokenKind.SEMICOLON)
+				accept(TokenKind.COMMA);
+			varDeclNodes.add(new VarDeclNode(idenNode, exp));
+		}
+		accept(TokenKind.SEMICOLON);
+		return varDeclNodes;
+
+	}
+	List<ConstDeclNode> parseConstVariable() {
+		/*
+		 * List Variables checks grammar for variable Declaration
+		 * 
+		 * 
+		 * calls parseVariableDeclaration
+		 * 
+		 * return List
+		 */
+		List<ConstDeclNode> constDeclNodes = new ArrayList<>();
+		accept(TokenKind.CONST);
+		while(token.kind != TokenKind.SEMICOLON){
+			IdenNode idenNode = (IdenNode) parseIdentifier();
+			accept(TokenKind.EQU);
+			ExprNode exp= parseValue();
+			if(token.kind != TokenKind.SEMICOLON)
+				accept(TokenKind.COMMA);
+			constDeclNodes.add(new ConstDeclNode(idenNode, exp));
+		}
+		accept(TokenKind.SEMICOLON);
+		return constDeclNodes;
+
 	}
 
-	void parseParameter() {
+	ParameterListNode parseParameter() {
 		/*
 		 * List of Arguments
 		 * 
@@ -760,9 +806,33 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		boolean varArg = false;
+		List<IdenNode> idenNodes= new ArrayList<>();
+		
+		while(token.kind != TokenKind.RPAREN){
+			if(token.kind == TokenKind.VARARGS){
+				accept(TokenKind.VARARGS);
+				varArg = true;
+				idenNodes.add((IdenNode)parseIdentifier());
+				accept(TokenKind.RPAREN);
+				break;
+			}
+			idenNodes.add((IdenNode)parseIdentifier());
+			if( TokenKind.RPAREN != token.kind)
+				accept(TokenKind.COMMA);
+		}
+
+		return new ParameterListNode(idenNodes, varArg);
+
 	}
 
-	void parseFunction() {
+	// ExprNode parseFunctionCall(){
+	// 	IdenNode funcName = parseIdentifier();
+
+	// }
+
+
+	DeclNode parseFunctionDeclaration() {
 		/*
 		 * List of Parameter BlockNode
 		 * 
@@ -771,6 +841,16 @@ public class MainParser extends Parser {
 		 * 
 		 * FunctionNode(name, parameter, BlockNode); returns FunctionNode
 		 */
+		accept(TokenKind.FUNC);
+		ExprNode  funcName = parseIdentifier();
+		accept(TokenKind.LPAREN);
+		ParameterListNode arg = parseParameter();
+		accept(TokenKind.RPAREN);
+		accept(TokenKind.LCURLY);
+		// List<StmtNode> stmt = parseBlockStatement();
+		accept(TokenKind.RCURLY);
+		BlockNode block = new BlockNode();	// BlockNode(stmt);
+		return new FuncDeclNode((IdenNode) funcName, arg, block);
 	}
 
 	void parseDeclarativeStatement() {
