@@ -59,144 +59,391 @@ public class MainParser extends Parser {
 		}
 	}
 
-	void parseLogicalOrExpression() {
+	ExprNode parseLogicalOrExpression() {
 		/*
 		 * parseLogicalAndExpression() while(TokenType == OR | TokenType == '||'){
 		 * parseLogicalAndExpression() }
 		 */
+		ExprNode exp1 = parseLogicalAndExpression();
+		while(token.kind == TokenKind.OROP || token.kind == TokenKind.OR ){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseLogicalAndExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
+
 	}
 
-	void parseLogicalAndExpression() {
+	ExprNode parseLogicalAndExpression() {
 		/*
 		 * parseLogicalNotExpression() while(TokenType == AND | TokenType == '&&'){
 		 * parseLogicalNotExpression() }
 		 */
+		ExprNode exp1 = parseLogicalNotExpression();
+		while(token.kind == TokenKind.ANDOP || token.kind == TokenKind.AND ){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseLogicalNotExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseLogicalNotExpression() {
+	ExprNode parseLogicalNotExpression() {
 		/*
 		 * parseNotEqualToExpression() while(TokenType == NOT | TokenType == '!'){
 		 * parseNotEqualToExpression() }
 		 */
+		ExprNode exp1 = parseNotEqualToExpression();
+		while(token.kind == TokenKind.NOTOP || token.kind == TokenKind.NOT ){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseNotEqualToExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseNotEqualToExpression() {
+	ExprNode parseNotEqualToExpression() {
 		/*
 		 * parseEqualEqualExpression() accept(NOT_EQ) while(TokenType == '!='){
 		 * parseEqualEqualExpression() }
 		 */
+		ExprNode exp1 = parseEqualEqualExpression();
+		while(token.kind == TokenKind.NOTEQU){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseEqualEqualExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseEqualEqualExpression() {
+	ExprNode parseEqualEqualExpression() {
 		/*
 		 * parseRealtionalExpression() while(TokenType == '=='){
 		 * parseRealtionalExpression() }
 		 */
+		ExprNode exp1 = parseRealtionalExpression();
+		while(token.kind == TokenKind.EQUEQU){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseRealtionalExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseRealtionalExpression() {
+	ExprNode parseRealtionalExpression() {
 		/*
 		 * parseBitOrExpression() while(TokenType == <,>,<=,>=,in ,not in, is, is not ){
 		 * parseBitOrExpression() }
 		 */
+		ExprNode exp1 = parseBitOrExpression();
+		while(token.kind == TokenKind.LT || token.kind == TokenKind.GT || token.kind == TokenKind.LTE || token.kind == TokenKind.GTE || token.kind == TokenKind.IN || token.kind == TokenKind.IS || token.kind == TokenKind.NOT){
+			String op = token.value();
+			if(token.kind == TokenKind.IS){
+				accept(token.kind);
+				op = "is";
+				if(token.kind == TokenKind.NOT)
+					op = "isnot";
+				accept(token.kind);
+			} else if (token.kind == TokenKind.NOT){
+				accept(token.kind);
+				if( token.kind == TokenKind.IN)
+					op = "notin";
+				accept(TokenKind.IN);
+			} else {
+				op = token.value();
+				accept(token.kind);
+			}
+			ExprNode exp2 = parseBitOrExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseBitOrExpression() {
+	ExprNode parseBitOrExpression() {
 		/*
 		 * parseBitXorExpression() while(TokenType == '|'){ parseBitXorExpression() }
 		 */
 	
-		ExprNode exp1 = null;
-		ExprNode exp2 = null;
-
-
+		ExprNode exp1 = parseBitXorExpression();
+		while(token.kind == TokenKind.BITOR){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseBitXorExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseBitXorExpression() {
+	ExprNode parseBitXorExpression() {
 		/*
 		 * parseLogicalAndExpression() while(TokenType == '^'){
 		 * parseLogicalAndExpression() }
 		 */
+		ExprNode exp1 = parseBitAndExpression();
+		while(token.kind == TokenKind.BITAND){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseBitAndExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseBitAndExpression() {
+	ExprNode parseBitAndExpression() {
 		/*
 		 * parseBitRightShiftExpression() while(TokenType == '&'){
 		 * parseBitRightShiftExpression() }
 		 */
+		ExprNode exp1 = parseBitRightShiftExpression();
+		while(token.kind == TokenKind.ANDOP){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseBitRightShiftExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseBitRightShiftExpression() {
+	ExprNode parseBitRightShiftExpression() {
 		/*
 		 * parseBitLeftShiftExpression() while(TokenType == '>>' | TokenType == '>>>'){
 		 * parseBitLeftShiftExpression() }
 		 */
+		ExprNode exp1 = parseBitLeftShiftExpression();
+		while(token.kind == TokenKind.RSHIFT || token.kind == TokenKind.TRSHIFT){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseBitLeftShiftExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseBitLeftShiftExpression() {
+	ExprNode parseBitLeftShiftExpression() {
 		/*
 		 * parseSubtractExpression() while(TokenType == '<<' | TokenType == '<<<'){
 		 * parseSubtractExpression() }
 		 */
+		ExprNode exp1 = parseSubtractExpression();
+		while(token.kind == TokenKind.LSHIFT){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseSubtractExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseSubtractExpression() {
+	ExprNode parseSubtractExpression() {
 		/*
 		 * parseAdditionExpression() while(TokenType == '-'){ parseAdditionExpression()
 		 * }
 		 */
+		ExprNode exp1 = parseAdditionExpression();
+		while(token.kind == TokenKind.SUB){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseAdditionExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseAdditionExpression() {
+	ExprNode parseAdditionExpression() {
 		/*
 		 * parseMultiplicationExpression() while(TokenType == '+'){
 		 * parseMultiplicationExpression() }
 		 */
+		ExprNode exp1 = parseMultiplicationExpression();
+		while(token.kind == TokenKind.ADD){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseMultiplicationExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseMultiplicationExpression() {
+	ExprNode parseMultiplicationExpression() {
 		/*
 		 * parseDivisionExpression() while(TokenType == '*'){ parseDivisionExpression()
 		 * }
 		 */
+		ExprNode exp1 = parseDivisionExpression();
+		while(token.kind == TokenKind.MUL){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseDivisionExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseDivisionExpression() {
+	ExprNode parseDivisionExpression() {
 		/*
 		 * parseFactorExpression() while(TokenType == /, %, // ){
 		 * parseFactorExpression() }
 		 */
+		ExprNode exp1 = parseFactorExpression();
+		while(token.kind == TokenKind.DIV || token.kind == TokenKind.MOD || token.kind == TokenKind.FLOORDIV){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseFactorExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		}
+		return exp1;
 	}
 
-	void parseFactorExpression() {
+	ExprNode parseFactorExpression() {
 		/*
 		 * 
 		 * if( TokenType == -, ~ ) parseFactorExpression() parsePowerExpression()
 		 * 
 		 */
+		ExprNode exp1=null;
+		if(token.kind == TokenKind.SUB || token.kind == TokenKind.TILDE){
+			if(prevToken().kind == TokenKind.IDENTIFIER){
+				// Handle Case where previous token is identifier and sould not generate UnaryOperator
+				// exp1 = parsePowerExpression();
+			} else {
+				exp1 = parseFactorExpression();
+				exp1 = new UnaryExprNode(exp1, token.value());
+				accept(token.kind);
+			}
+		} else {
+			exp1 = parsePowerExpression();
+		}
+		return exp1;
 	}
 
-	void parsePowerExpression() {
+	ExprNode parsePowerExpression() {
 		/*
 		 * parseAtomExpression() while(TokenType == '**'){ parseAtomExpression() }
 		 */
+		ExprNode exp1=null,exp2;
+		try {
+			exp1 = parseAtomExpression();
+			while(token.kind == TokenKind.POWER){
+				String op = token.value();
+				accept(TokenKind.POWER);
+				exp2 = parseFactorExpression();
+				exp1 = new BinaryExprNode(exp1, exp2, op);
+			}
+			return exp1;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return exp1;
+
 	}
 
-	void parseAtomExpression() {
+	ExprNode parseAtomExpression() throws ParseException {
 		/*
 		 * List of Trailers parseAtom()
 		 * 
 		 * trail = parseTrailer() while (trail) trail = parseTrailer()
 		 */
+
+		ExprNode oExp = parseAtom();
+		while(token.kind == TokenKind.LPAREN || token.kind == TokenKind.DOT || token.kind == TokenKind.LSQU){
+			switch(token.kind){
+				case LPAREN:
+					accept(TokenKind.LPAREN);
+					oExp = new FuncCallNode(oExp, parseParameter());
+					break;
+				
+				case LSQU:
+					ExprNode exp1,exp2;
+					while(token.kind == TokenKind.LSQU){
+						accept(TokenKind.LSQU);
+						exp1 = parseNumberLiteral();
+						if(token.kind == TokenKind.COLON){
+							accept(TokenKind.COLON);
+							exp2 = parseNumberLiteral();
+							oExp = new SliceNode(oExp, exp1, exp2);
+						} else {
+							accept(TokenKind.RSQU);
+							oExp = new SubscriptNode(oExp, exp1);
+						}
+						
+					}
+					break;
+				case DOT:
+					ExprNode e1;
+					while(token.kind == TokenKind.DOT){
+						accept(TokenKind.DOT);
+						e1 = parseIdentifier();
+						oExp = new ObjectAccessNode(oExp, e1);
+					}
+					break;
+			}
+		}
+		return oExp;
+
 	}
 
-	void parseAtom() {
+	ExprNode parseExprStmt() {
+		ExprNode exp1 = parseLogicalAndExpression();
+		if( token.kind == TokenKind.OR || token.kind== TokenKind.OROP){
+			String op = token.value();
+			accept(token.kind);
+			ExprNode exp2 = parseLogicalAndExpression();
+			exp1 = new BinaryExprNode(exp1, exp2, op);
+		} else if(token.kind == TokenKind.EQU) {
+			accept(token.kind);
+			exp1 = parseValue();
+		}
+		return exp1;
+	}
+
+	ExprNode parseAtom() {
 		/*
 		 * switch TokenType case LPAREN: parseExpressionStatement() accept(RPAREN) case
 		 * IDENTIFIER: parseIdentifier() case STRINGLITERAL: parseStringLiteral() case
 		 * NUMLiteral: parseNumberLiteral() case BOOLLiteral: parseBoolLiteral() case
 		 * NULL: parseNull() case THIS: parseThis()
 		 */
+		ExprNode exp1 = null;
+		switch(token.kind){
+			case LPAREN:
+				accept(TokenKind.LPAREN);
+				exp1 = parseExprStmt();
+				accept(TokenKind.RPAREN);
+				break;
+			case IDENTIFIER:
+				exp1 =  parseIdentifier();
+				break;
+			case STRLIT:
+				exp1 = parseStringLiteral();
+				break;
+			case NUMLIT:
+				 try {
+					exp1 = parseNumberLiteral();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					// e.printStackTrace();
+					System.out.println("Exception Thrown in parseAtom by NUMLIT");
+				}
+				break;
+			case TRUE:
+				exp1 =  parseBoolLiteral();
+				break;
+			case FALSE:
+				exp1 =  parseBoolLiteral();
+				break;
+			// case NULL:
+			// 	exp1 = parseNull();
+			// case THIS:
+			// 	exp1 = parseThis();
+		}
+		return exp1;
+
 	}
 
 	ExprNode parseNull(){
@@ -221,7 +468,9 @@ public class MainParser extends Parser {
 		 * check Quotes accept(STRING LITERAL)
 		 * 
 		 */
-		return new StrLitNode(token.value());
+		Token prev = token;
+		accept(TokenKind.STRLIT);
+		return new StrLitNode(prev.value());
 	}
 
 	ExprNode parseNumberLiteral() throws ParseException {
@@ -229,12 +478,14 @@ public class MainParser extends Parser {
 		 * 
 		 */
 		Token prevToken = token;
-		nextToken();
+		accept(TokenKind.NUMLIT);
 		Number num;
 		if (token.kind == TokenKind.DOT) {
-			nextToken();
+			accept(TokenKind.DOT);
+			if(token.kind != TokenKind.NUMLIT)
+				accept(TokenKind.NUMLIT);
 			num = NumberFormat.getInstance().parse(prevToken.value() + '.' + token.value());
-			nextToken();
+			accept(TokenKind.NUMLIT);
 			return new NumLitNode(num);
 		}
 		num = NumberFormat.getInstance().parse(prevToken.value());
@@ -246,10 +497,14 @@ public class MainParser extends Parser {
 		 * 
 		 */
 
-		if (token.kind == TokenKind.TRUE)
+		if (token.kind == TokenKind.TRUE){
+			accept(TokenKind.TRUE);
 			return new BoolLitNode(true);
-		else if (token.kind == TokenKind.FALSE)
+		}
+		else if (token.kind == TokenKind.FALSE){
+			accept(TokenKind.FALSE);
 			return new BoolLitNode(false);
+		}
 
 		return null;
 
@@ -278,7 +533,10 @@ public class MainParser extends Parser {
 		List<ExprNode> args = new ArrayList<ExprNode>();
 		while (token.kind != TokenKind.RPAREN) {
 			args.add(parseValue());
-			nextToken();
+			if(token.kind != TokenKind.RPAREN)
+				accept(TokenKind.COMMA);
+			else
+				nextToken();
 		}
 		return args;
 
