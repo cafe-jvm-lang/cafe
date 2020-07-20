@@ -4,8 +4,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 
-import com.google.errorprone.annotations.Var;
-
 import compiler.ast.Node.*;
 import compiler.ast.Node.ListCollNode;
 import compiler.ast.Node.IdenNode;
@@ -50,12 +48,14 @@ public class MainParser extends Parser {
 		token = lexer.token();
 	}
 
-	void accept(TokenKind kind) {
+	boolean accept(TokenKind kind/* ,Errors error )*/ /*pass specific error type */) {
 		if (kind == token.kind) {
 			nextToken();
+			return true;
 		} else {
 			// TODO: throw Error
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
+			return false;
 		}
 	}
 
@@ -146,14 +146,16 @@ public class MainParser extends Parser {
 			if(token.kind == TokenKind.IS){
 				accept(token.kind);
 				op = "is";
-				if(token.kind == TokenKind.NOT)
+				if(token.kind == TokenKind.NOT) {
 					op = "isnot";
-				accept(token.kind);
+					accept(token.kind);
+				}
 			} else if (token.kind == TokenKind.NOT){
 				accept(token.kind);
-				if( token.kind == TokenKind.IN)
+				if( token.kind == TokenKind.IN) {
 					op = "notin";
-				accept(TokenKind.IN);
+					accept(TokenKind.IN);
+				}
 			} else {
 				op = token.value();
 				accept(token.kind);
@@ -437,10 +439,10 @@ public class MainParser extends Parser {
 			case FALSE:
 				exp1 =  parseBoolLiteral();
 				break;
-			// case NULL:
-			// 	exp1 = parseNull();
-			// case THIS:
-			// 	exp1 = parseThis();
+			case NULL:
+			 	exp1 = parseNull();
+			case THIS:
+			 	exp1 = parseThis();
 		}
 		return exp1;
 
@@ -480,18 +482,20 @@ public class MainParser extends Parser {
 		Token prevToken = token;
 		accept(TokenKind.NUMLIT);
 		Number num;
-		if (token.kind == TokenKind.DOT) {
-			accept(TokenKind.DOT);
-			if(token.kind != TokenKind.NUMLIT)
+		if (accept(TokenKind.DOT)) {
+			if(accept(TokenKind.NUMLIT)) {
+				num = NumberFormat.getInstance().parse(prevToken.value() + '.' + token.value());
 				accept(TokenKind.NUMLIT);
-			num = NumberFormat.getInstance().parse(prevToken.value() + '.' + token.value());
-			accept(TokenKind.NUMLIT);
+				return new NumLitNode(num);
+			}
+		}
+		else {
+			num = NumberFormat.getInstance().parse(prevToken.value());
 			return new NumLitNode(num);
 		}
-		num = NumberFormat.getInstance().parse(prevToken.value());
-		return new NumLitNode(num);
+		return null;
 	}
-
+	
 	ExprNode parseBoolLiteral() {
 		/*
 		 * 
@@ -530,7 +534,7 @@ public class MainParser extends Parser {
 		/*
 		 * parseArg() while(COMMA) parseArg()
 		 */
-		List<ExprNode> args = new ArrayList<ExprNode>();
+		List<ExprNode> args = new ArrayList<>();
 		while (token.kind != TokenKind.RPAREN) {
 			args.add(parseValue());
 			if(token.kind != TokenKind.RPAREN)
@@ -705,7 +709,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
-		List<ExprNode> listNode = new ArrayList<ExprNode>();
+		List<ExprNode> listNode = new ArrayList<>();
 		while (token.kind != TokenKind.RSQU) {
 			listNode.add(parseValue());
 			if (token.kind != TokenKind.RSQU)
@@ -793,7 +797,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
-		List<ExprNode> setNode = new ArrayList<ExprNode>();
+		List<ExprNode> setNode = new ArrayList<>();
 		while (token.kind != TokenKind.RSQU) {
 			setNode.add(parseValue());
 			if (token.kind != TokenKind.RSQU)
@@ -833,7 +837,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
-		List<ExprNode> listNode = new ArrayList<ExprNode>();
+		List<ExprNode> listNode = new ArrayList<>();
 		while (token.kind != TokenKind.RSQU) {
 			listNode.add(parseValue());
 			if (token.kind != TokenKind.RSQU)
