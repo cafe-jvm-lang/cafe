@@ -122,6 +122,8 @@ public class Tokens {
 //			return TokenKind.RCOMMENT;
 		case "this":
 			return TokenKind.THIS;
+		case "null":
+			return TokenKind.NULL;
 		case "true":
 			return TokenKind.TRUE;
 		case "false":
@@ -207,6 +209,7 @@ public class Tokens {
 		SINGLECOMMENT("#"),
 		MULTICOMMENT("/* */"),
 		THIS("this",Tag.NAMED),
+		NULL("null",Tag.NAMED),
 		CONTINUE("continue",Tag.NAMED),
 		RET("return",Tag.NAMED),
 		BREAK("break",Tag.NAMED),
