@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// import org.graalvm.compiler.word.ObjectAccess;
+
 public abstract class Node {
 
 	public abstract Tag getTag();
@@ -664,10 +666,10 @@ public abstract class Node {
 	}
 
 	public static class AsgnStmtNode extends StmtNode {
-		public IdenNode lhs;
+		public ExprNode lhs;
 		public ExprNode rhs;
 
-		public AsgnStmtNode(IdenNode lhs, ExprNode rhs) {
+		public AsgnStmtNode(ExprNode lhs, ExprNode rhs) {
 			this.lhs = lhs;
 			this.rhs = rhs;
 		}
@@ -686,20 +688,20 @@ public abstract class Node {
 	public static class IfStmtNode extends StmtNode {
 		public ExprNode ifCond;
 		public BlockNode ifBlock;
-		public StmtNode elsePart;
+		public List<StmtNode> elsePart;
 
 		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock) {
 			this(ifCond, ifBlock, null);
 		}
 
-		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock, StmtNode elsePart) {
+		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock, List<StmtNode> elsePart) {
 			this.ifCond = ifCond;
 			this.ifBlock = ifBlock;
 			this.elsePart = elsePart;
 		}
 
 		// can be another if block or else block;
-		public void setElsePart(StmtNode n) {
+		public void setElsePart(List<StmtNode> n) {
 			elsePart = n;
 		}
 

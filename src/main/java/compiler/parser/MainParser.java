@@ -4,7 +4,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 
-import com.google.errorprone.annotations.Var;
+// import com.google.errorprone.annotations.Var;
 
 import compiler.ast.Node.*;
 import compiler.ast.Node.ListCollNode;
@@ -13,6 +13,7 @@ import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
 import compiler.util.LogType.Errors;
+// import jdk.nashorn.internal.ir.Assignment;
 
 public class MainParser extends Parser {
 	static {
@@ -565,6 +566,19 @@ public class MainParser extends Parser {
 	}
 
 	/* parseStatements */
+	IfStmtNode parseIf(){
+		ExprNode ifCond, elseBlock;
+		BlockNode ifBlock = null;
+
+		accept(TokenKind.IF);
+		accept(TokenKind.LPAREN);
+		ifCond = parseLogicalOrExpression();
+		accept(TokenKind.RPAREN);
+		accept(TokenKind.LCURLY);
+		parseBlock(); // ifBlock = parseBlock()
+		accept(TokenKind.RCURLY);
+		return new IfStmtNode(ifCond, ifBlock);
+	}
 
 	void parseIfStatement() {
 		/*
@@ -572,6 +586,22 @@ public class MainParser extends Parser {
 		 * accept(LCURLY) parseBlockStatements() accept(RCURLY) if ELSEIF
 		 * parseElseIfStatement() if ELSE parseElseStatement()
 		 */
+		
+		IfStmtNode ifNode = parseIf();
+		List<StmtNode> elseIfList = new ArrayList<StmtNode>();
+		StmtNode elseBlock = null;
+		while (token.kind == TokenKind.ELSE){
+			accept(TokenKind.ELSE);
+			if (token.kind == TokenKind.IF){
+				elseIfList.add(parseIf());
+			} else if(token.kind == TokenKind.LCURLY){
+				// elseBlock = parseBlock();
+				
+				break;
+			}
+		}
+		elseIfList.add(new ElseStmtNode(ifNode, elseBlock));
+		ifNode.setElsePart(elseIfList);
 	}
 
 	void parseElseStatement() {
@@ -592,13 +622,23 @@ public class MainParser extends Parser {
 		 */
 	}
 
-	void parseAssignmentStatement() {
+	StmtNode parseAssignmentStatement() {
 		/*
 		 * parseIdentifier() while (DOT) parseIdentifier() parseEqualOperator()
 		 * parseValue() accept(SEMI)
-		 * 
 		 */
-
+		
+		ExprNode exp1 =  parseIdentifier();
+		ExprNode exp2;
+		while(token.kind == TokenKind.DOT){
+			accept(TokenKind.DOT);
+			exp2 = parseIdentifier();
+			exp1 = new ObjectAccessNode(exp1, exp2);
+		}
+		accept(TokenKind.EQU);
+		ExprNode exp = parseValue();
+		accept(TokenKind.SEMICOLON);
+		return new AsgnStmtNode(exp1, exp);
 	}
 
 	/* Parse Loops */
@@ -656,10 +696,14 @@ public class MainParser extends Parser {
 		 */
 	}
 
-	void parseFlowStatement() {
+	StmtNode parseFlowStatement() {
 		/*
 		 * if(CONTINUE) return ContinueNode if(BREAK) return BreakNode
 		 */
+		if(token.kind == TokenKind.CONTINUE)
+			return new ContinueStmtNode();
+		else
+			return new BreakStmtNode();
 	}
 
 	void parseCollectionComprehension() {
@@ -1156,6 +1200,8 @@ public class MainParser extends Parser {
 		// boolean valid = checkFilePathRegex(token.value());
 		// if(valid) return ImportStatement(token.value())
 		// else Throw Error
+
+
 	}
 
 	// return Statement Node
