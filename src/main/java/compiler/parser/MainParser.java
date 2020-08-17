@@ -31,6 +31,14 @@ public class MainParser extends Parser {
 		System.out.println("PARSING");
 		this.lexer = lexer;
 		this.log = factory.log;
+//		TESTING
+//		nextToken();
+//		while(token.kind != TokenKind.END) {
+//			System.out.println(token.kind);
+//			nextToken();
+//			if(token.kind == TokenKind.ERROR)
+//				break;
+//		}
 	}
 
 	@Override
@@ -594,7 +602,7 @@ public class MainParser extends Parser {
 		 */
 		
 		IfStmtNode ifNode = parseIf();
-		List<StmtNode> elseIfList = new ArrayList<StmtNode>();
+		List<StmtNode> elseIfList = new ArrayList<>();
 		StmtNode elseBlock = null;
 		while (token.kind == TokenKind.ELSE){
 			accept(TokenKind.ELSE);
