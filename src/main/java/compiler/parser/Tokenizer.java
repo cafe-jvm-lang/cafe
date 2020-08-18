@@ -311,7 +311,9 @@ public class Tokenizer {
             case '\0':
             	tokenKind = TokenKind.END;break LOOP;
 			default:
-				log.error(pos, Errors.ILLEGAL_CHARACTER);break LOOP;
+				// TODO: pos calculation is wrong
+				lexicalError(pos, pos, Errors.ILLEGAL_CHARACTER);
+				break LOOP;
 			}	
 		}
 		int endPosBp = reader.bp+1;
