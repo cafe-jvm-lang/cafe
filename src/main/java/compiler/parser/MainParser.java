@@ -586,11 +586,11 @@ public class MainParser extends Parser {
 		return new IfStmtNode(ifCond, ifBlock);
 	}
 
-	void parseIfStatement() {
+	StmtNode parseIfStatement() {
 		/*
-		 * accept(IF) accept(LPAREN) parseLogORExpression() accept(RPAREN)
-		 * accept(LCURLY) parseBlockStatements() accept(RCURLY) if ELSEIF
-		 * parseElseIfStatement() if ELSE parseElseStatement()
+		 * Parse If Statement and check if there any 'else' is there, 
+		 * if 'yes' then parseIt and Break 
+		 * otherwise parse Else if statement and append to a list
 		 */
 		
 		IfStmtNode ifNode = parseIf();
@@ -606,8 +606,10 @@ public class MainParser extends Parser {
 				break;
 			}
 		}
-		elseIfList.add(new ElseStmtNode(ifNode, elseBlock));
+		if (elseBlock != null)
+			elseIfList.add(new ElseStmtNode(ifNode, elseBlock));
 		ifNode.setElsePart(elseIfList);
+		return ifNode;
 	}
 
 	void parseElseStatement() {
@@ -648,24 +650,73 @@ public class MainParser extends Parser {
 	}
 
 	/* Parse Loops */
-	void parseForInit() {
+	List<StmtNode> parseForInit() {
 		/*
-		 * if ( VAR ) accept(VAR) parseVariableDeclaration()
+		 * 
 		 * 
 		 */
+		List<StmtNode> init = null;
+		ExprNode iden, val;
+		if (token.kind == TokenKind.SEMICOLON)
+			return init;
+		init = new ArrayList<StmtNode>();
+		while (token.kind == TokenKind.VAR || token.kind == TokenKind.IDENTIFIER) {
+			if (token.kind == TokenKind.VAR){
+				accept(TokenKind.VAR);
+				iden = parseIdentifier();
+				accept(TokenKind.EQU);
+				val = parseValue();
+				if (token.kind == TokenKind.COMMA)
+					nextToken();
+				init.add(new VarDeclNode((IdenNode)iden, val));
+			} else {
+				iden = parseIdentifier();
+				accept(TokenKind.EQU);
+				val = parseValue();
+				if (token.kind == TokenKind.COMMA)
+					nextToken();
+				init.add(new AsgnStmtNode(iden, val));
+			}
+		}
+		return init;
 	}
 
-	void parseForCondition() {
+	ExprNode parseForCondition() {
 		/*
 		 * parseLogOrEcpression()
 		 */
+		ExprNode cond = null;
+		if (token.kind == TokenKind.SEMICOLON)
+			return cond;
+		cond = parseLogicalOrExpression();
+		return cond;
 	}
 
-	void parseForIncrement() {
+	List<AsgnStmtNode> parseForIncrement() {
 		/*
 		 * 
 		 * parseAssignmentStatement()
 		 */
+		ExprNode iden, val, exp2;
+		List<AsgnStmtNode> incrNodes = null;
+		if (token.kind == TokenKind.RPAREN)
+			return incrNodes;
+
+		incrNodes = new ArrayList<AsgnStmtNode>();
+		while(token.kind == TokenKind.IDENTIFIER){
+			iden =  parseIdentifier();
+			while(token.kind == TokenKind.DOT){
+				accept(TokenKind.DOT);
+				exp2 = parseIdentifier();
+				iden = new ObjectAccessNode(iden, exp2);
+			}
+			accept(TokenKind.EQU);
+			val = parseValue();
+			incrNodes.add(new AsgnStmtNode(iden, val));
+			if (token.kind == TokenKind.COMMA)
+				nextToken();
+		}
+		return incrNodes;
 	}
 
 	void parseForStatement() {
@@ -674,32 +725,64 @@ public class MainParser extends Parser {
 		 * parseForIncr() else parseForInit() accept(SEMI) parseForCondition()
 		 * accept(SEMI) parseForIncr()
 		 */
+		List<StmtNode> init=null;
+		ExprNode cond = null;
+		List<AsgnStmtNode> incrNode = null;
+		ExprNode block;
+		accept(TokenKind.FOR);
+		accept(TokenKind.LPAREN);
+		init = parseForInit();
+		accept(TokenKind.SEMICOLON);
+		cond = parseForCondition();
+		accept(TokenKind.SEMICOLON);
+		incrNode = parseForIncrement();
+		accept(TokenKind.RPAREN);
+		accept(TokenKind.LCURLY);
+		// block = parseBlock();
+		accept(TokenKind.RCURLY);
 	}
 
-	void parseLoopStatement() {
+	StmtNode parseLoopStatement() {
 		/*
 		 * accept(LOOP) parseLoopIdentifier() accept(IN) parseLoopValue()
 		 * parseLoopBlock() parseCollectionComprehension()
 		 * 
 		 */
-	}
-
-	void parseLoopIdentifier() {
-		/*
-		 * parseIdentifier() if (COMMA) parseLoopIdentifier()
-		 */
-	}
-
-	void parseLoopValues() {
-		/*
-		 * parseCollection() parseAtomExpr() parseObjectCreation()
-		 */
+		IdenNode iden1, iden2 = null;
+		ExprNode exp = null;
+		BlockNode block = null;
+		
+		accept(TokenKind.LOOP);
+		iden1 = (IdenNode) parseIdentifier();
+		if (token.kind == TokenKind.COMMA){
+			nextToken();
+			iden2 = (IdenNode) parseIdentifier();
+		}
+		accept(TokenKind.IN);
+		exp = parseCollection();
+		if (exp == null){	
+			if(token.kind == TokenKind.LCURLY)
+				exp = parseObjectCreation();
+			else
+				try {
+					exp = parseAtomExpression();
+				} catch (ParseException e) {}
+		}
+		accept(TokenKind.LCURLY);
+		//block = parseLoopBlock();
+		accept(TokenKind.RCURLY);
+		return new LoopStmtNode(iden1, iden2, exp, block);
 	}
 
 	void parseLoopBlock() {
 		/*
 		 * parseBlockStatement() parseFlowStatement()
 		 */
+		List<StmtNode> blockStats = new ArrayList<StmtNode>();
+		while (token.kind != TokenKind.RCURLY){
+
+		}
+		
 	}
 
 	StmtNode parseFlowStatement() {
@@ -1188,6 +1271,8 @@ public class MainParser extends Parser {
 		/*
 		 * switch(token.kind){ case VAR }
 		 */
+
+		
 	}
 
 	// return Block Statement Node
