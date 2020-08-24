@@ -33,6 +33,26 @@ public abstract class Node {
 
 	}
 
+	public static class ProgramNode extends StmtNode {
+		List<StmtNode> tree;
+
+		public ProgramNode(List<StmtNode> tr) {
+			tree = tr;
+		}
+
+		@Override
+		public Tag getTag() {
+			// return NODE;
+			return IDEN;
+		}
+
+		@Override
+		public void accept(Visitor v) {
+			// v.visitIden(this);
+		}
+
+	}
+
 	public static class IdenNode extends ExprNode {
 		public String name;
 
