@@ -29,7 +29,7 @@ dependencies {
 }
 
 run {
-    args = ["D:\\Dhyey\\compiler\\cp.txt"]
+    args = [".\\cp.txt"]
 }
 
 application {

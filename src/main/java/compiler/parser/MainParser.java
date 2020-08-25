@@ -62,9 +62,13 @@ public class MainParser extends Parser {
 		if (kind == token.kind) {
 			nextToken();
 			return true;
+		} else if (token.kind == TokenKind.ERROR) {
+			System.exit(1);
+			return false;
 		} else {
 			// TODO: throw Error
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
+			System.exit(1);
 			return false;
 		}
 	}
@@ -1329,6 +1333,7 @@ public class MainParser extends Parser {
 		 * List of block Statements calls parseBlockStatement
 		 */
 		List<StmtNode> blockStmt = new ArrayList<>();
+		System.out.println("Token kind "+token.kind);
 		switch (token.kind) {
 			case VAR:
 				blockStmt.addAll(parseVariable());
@@ -1359,6 +1364,7 @@ public class MainParser extends Parser {
 				blockStmt.add(parseAssignmentStatement());
 				break;
 		}
+		System.out.println("Block Stmt: "+blockStmt);
 		return blockStmt;
 	}
 
@@ -1402,6 +1408,7 @@ public class MainParser extends Parser {
 					break;
 			}
 		}
+		System.out.println(tree);
 		return new ProgramNode(tree);
 	}
 
