@@ -58,18 +58,21 @@ public class MainParser extends Parser {
 		token = lexer.token();
 	}
 
-	boolean accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
+	void accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
 		if (kind == token.kind) {
 			nextToken();
-			return true;
+			// return true;
 		} else if (token.kind == TokenKind.ERROR) {
-			System.exit(1);
-			return false;
+			System.out.println("Expected "+ kind+ " Found "+token.kind);
+			log.error(token.pos, Errors.INVALID_IDENTIFIER);
+			// System.exit(1);
+			// return false;
 		} else {
 			// TODO: throw Error
+			System.out.println("Expected "+ kind+ " Found "+token.kind);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
-			System.exit(1);
-			return false;
+			// System.exit(1);
+			// return false;
 		}
 	}
 
@@ -500,11 +503,14 @@ public class MainParser extends Parser {
 		Token prevToken = token;
 		accept(TokenKind.NUMLIT);
 		Number num;
-		if (accept(TokenKind.DOT)) {
-			if (accept(TokenKind.NUMLIT)) {
+		if (token.kind == TokenKind.DOT) {
+			nextToken();
+			if (token.kind == TokenKind.NUMLIT) {
 				num = NumberFormat.getInstance().parse(prevToken.value() + '.' + token.value());
 				accept(TokenKind.NUMLIT);
 				return new NumLitNode(num);
+			} else {
+				accept(TokenKind.NUMLIT);
 			}
 		} else {
 			num = NumberFormat.getInstance().parse(prevToken.value());
@@ -1126,6 +1132,7 @@ public class MainParser extends Parser {
 		 * return ValueNode
 		 */
 		ExprNode valExpr = null;
+		System.out.println("Parse Value: "+token.kind);
 		switch (token.kind) {
 			case LCURLY:
 				valExpr = parseObjectCreation();
@@ -1141,7 +1148,8 @@ public class MainParser extends Parser {
 				valExpr = parseAnnFunction();
 				break;
 
-			case BITOR:
+			default:
+				valExpr = parseBitOrExpression();
 				break;
 
 		}
@@ -1178,8 +1186,10 @@ public class MainParser extends Parser {
 				nextToken();
 				exp = parseValue();
 			}
-			if (token.kind != TokenKind.SEMICOLON)
+			if (token.kind != TokenKind.SEMICOLON){
 				accept(TokenKind.COMMA);
+				accept(TokenKind.IDENTIFIER);
+			}
 			varDeclNodes.add(new VarDeclNode(idenNode, exp));
 		}
 		accept(TokenKind.SEMICOLON);
@@ -1408,7 +1418,7 @@ public class MainParser extends Parser {
 					break;
 			}
 		}
-		System.out.println(tree);
+		System.out.println("Block Statements "+tree);
 		return new ProgramNode(tree);
 	}
 
