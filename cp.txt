@@ -1,7 +1,13 @@
-var x = 5.522 + 4.22;
+var z = 5;
 
-if (x==2) {
+var z = link[1,2];
 
-}
-func aa() {
-}
+var z= z[2];
+
+var x = map[[1,1], [2,4], [5,6]];
+
+var t = [1,2,];
+
+z=5;
+
+var x = { a:10 };
