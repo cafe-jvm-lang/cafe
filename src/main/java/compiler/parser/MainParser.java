@@ -21,7 +21,7 @@ public class MainParser extends Parser {
 	private Lexer lexer;
 	private Token token;
 	private Log log;
-	private boolean breakAllowed = false, innerLoop = false;
+	private boolean breakAllowed = false, innerLoop = false, error = false;
 
 	private MainParser() {
 	}
@@ -63,12 +63,14 @@ public class MainParser extends Parser {
 			nextToken();
 			// return true;
 		} else if (token.kind == TokenKind.ERROR) {
+			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
 			// System.exit(1);
 			// return false;
 		} else {
 			// TODO: throw Error
+			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
 			// System.exit(1);
@@ -81,6 +83,7 @@ public class MainParser extends Parser {
 		 * parseLogicalAndExpression() while(TokenType == OR | TokenType == '||'){
 		 * parseLogicalAndExpression() }
 		 */
+		if (error) return null;
 		ExprNode exp1 = parseLogicalAndExpression();
 		while (token.kind == TokenKind.OROP || token.kind == TokenKind.OR) {
 			String op = token.value();
@@ -88,6 +91,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseLogicalAndExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 
 	}
@@ -97,6 +101,7 @@ public class MainParser extends Parser {
 		 * parseLogicalNotExpression() while(TokenType == AND | TokenType == '&&'){
 		 * parseLogicalNotExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseLogicalNotExpression();
 		while (token.kind == TokenKind.ANDOP || token.kind == TokenKind.AND) {
 			String op = token.value();
@@ -104,6 +109,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseLogicalNotExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -112,6 +118,7 @@ public class MainParser extends Parser {
 		 * parseNotEqualToExpression() while(TokenType == NOT | TokenType == '!'){
 		 * parseNotEqualToExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseNotEqualToExpression();
 		while (token.kind == TokenKind.NOTOP || token.kind == TokenKind.NOT) {
 			String op = token.value();
@@ -119,6 +126,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseNotEqualToExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -127,6 +135,7 @@ public class MainParser extends Parser {
 		 * parseEqualEqualExpression() accept(NOT_EQ) while(TokenType == '!='){
 		 * parseEqualEqualExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseEqualEqualExpression();
 		while (token.kind == TokenKind.NOTEQU) {
 			String op = token.value();
@@ -134,6 +143,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseEqualEqualExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -142,6 +152,7 @@ public class MainParser extends Parser {
 		 * parseRealtionalExpression() while(TokenType == '=='){
 		 * parseRealtionalExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseRealtionalExpression();
 		while (token.kind == TokenKind.EQUEQU) {
 			String op = token.value();
@@ -149,6 +160,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseRealtionalExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -157,6 +169,7 @@ public class MainParser extends Parser {
 		 * parseBitOrExpression() while(TokenType == <,>,<=,>=,in ,not in, is, is not ){
 		 * parseBitOrExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseBitOrExpression();
 		while (token.kind == TokenKind.LT || token.kind == TokenKind.GT || token.kind == TokenKind.LTE
 				|| token.kind == TokenKind.GTE || token.kind == TokenKind.IN || token.kind == TokenKind.IS
@@ -182,6 +195,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseBitOrExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -190,6 +204,7 @@ public class MainParser extends Parser {
 		 * parseBitXorExpression() while(TokenType == '|'){ parseBitXorExpression() }
 		 */
 
+		if (error)  return null;
 		ExprNode exp1 = parseBitXorExpression();
 		while (token.kind == TokenKind.BITOR) {
 			String op = token.value();
@@ -197,6 +212,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseBitXorExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -205,6 +221,7 @@ public class MainParser extends Parser {
 		 * parseLogicalAndExpression() while(TokenType == '^'){
 		 * parseLogicalAndExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseBitAndExpression();
 		while (token.kind == TokenKind.BITAND) {
 			String op = token.value();
@@ -212,6 +229,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseBitAndExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -220,6 +238,7 @@ public class MainParser extends Parser {
 		 * parseBitRightShiftExpression() while(TokenType == '&'){
 		 * parseBitRightShiftExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseBitRightShiftExpression();
 		while (token.kind == TokenKind.ANDOP) {
 			String op = token.value();
@@ -227,6 +246,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseBitRightShiftExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -235,6 +255,7 @@ public class MainParser extends Parser {
 		 * parseBitLeftShiftExpression() while(TokenType == '>>' | TokenType == '>>>'){
 		 * parseBitLeftShiftExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseBitLeftShiftExpression();
 		while (token.kind == TokenKind.RSHIFT || token.kind == TokenKind.TRSHIFT) {
 			String op = token.value();
@@ -242,6 +263,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseBitLeftShiftExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -250,6 +272,7 @@ public class MainParser extends Parser {
 		 * parseSubtractExpression() while(TokenType == '<<' | TokenType == '<<<'){
 		 * parseSubtractExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseSubtractExpression();
 		while (token.kind == TokenKind.LSHIFT) {
 			String op = token.value();
@@ -257,6 +280,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseSubtractExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -265,6 +289,7 @@ public class MainParser extends Parser {
 		 * parseAdditionExpression() while(TokenType == '-'){ parseAdditionExpression()
 		 * }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseAdditionExpression();
 		while (token.kind == TokenKind.SUB) {
 			String op = token.value();
@@ -272,6 +297,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseAdditionExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -280,6 +306,7 @@ public class MainParser extends Parser {
 		 * parseMultiplicationExpression() while(TokenType == '+'){
 		 * parseMultiplicationExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseMultiplicationExpression();
 		while (token.kind == TokenKind.ADD) {
 			String op = token.value();
@@ -287,6 +314,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseMultiplicationExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -295,6 +323,7 @@ public class MainParser extends Parser {
 		 * parseDivisionExpression() while(TokenType == '*'){ parseDivisionExpression()
 		 * }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseDivisionExpression();
 		while (token.kind == TokenKind.MUL) {
 			String op = token.value();
@@ -302,6 +331,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseDivisionExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -310,6 +340,7 @@ public class MainParser extends Parser {
 		 * parseFactorExpression() while(TokenType == /, %, // ){
 		 * parseFactorExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = parseFactorExpression();
 		while (token.kind == TokenKind.DIV || token.kind == TokenKind.MOD || token.kind == TokenKind.FLOORDIV) {
 			String op = token.value();
@@ -317,6 +348,7 @@ public class MainParser extends Parser {
 			ExprNode exp2 = parseFactorExpression();
 			exp1 = new BinaryExprNode(exp1, exp2, op);
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -326,6 +358,7 @@ public class MainParser extends Parser {
 		 * if( TokenType == -, ~ ) parseFactorExpression() parsePowerExpression()
 		 * 
 		 */
+		if (error)  return null;
 		ExprNode exp1 = null;
 		if (token.kind == TokenKind.SUB || token.kind == TokenKind.TILDE) {
 			if (prevToken().kind == TokenKind.IDENTIFIER) {
@@ -340,6 +373,7 @@ public class MainParser extends Parser {
 		} else {
 			exp1 = parsePowerExpression();
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -347,6 +381,7 @@ public class MainParser extends Parser {
 		/*
 		 * parseAtomExpression() while(TokenType == '**'){ parseAtomExpression() }
 		 */
+		if (error)  return null;
 		ExprNode exp1 = null, exp2;
 		try {
 			exp1 = parseAtomExpression();
@@ -361,6 +396,7 @@ public class MainParser extends Parser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		if (error)  return null;
 		return exp1;
 
 	}
@@ -371,7 +407,7 @@ public class MainParser extends Parser {
 		 * 
 		 * trail = parseTrailer() while (trail) trail = parseTrailer()
 		 */
-
+		if (error)  return null;
 		ExprNode oExp = parseAtom();
 		while (token.kind == TokenKind.LPAREN || token.kind == TokenKind.DOT || token.kind == TokenKind.LSQU) {
 			switch (token.kind) {
@@ -406,11 +442,12 @@ public class MainParser extends Parser {
 					break;
 			}
 		}
+		if (error)  return null;
 		return oExp;
-
 	}
 
 	ExprNode parseExprStmt() {
+		if (error)  return null;
 		ExprNode exp1 = parseLogicalAndExpression();
 		if (token.kind == TokenKind.OR || token.kind == TokenKind.OROP) {
 			String op = token.value();
@@ -421,6 +458,7 @@ public class MainParser extends Parser {
 			accept(token.kind);
 			exp1 = parseValue();
 		}
+		if (error)  return null;
 		return exp1;
 	}
 
@@ -431,6 +469,7 @@ public class MainParser extends Parser {
 		 * NUMLiteral: parseNumberLiteral() case BOOLLiteral: parseBoolLiteral() case
 		 * NULL: parseNull() case THIS: parseThis()
 		 */
+		if (error)  return null;
 		ExprNode exp1 = null;
 		switch (token.kind) {
 			case LPAREN:
@@ -464,15 +503,18 @@ public class MainParser extends Parser {
 			case THIS:
 				exp1 = parseThis();
 		}
+		if (error)  return null;
 		return exp1;
 
 	}
 
 	ExprNode parseNull() {
+		if (error)  return null;
 		return new NullNode();
 	}
 
 	ExprNode parseThis() {
+		if (error)  return null;
 		return new ThisNode();
 	}
 
@@ -480,6 +522,7 @@ public class MainParser extends Parser {
 		/*
 		 * Create Identifier Node. return IdentNode()
 		 */
+		if (error)  return null;
 		Token prev = token;
 		accept(TokenKind.IDENTIFIER);
 		return new IdenNode(prev.value());
@@ -491,6 +534,7 @@ public class MainParser extends Parser {
 		 * check Quotes accept(STRING LITERAL)
 		 * 
 		 */
+		if (error)  return null;
 		Token prev = token;
 		accept(TokenKind.STRLIT);
 		return new StrLitNode(prev.value());
@@ -500,6 +544,7 @@ public class MainParser extends Parser {
 		/*
 		 * 
 		 */
+		if (error)  return null;
 		Token prevToken = token;
 		accept(TokenKind.NUMLIT);
 		Number num;
@@ -508,14 +553,17 @@ public class MainParser extends Parser {
 			if (token.kind == TokenKind.NUMLIT) {
 				num = NumberFormat.getInstance().parse(prevToken.value() + '.' + token.value());
 				accept(TokenKind.NUMLIT);
+				if (error)  return null;
 				return new NumLitNode(num);
 			} else {
 				accept(TokenKind.NUMLIT);
 			}
 		} else {
 			num = NumberFormat.getInstance().parse(prevToken.value());
+			if (error)  return null;
 			return new NumLitNode(num);
 		}
+		
 		return null;
 	}
 
@@ -523,17 +571,17 @@ public class MainParser extends Parser {
 		/*
 		 * 
 		 */
-
+		if (error)  return null;
 		if (token.kind == TokenKind.TRUE) {
 			accept(TokenKind.TRUE);
+			if (error)  return null;
 			return new BoolLitNode(true);
 		} else if (token.kind == TokenKind.FALSE) {
 			accept(TokenKind.FALSE);
+			if (error)  return null;
 			return new BoolLitNode(false);
 		}
-
 		return null;
-
 	}
 
 	void parseSubscriptList() {
@@ -556,6 +604,7 @@ public class MainParser extends Parser {
 		/*
 		 * parseArg() while(COMMA) parseArg()
 		 */
+		if (error)  return null;
 		List<ExprNode> args = new ArrayList<>();
 		while (token.kind != TokenKind.RPAREN) {
 			args.add(parseValue());
@@ -564,6 +613,7 @@ public class MainParser extends Parser {
 			else
 				nextToken();
 		}
+		if (error)  return null;
 		return args;
 
 	}
@@ -592,6 +642,7 @@ public class MainParser extends Parser {
 
 	/* parseStatements */
 	IfStmtNode parseIf() {
+		if (error)  return null;
 		ExprNode ifCond, elseBlock;
 		BlockNode ifBlock = new BlockNode();
 
@@ -602,6 +653,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.LCURLY);
 		ifBlock = parseLoopBlock();
 		accept(TokenKind.RCURLY);
+		if (error)  return null;
 		return new IfStmtNode(ifCond, ifBlock);
 	}
 
@@ -611,6 +663,7 @@ public class MainParser extends Parser {
 		 * parseIt and Break otherwise parse Else if statement and append to a list
 		 */
 
+		if (error)  return null;
 		IfStmtNode ifNode = parseIf();
 		List<StmtNode> elseIfList = new ArrayList<>();
 		StmtNode elseBlock = null;
@@ -627,6 +680,7 @@ public class MainParser extends Parser {
 		if (elseBlock != null)
 			elseIfList.add(new ElseStmtNode(ifNode, elseBlock));
 		ifNode.setElsePart(elseIfList);
+		if (error)  return null;
 		return ifNode;
 	}
 
@@ -653,6 +707,7 @@ public class MainParser extends Parser {
 		 * parseIdentifier() while (DOT) parseIdentifier() parseEqualOperator()
 		 * parseValue() accept(SEMI)
 		 */
+		if (error)  return null;
 
 		ExprNode exp1 = parseIdentifier();
 		ExprNode exp2;
@@ -664,6 +719,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.EQU);
 		ExprNode exp = parseValue();
 		accept(TokenKind.SEMICOLON);
+		if (error)  return null;
 		return new AsgnStmtNode(exp1, exp);
 	}
 
@@ -673,6 +729,7 @@ public class MainParser extends Parser {
 		 * 
 		 * 
 		 */
+		if (error)  return null;
 		List<StmtNode> init = null;
 		ExprNode iden, val;
 		if (token.kind == TokenKind.SEMICOLON)
@@ -696,6 +753,7 @@ public class MainParser extends Parser {
 				init.add(new AsgnStmtNode(iden, val));
 			}
 		}
+		if (error)  return null;
 		return init;
 	}
 
@@ -703,10 +761,12 @@ public class MainParser extends Parser {
 		/*
 		 * parseLogOrEcpression()
 		 */
+		if (error)  return null;
 		ExprNode cond = null;
 		if (token.kind == TokenKind.SEMICOLON)
 			return cond;
 		cond = parseLogicalOrExpression();
+		if (error)  return null;
 		return cond;
 	}
 
@@ -715,10 +775,13 @@ public class MainParser extends Parser {
 		 * 
 		 * parseAssignmentStatement()
 		 */
+		if (error)  return null;
 		ExprNode iden, val, exp2;
 		List<AsgnStmtNode> incrNodes = null;
-		if (token.kind == TokenKind.RPAREN)
+		if (token.kind == TokenKind.RPAREN){
+			if (error)  return null;
 			return incrNodes;
+		}
 
 		incrNodes = new ArrayList<AsgnStmtNode>();
 		while (token.kind == TokenKind.IDENTIFIER) {
@@ -734,6 +797,7 @@ public class MainParser extends Parser {
 			if (token.kind == TokenKind.COMMA)
 				nextToken();
 		}
+		if (error)  return null;
 		return incrNodes;
 	}
 
@@ -743,6 +807,7 @@ public class MainParser extends Parser {
 		 * parseForIncr() else parseForInit() accept(SEMI) parseForCondition()
 		 * accept(SEMI) parseForIncr()
 		 */
+		if (error)  return null;
 		List<StmtNode> init = null;
 		ExprNode cond = null;
 		List<AsgnStmtNode> incrNode = null;
@@ -758,6 +823,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.LCURLY);
 		block = parseLoopBlock();
 		accept(TokenKind.RCURLY);
+		if (error)  return null;
 		return new ForStmtNode(init, cond, incrNode, block);
 	}
 
@@ -767,6 +833,7 @@ public class MainParser extends Parser {
 		 * parseLoopBlock() parseCollectionComprehension()
 		 * 
 		 */
+		if (error)  return null;
 		IdenNode iden1, iden2 = null;
 		ExprNode exp = null;
 		BlockNode block = null;
@@ -791,6 +858,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.LCURLY);
 		block = parseLoopBlock();
 		accept(TokenKind.RCURLY);
+		if (error)  return null;
 		return new LoopStmtNode(iden1, iden2, exp, block);
 	}
 
@@ -798,11 +866,16 @@ public class MainParser extends Parser {
 		/*
 		 * if(CONTINUE) return ContinueNode if(BREAK) return BreakNode
 		 */
+		if (error)  return null;
 		if (breakAllowed)
-			if (token.kind == TokenKind.CONTINUE)
+			if (token.kind == TokenKind.CONTINUE){
+				if (error)  return null;
 				return new ContinueStmtNode();
-			else
+			}
+			else{
+				if (error)  return null;
 				return new BreakStmtNode();
+			}
 		else
 			System.out.println("Throw Error");
 		return null;
@@ -820,6 +893,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		List<ExprNode> listNode = new ArrayList<>();
 		while (token.kind != TokenKind.RSQU) {
 			listNode.add(parseValue());
@@ -827,6 +901,7 @@ public class MainParser extends Parser {
 				accept(TokenKind.COMMA);
 		}
 		accept(TokenKind.RSQU);
+		if (error)  return null;
 		return new ListCollNode(listNode);
 	}
 
@@ -840,13 +915,17 @@ public class MainParser extends Parser {
 		 * 
 		 * 
 		 */
+		if (error)  return null;
 		accept(TokenKind.LSQU);
 		if (token.kind == TokenKind.RSQU) {
 			accept(TokenKind.RSQU);
+			if (error)  return null;
 			return new ListCollNode();
 		} else if (token.kind == TokenKind.LOOP) {
+			if (error)  return null;
 			return parseComprehension("list");
 		} else {
+			if (error)  return null;
 			return parseList();
 		}
 	}
@@ -873,6 +952,7 @@ public class MainParser extends Parser {
 		 * Comp.add(parseForComprehension())
 		 * 
 		 */
+		if (error)  return null;
 		Map<ExprNode, ExprNode> pairs = new HashMap<>();
 		nextToken();
 		accept(TokenKind.LSQU);
@@ -899,15 +979,17 @@ public class MainParser extends Parser {
 			pairs.put(exp1, exp2);
 		}
 		accept(TokenKind.RSQU);
+		if (error)  return null;
 		return new MapCollNode(pairs);
 	}
 
 	CompTypeNode parseComprehension(String type) {
+		if (error)  return null;
 		IdenNode iden1, iden2 = null;
 		ExprNode exp = null;
 		BlockNode block = null;
 		ExprNode ifCond;
-
+		
 		CompTypeNode mapComp = type == "map" ? new MapCompNode()
 				: type == "list" ? new ListCompNode()
 						: type == "set" ? new SetCompNode() : type == "link" ? new LinkCompNode() : null;
@@ -943,6 +1025,7 @@ public class MainParser extends Parser {
 			}
 		}
 		accept(TokenKind.RSQU);
+		if (error)  return null;
 		return mapComp;
 	}
 
@@ -956,6 +1039,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		List<ExprNode> setNode = new ArrayList<>();
 		while (token.kind != TokenKind.RSQU) {
 			setNode.add(parseValue());
@@ -963,6 +1047,7 @@ public class MainParser extends Parser {
 				accept(TokenKind.COMMA);
 		}
 		accept(TokenKind.RSQU);
+		if (error)  return null;
 		return new SetCollNode(setNode);
 	}
 
@@ -976,14 +1061,18 @@ public class MainParser extends Parser {
 		 * 
 		 * 
 		 */
+		if (error)  return null;
 		nextToken();
 		accept(TokenKind.LSQU);
 		if (token.kind == TokenKind.RSQU) {
 			accept(TokenKind.RSQU);
+			if (error)  return null;
 			return new SetCollNode();
 		} else if (token.kind == TokenKind.LOOP) {
+			if (error)  return null;
 			return parseComprehension("set");
 		} else {
+			if (error)  return null;
 			return parseSet();
 		}
 	}
@@ -998,6 +1087,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		List<ExprNode> listNode = new ArrayList<>();
 		listNode.add(parseValue());
 		while (token.kind != TokenKind.RSQU) {
@@ -1005,6 +1095,7 @@ public class MainParser extends Parser {
 			listNode.add(parseValue());
 		}
 		accept(TokenKind.RSQU);
+		if (error)  return null;
 		return new LinkCollNode(listNode);
 	}
 
@@ -1018,14 +1109,18 @@ public class MainParser extends Parser {
 		 * 
 		 * 
 		 */
+		if (error)  return null;
 		nextToken();
 		accept(TokenKind.LSQU);
 		if (token.kind == TokenKind.RSQU) {
 			accept(TokenKind.RSQU);
+			if (error)  return null;
 			return new LinkCollNode();
 		} else if (token.kind == TokenKind.LOOP) {
+			if (error)  return null;
 			return parseComprehension("link");
 		} else {
+			if (error)  return null;
 			return parseLink();
 		}
 	}
@@ -1039,6 +1134,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		ExprNode collExpr = null;
 
 		switch (token.kind) {
@@ -1055,6 +1151,7 @@ public class MainParser extends Parser {
 				collExpr = parseMapCollection();
 				break;
 		}
+		if (error)  return null;
 		return collExpr;
 
 	}
@@ -1072,6 +1169,7 @@ public class MainParser extends Parser {
 		 * 
 		 */
 
+		if (error)  return null;
 		Map<IdenNode, ExprNode> object = new HashMap<>();
 		IdenNode idenNode;
 		ExprNode exprNode;
@@ -1088,6 +1186,7 @@ public class MainParser extends Parser {
 		}
 		System.out.println("Object Creation: "+token.kind);
 		accept(TokenKind.RCURLY);
+		if (error)  return null;
 		return new ObjCreationNode(object);
 
 	}
@@ -1112,6 +1211,7 @@ public class MainParser extends Parser {
 		 * accept(FUNC) isAnnFunmc = true parseFunction()
 		 * 
 		 */
+		if (error)  return null;
 		accept(TokenKind.FUNC);
 		accept(TokenKind.LPAREN);
 		List<ExprNode> arg = parseArgList();
@@ -1123,6 +1223,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.RCURLY);
 		BlockNode block = new BlockNode(); // BlockNode(stmt);
 		block.setStmt(stmt);
+		if (error)  return null;
 		return new AnnFuncNode(args, block);
 	}
 
@@ -1137,6 +1238,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return ValueNode
 		 */
+		if (error)  return null;
 		ExprNode valExpr = null;
 		System.out.println("Parse Value: "+token.kind);
 		switch (token.kind) {
@@ -1159,6 +1261,7 @@ public class MainParser extends Parser {
 				break;
 
 		}
+		if (error)  return null;
 		return valExpr;
 	}
 
@@ -1183,6 +1286,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		List<VarDeclNode> varDeclNodes = new ArrayList<>();
 		accept(TokenKind.VAR);
 		while (token.kind != TokenKind.SEMICOLON) {
@@ -1201,6 +1305,7 @@ public class MainParser extends Parser {
 			varDeclNodes.add(new VarDeclNode(idenNode, exp));
 		}
 		accept(TokenKind.SEMICOLON);
+		if (error)  return null;
 		return varDeclNodes;
 
 	}
@@ -1214,6 +1319,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		List<ConstDeclNode> constDeclNodes = new ArrayList<>();
 		accept(TokenKind.CONST);
 		while (token.kind != TokenKind.SEMICOLON) {
@@ -1225,6 +1331,7 @@ public class MainParser extends Parser {
 			constDeclNodes.add(new ConstDeclNode(idenNode, exp));
 		}
 		accept(TokenKind.SEMICOLON);
+		if (error)  return null;
 		return constDeclNodes;
 
 	}
@@ -1239,6 +1346,7 @@ public class MainParser extends Parser {
 		 * 
 		 * return List
 		 */
+		if (error)  return null;
 		boolean varArg = false;
 		List<IdenNode> idenNodes = new ArrayList<>();
 
@@ -1254,7 +1362,7 @@ public class MainParser extends Parser {
 			if (TokenKind.RPAREN != token.kind)
 				accept(TokenKind.COMMA);
 		}
-
+		if (error)  return null;
 		return new ParameterListNode(idenNodes, varArg);
 
 	}
@@ -1273,6 +1381,7 @@ public class MainParser extends Parser {
 		 * 
 		 * FunctionNode(name, parameter, BlockNode); returns FunctionNode
 		 */
+		if (error)  return null;
 		accept(TokenKind.FUNC);
 		ExprNode funcName = parseIdentifier();
 		accept(TokenKind.LPAREN);
@@ -1285,6 +1394,7 @@ public class MainParser extends Parser {
 		accept(TokenKind.RCURLY);
 		BlockNode block = new BlockNode();
 		block.setStmt(stmt);
+		if (error)  return null;
 		return new FuncDeclNode((IdenNode) funcName, arg, block);
 	}
 
@@ -1319,10 +1429,12 @@ public class MainParser extends Parser {
 	}
 
 	StmtNode parseReturnStatement() {
+		if (error)  return null;
 		accept(TokenKind.RET);
 		ExprNode exp = parseValue();
 		System.out.println("Return : "+exp);
 		accept(TokenKind.SEMICOLON);
+		if (error)  return null;
 		return new ReturnStmtNode(exp);
 	}
 
@@ -1330,6 +1442,7 @@ public class MainParser extends Parser {
 		/*
 		 * parseBlockStatement() parseFlowStatement()
 		 */
+		if (error)  return null;
 		List<StmtNode> blockStats = new ArrayList<StmtNode>();
 		BlockNode blockNode = new BlockNode();
 		while (token.kind != TokenKind.RCURLY) {
@@ -1342,6 +1455,7 @@ public class MainParser extends Parser {
 					blockStats.addAll(parseBlock());
 			}
 		}
+		if (error)  return null;
 		blockNode.setStmt(blockStats);
 		return blockNode;
 	}
@@ -1351,6 +1465,7 @@ public class MainParser extends Parser {
 		/*
 		 * List of block Statements calls parseBlockStatement
 		 */
+		if (error)  return null;
 		List<StmtNode> blockStmt = new ArrayList<>();
 		System.out.println("Token kind "+token.kind);
 		switch (token.kind) {
@@ -1383,6 +1498,7 @@ public class MainParser extends Parser {
 				blockStmt.add(parseAssignmentStatement());
 				break;
 		}
+		if (error)  return null;
 		System.out.println("Block Stmt: "+blockStmt);
 		return blockStmt;
 	}
@@ -1415,7 +1531,7 @@ public class MainParser extends Parser {
 		// nextToken();
 		// }
 		// return ProgramNode(stats);
-
+		if (error)  return null;
 		nextToken();
 		List<StmtNode> tree = new ArrayList<>();
 		while (token.kind != TokenKind.END) {
@@ -1427,6 +1543,7 @@ public class MainParser extends Parser {
 					break;
 			}
 		}
+		if (error)  return null;
 		System.out.println("Block Statements "+tree);
 		return new ProgramNode(tree);
 	}
@@ -1441,8 +1558,9 @@ public class MainParser extends Parser {
 		// TODO: ProgramNode node;
 		// node = parseStatements()
 		// return node
-
+		if (error)  return null;
 		ProgramNode node = parseStatements();
+		if (error)  return null;
 		return node;
 	}
 
@@ -1459,7 +1577,6 @@ public class MainParser extends Parser {
 
 		// Parser p = parseProgram();
 		// return p;
-
 
 		ProgramNode parser = parseProgram();
 	}
