@@ -127,6 +127,30 @@ public class Tokenizer {
 		}
 	}
 	
+	void scanString(){
+		if(reader.ch == '"'){
+			reader.scanChar();
+			while(reader.ch != '"' && reader.ch != Character.MIN_VALUE){
+				reader.putChar(reader.ch);
+				// Escape char after '\'
+				if(reader.ch == '\\'){
+					reader.scanChar();
+					reader.putChar(reader.ch);	
+				}
+				reader.scanChar();
+			}
+			if(reader.ch == Character.MIN_VALUE){
+				lexicalError(linePos, lineNum, Errors.EOF);
+				return;
+			}
+			// scan ending DQUOTE ('"')
+			reader.scanChar();
+			litValue = reader.getSavedBufferAsString(true);
+			tokenKind = TokenKind.STRLIT;
+			return;
+		}
+	}
+
 	Token readToken() {
 		int posBp = reader.bp;
 		int pos=linePos;
@@ -307,7 +331,8 @@ public class Tokenizer {
             case '\'':
             	reader.scanChar();tokenKind=TokenKind.SQOUTE;break LOOP;
             case '"':
-            	reader.scanChar();tokenKind=TokenKind.DQOUTE;break LOOP;
+				scanString();
+				break LOOP;
             case '\0':
             	tokenKind = TokenKind.END;break LOOP;
 			default:

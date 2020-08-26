@@ -1,7 +1,1 @@
-var x = 5.522 + 4.22;
-
-if (x==2) {
-
-}
-func aa() {
-}
+var a = "hell\\\"o;

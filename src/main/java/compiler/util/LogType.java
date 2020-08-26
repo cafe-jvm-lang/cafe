@@ -51,6 +51,7 @@ public class LogType {
 		ILLEGAL_CHARACTER("Illegal character"),
 		INVALID_IDENTIFIER("Invalid identifier"),
 		INVALID_FRACTIONAL_VAL("Invalid fractional value"),
+		EOF("Unexpected end of file"),
 		EOF_PARSING_COMMENT("Reached EOF while parsing comment");
 		
 		Errors(String desc) {

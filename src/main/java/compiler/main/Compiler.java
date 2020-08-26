@@ -47,7 +47,7 @@ public class Compiler {
 	LOOP:for(Phase phase : Phase.values()) {
 			switch(phase) {
 			case PARSE:
-				parser.parse();
+				//parser.parse();
 				if(checkErrors()) {
 					break LOOP;
 				}
