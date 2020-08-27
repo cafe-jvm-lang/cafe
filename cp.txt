@@ -1,11 +1,5 @@
-func hello(){
-    return [5,[x,1,2],10];
-}
-var x = "DHYEY";
-var xx = func() {};
+func a(...i) {
 
-func hello(){
-	return "Hello";
 }
-u=a[5];
-v=a[1:5];
+a = 12;
+var c = "D"+"R"+"S";
