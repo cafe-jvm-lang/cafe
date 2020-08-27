@@ -66,14 +66,14 @@ public class MainParser extends Parser {
 			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
-			// System.exit(1);
+			System.exit(0);
 			// return false;
 		} else {
 			// TODO: throw Error
 			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
-			// System.exit(1);
+			System.exit(0);
 			// return false;
 		}
 	}
@@ -610,8 +610,6 @@ public class MainParser extends Parser {
 			args.add(parseValue());
 			if (token.kind != TokenKind.RPAREN)
 				accept(TokenKind.COMMA);
-			else
-				nextToken();
 		}
 		if (error)  return null;
 		return args;
@@ -895,10 +893,11 @@ public class MainParser extends Parser {
 		 */
 		if (error)  return null;
 		List<ExprNode> listNode = new ArrayList<>();
+		listNode.add(parseValue());
 		while (token.kind != TokenKind.RSQU) {
+			accept(TokenKind.COMMA);
+			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
 			listNode.add(parseValue());
-			if (token.kind != TokenKind.RSQU)
-				accept(TokenKind.COMMA);
 		}
 		accept(TokenKind.RSQU);
 		if (error)  return null;
@@ -1041,10 +1040,11 @@ public class MainParser extends Parser {
 		 */
 		if (error)  return null;
 		List<ExprNode> setNode = new ArrayList<>();
+		setNode.add(parseValue());
 		while (token.kind != TokenKind.RSQU) {
+			accept(TokenKind.COMMA);
+			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
 			setNode.add(parseValue());
-			if (token.kind != TokenKind.RSQU)
-				accept(TokenKind.COMMA);
 		}
 		accept(TokenKind.RSQU);
 		if (error)  return null;
@@ -1092,6 +1092,7 @@ public class MainParser extends Parser {
 		listNode.add(parseValue());
 		while (token.kind != TokenKind.RSQU) {
 			accept(TokenKind.COMMA);
+			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
 			listNode.add(parseValue());
 		}
 		accept(TokenKind.RSQU);

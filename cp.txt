@@ -1,8 +1,16 @@
 var a = "a";
-
+var b = link[1,2];
 var x = set[1,2,"a","b"];
 var x = map[[1,"a"],[2,"b"]];
 
 func helloWorld(){
     return "Hello";
 }
+var x = "DHYEY";
+var xx = func() {};
+
+func hello(){
+	return "Hello";
+}
+u=a[5];
+v=a[1:5];
