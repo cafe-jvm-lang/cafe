@@ -98,6 +98,8 @@ public class Tokens {
 //			return TokenKind.POWER;
 		case "is":
 			return TokenKind.IS;
+		case "if":
+			return TokenKind.IF;
 //		case "is not":
 //			return TokenKind.ISNOT;
 		case "in":
