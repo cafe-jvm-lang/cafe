@@ -1,10 +1,5 @@
-var a = "a";
-var b = link[1,2];
-var x = set[1,2,"a","b"];
-var x = map[[1,"a"],[2,"b"]];
-
-func helloWorld(){
-    return "Hello";
+func hello(){
+    return [5,[x,1,2],10];
 }
 var x = "DHYEY";
 var xx = func() {};
