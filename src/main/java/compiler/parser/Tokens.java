@@ -100,6 +100,8 @@ public class Tokens {
 			return TokenKind.IS;
 		case "if":
 			return TokenKind.IF;
+		case "else":
+			return TokenKind.ELSE;
 //		case "is not":
 //			return TokenKind.ISNOT;
 		case "in":
