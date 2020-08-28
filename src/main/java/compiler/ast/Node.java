@@ -156,10 +156,10 @@ public abstract class Node {
 	}
 
 	public static class AnnFuncNode extends ExprNode {
-		public ArgsListNode args;
+		public ParameterListNode args;
 		public BlockNode block;
 
-		public AnnFuncNode(ArgsListNode a, BlockNode b) {
+		public AnnFuncNode(ParameterListNode a, BlockNode b) {
 			args = a;
 			block = b;
 		}

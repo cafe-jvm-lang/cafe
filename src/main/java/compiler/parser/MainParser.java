@@ -894,8 +894,10 @@ public class MainParser extends Parser {
 				if (error)  return null;
 				return new BreakStmtNode();
 			}
-		else
-			System.out.println("Throw Error");
+		else{
+			error = true;
+			accept(TokenKind.IDENTIFIER);
+		}
 		return null;
 	}
 	/* Parse Loop Done */
@@ -1235,17 +1237,17 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		accept(TokenKind.FUNC);
 		accept(TokenKind.LPAREN);
-		List<ExprNode> arg = parseArgList();
+		ParameterListNode params = parseParameter();
 		accept(TokenKind.RPAREN);
-		ArgsListNode args = new ArgsListNode(arg);
-
 		accept(TokenKind.LCURLY);
+		System.out.println("Ann Func Node: "+token.kind);
 		List<StmtNode> stmt = parseBlock();
+		System.out.println("Ann Func Node: "+token.kind);
 		accept(TokenKind.RCURLY);
 		BlockNode block = new BlockNode(); // BlockNode(stmt);
 		block.setStmt(stmt);
 		if (error)  return null;
-		return new AnnFuncNode(args, block);
+		return new AnnFuncNode(params, block);
 	}
 
 	ExprNode parseValue() {
@@ -1521,6 +1523,9 @@ public class MainParser extends Parser {
 			case IDENTIFIER:
 				blockStmt.add(parseExprStmt());
 				break;
+			default:
+				error =true;
+				accept(TokenKind.IDENTIFIER);
 		}
 		if (error)  return null;
 		System.out.println("Block Stmt: "+blockStmt);
