@@ -18,7 +18,7 @@ public abstract class Node {
 	enum Tag {
 		VARDECL, IDEN, CONSTDECL, NUMLIT, STRLIT, BOOLLIT, FUNCDECL, OBJCREATION, BLOCK, ANNFUNC, LIST, SET, LINKEDLIST,
 		MAP, BINEXPR, UNEXPR, THIS, NULL, FUNCCALL, SUBSCRIPT, SLICE, OBJACCESS, ARGSLIST, PARAMLIST, IMPORT, ASGN, IF,
-		ELSE, FOR, LOOP, RETURN, CONTINUE, BREAK, LISTCOMP, SETCOMP, LINKCOMP, MAPCOMP, COMPLOOP, COMPIF;
+		ELSE, FOR, LOOP, RETURN, CONTINUE, BREAK, LISTCOMP, SETCOMP, LINKCOMP, MAPCOMP, COMPLOOP, COMPIF,RANGE;
 	}
 
 	public static abstract class StmtNode extends Node {
@@ -172,6 +172,34 @@ public abstract class Node {
 		@Override
 		public void accept(Visitor v) {
 			v.visitAnnFunc(this);
+		}
+	}
+	
+	static class RangeNode extends ExprNode{
+		static enum Type{
+			LIST,
+			SET,
+			LINK
+		}
+		
+		public ExprNode rangeStart;
+		public ExprNode rangeEnd;
+		public Type type;
+		
+		public RangeNode(ExprNode rangeStart, ExprNode rangeEnd, Type type) {
+			this.rangeStart = rangeStart;
+			this.rangeEnd = rangeEnd;
+			this.type = type;
+		}
+
+		@Override
+		public Tag getTag() {
+			return RANGE;
+		}
+
+		@Override
+		public void accept(Visitor v) {
+			v.visitListRange(this);
 		}
 	}
 
@@ -962,5 +990,7 @@ public abstract class Node {
 		void visitCompLoop(CompLoopNode n);
 
 		void visitCompIf(CompIfNode n);
+		
+		void visitListRange(RangeNode n);
 	}
 }
