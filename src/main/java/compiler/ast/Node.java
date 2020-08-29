@@ -156,10 +156,10 @@ public abstract class Node {
 	}
 
 	public static class AnnFuncNode extends ExprNode {
-		public ArgsListNode args;
+		public ParameterListNode args;
 		public BlockNode block;
 
-		public AnnFuncNode(ArgsListNode a, BlockNode b) {
+		public AnnFuncNode(ParameterListNode a, BlockNode b) {
 			args = a;
 			block = b;
 		}
@@ -486,9 +486,9 @@ public abstract class Node {
 		 * Ex | invoked-on | args sum(5,x) | sum | (5,x); a[2](10) | a[5] | (10);
 		 */
 		public ExprNode invokedOn;
-		public ParameterListNode parmas;
+		public ArgsListNode parmas;
 
-		public FuncCallNode(ExprNode e, ParameterListNode p) {
+		public FuncCallNode(ExprNode e, ArgsListNode p) {
 			invokedOn = e;
 			parmas = p;
 		}
@@ -766,9 +766,9 @@ public abstract class Node {
 
 	public static class ElseStmtNode extends StmtNode {
 		public StmtNode parentIf;
-		public StmtNode elsePart;
+		public List<StmtNode> elsePart;
 
-		public ElseStmtNode(StmtNode parentIf, StmtNode elsePart) {
+		public ElseStmtNode(StmtNode parentIf, List<StmtNode> elsePart) {
 			this.parentIf = parentIf;
 			this.elsePart = elsePart;
 		}
