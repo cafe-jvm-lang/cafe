@@ -1,17 +1,1 @@
-func a(...i) {
-
-}
-a = 12;
-var c = "D"+"RS";
-
-var v = {a:10, b: func(){return 10;}, c:"Hello"};
-
-loop a in [1,2,3] {
-    print(a);
-}
-var a= true;
-a = func(a,c){
-    return a+c;
-};
-v.a = 15;
-a(3,4);
+var a = link[loop a in [1..10] if(a>1)];

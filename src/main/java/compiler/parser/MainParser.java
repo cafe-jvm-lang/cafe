@@ -417,7 +417,6 @@ public class MainParser extends Parser {
 					accept(TokenKind.LPAREN);
 					oExp = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
 					accept(TokenKind.RPAREN);
-					accept(TokenKind.SEMICOLON);
 					break;
 
 				case LSQU:
@@ -465,7 +464,7 @@ public class MainParser extends Parser {
 		} else if (token.kind == TokenKind.EQU) {
 			accept(token.kind);
 			exp2 = parseValue();
-			accept(TokenKind.SEMICOLON);
+			
 			return new AsgnStmtNode(exp1, exp2);
 		}
 		if (error)  return null;
@@ -665,8 +664,11 @@ public class MainParser extends Parser {
 		ifCond = parseLogicalOrExpression();
 		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.RPAREN);
+		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.LCURLY);
+		System.out.println("If Node Token: "+token.kind);
 		ifBlock = parseLoopBlock();
+		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.RCURLY);
 		if (error)  return null;
 		return new IfStmtNode(ifCond, ifBlock);
@@ -888,10 +890,14 @@ public class MainParser extends Parser {
 		if (breakAllowed)
 			if (token.kind == TokenKind.CONTINUE){
 				if (error)  return null;
+				accept(TokenKind.CONTINUE);
+				accept(TokenKind.SEMICOLON);
 				return new ContinueStmtNode();
 			}
 			else{
 				if (error)  return null;
+				accept(TokenKind.BREAK);
+				accept(TokenKind.SEMICOLON);
 				return new BreakStmtNode();
 			}
 		else{
@@ -915,7 +921,15 @@ public class MainParser extends Parser {
 		 */
 		if (error)  return null;
 		List<ExprNode> listNode = new ArrayList<>();
-		listNode.add(parseValue());
+		ExprNode exp1, exp2;
+		exp1 = parseValue();
+		if(token.kind == TokenKind.RANGE){
+			accept(TokenKind.RANGE);
+			exp2 = parseValue();
+			accept(TokenKind.RSQU);
+			return new RangeNode(exp1, exp2, RangeNode.Type.LIST);
+		}
+		listNode.add(exp1);
 		while (token.kind != TokenKind.RSQU) {
 			accept(TokenKind.COMMA);
 			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
@@ -1042,7 +1056,12 @@ public class MainParser extends Parser {
 					accept(TokenKind.LPAREN);
 					ifCond = parseLogicalOrExpression();
 					accept(TokenKind.RPAREN);
+					System.out.println("Comprehension: "+token.kind);
 					mapComp.addExpr(new CompIfNode(ifCond));
+					break;
+				default: 
+					error = true;
+					accept(TokenKind.IDENTIFIER);
 			}
 		}
 		accept(TokenKind.RSQU);
@@ -1062,7 +1081,15 @@ public class MainParser extends Parser {
 		 */
 		if (error)  return null;
 		List<ExprNode> setNode = new ArrayList<>();
-		setNode.add(parseValue());
+		ExprNode exp1, exp2;
+		exp1 = parseValue();
+		if(token.kind == TokenKind.RANGE){
+			accept(TokenKind.RANGE);
+			exp2 = parseValue();
+			accept(TokenKind.RSQU);
+			return new RangeNode(exp1, exp2, RangeNode.Type.SET);
+		}
+		setNode.add(exp1);
 		while (token.kind != TokenKind.RSQU) {
 			accept(TokenKind.COMMA);
 			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
@@ -1111,7 +1138,15 @@ public class MainParser extends Parser {
 		 */
 		if (error)  return null;
 		List<ExprNode> listNode = new ArrayList<>();
-		listNode.add(parseValue());
+		ExprNode exp1, exp2;
+		exp1 = parseValue();
+		if(token.kind == TokenKind.RANGE){
+			accept(TokenKind.RANGE);
+			exp2 = parseValue();
+			accept(TokenKind.RSQU);
+			return new RangeNode(exp1, exp2, RangeNode.Type.LINK);
+		}
+		listNode.add(exp1);
 		while (token.kind != TokenKind.RSQU) {
 			accept(TokenKind.COMMA);
 			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
@@ -1522,6 +1557,8 @@ public class MainParser extends Parser {
 				break;
 			case IDENTIFIER:
 				blockStmt.add(parseExprStmt());
+				System.out.println("Block Stmt: "+token.kind);
+				accept(TokenKind.SEMICOLON);
 				break;
 			default:
 				error =true;

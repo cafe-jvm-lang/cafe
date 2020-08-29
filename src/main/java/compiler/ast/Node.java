@@ -175,8 +175,8 @@ public abstract class Node {
 		}
 	}
 	
-	static class RangeNode extends ExprNode{
-		static enum Type{
+	public static class RangeNode extends ExprNode{
+		public static enum Type{
 			LIST,
 			SET,
 			LINK
