@@ -1270,13 +1270,16 @@ public class MainParser extends Parser {
 		 * 
 		 */
 		if (error)  return null;
+		List<StmtNode> stmt = new ArrayList<>();
 		accept(TokenKind.FUNC);
 		accept(TokenKind.LPAREN);
 		ParameterListNode params = parseParameter();
 		accept(TokenKind.RPAREN);
 		accept(TokenKind.LCURLY);
 		System.out.println("Ann Func Node: "+token.kind);
-		List<StmtNode> stmt = parseBlock();
+		while(token.kind != TokenKind.RCURLY) {
+			stmt.addAll(parseBlock());
+		}
 		System.out.println("Ann Func Node: "+token.kind);
 		accept(TokenKind.RCURLY);
 		BlockNode block = new BlockNode(); // BlockNode(stmt);
@@ -1354,10 +1357,8 @@ public class MainParser extends Parser {
 			if (token.kind == TokenKind.EQU) {
 				nextToken();
 				exp = parseValue();
-			}
-			if (token.kind != TokenKind.SEMICOLON){
+			}if (token.kind != TokenKind.SEMICOLON){
 				accept(TokenKind.COMMA);
-				accept(TokenKind.IDENTIFIER);
 			}
 			System.out.println("Var Decl: "+exp);
 			varDeclNodes.add(new VarDeclNode(idenNode, exp));
