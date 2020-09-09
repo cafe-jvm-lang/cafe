@@ -156,11 +156,11 @@ public abstract class Node {
 	}
 
 	public static class AnnFuncNode extends ExprNode {
-		public ParameterListNode args;
+		public ParameterListNode params;
 		public BlockNode block;
 
 		public AnnFuncNode(ParameterListNode a, BlockNode b) {
-			args = a;
+			params = a;
 			block = b;
 		}
 
@@ -486,11 +486,11 @@ public abstract class Node {
 		 * Ex | invoked-on | args sum(5,x) | sum | (5,x); a[2](10) | a[5] | (10);
 		 */
 		public ExprNode invokedOn;
-		public ArgsListNode parmas;
+		public ArgsListNode params;
 
 		public FuncCallNode(ExprNode e, ArgsListNode p) {
 			invokedOn = e;
-			parmas = p;
+			params = p;
 		}
 
 		@Override

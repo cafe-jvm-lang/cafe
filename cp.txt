@@ -1,3 +1,4 @@
+
 var a = 10, b=20;
 const a=[10,20,40,30];
 u = a[1];
@@ -15,7 +16,6 @@ for(;i<10;){
     }
 }
 
-/*
 if(a<10){
     print("Lesser");
 } else if(a>10){
@@ -32,7 +32,7 @@ if(a<=10){
 } else {
     print("Greater");
 }
-*/
+
 func test(a,b) {
     if(a<b) {
         print("A GREATER");

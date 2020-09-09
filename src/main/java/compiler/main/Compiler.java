@@ -54,7 +54,7 @@ public class Compiler {
 					programNode = parser.parse();
 					break;
 				case ANALYZE:
-					System.out.println("PrettyPrint");
+					System.out.println((char)27+"[33m"+"\nPrettyPrint");
 					new PrettyPrinter().prettyPrint(programNode);
 					break;
 			}
