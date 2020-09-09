@@ -692,7 +692,9 @@ public class MainParser extends Parser {
 				elseIfList.add(parseIf());
 			} else if (token.kind == TokenKind.LCURLY) {
 				accept(TokenKind.LCURLY);
-				elseBlock = new ElseStmtNode(ifNode, parseBlock());
+				BlockNode blockNode = new BlockNode();
+				blockNode.setStmt(parseBlock());
+				elseBlock = new ElseStmtNode(ifNode, blockNode);
 				accept(TokenKind.RCURLY);
 				break;
 			}

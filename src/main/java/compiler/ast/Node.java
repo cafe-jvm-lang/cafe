@@ -766,9 +766,9 @@ public abstract class Node {
 
 	public static class ElseStmtNode extends StmtNode {
 		public StmtNode parentIf;
-		public List<StmtNode> elsePart;
+		public BlockNode elsePart;
 
-		public ElseStmtNode(StmtNode parentIf, List<StmtNode> elsePart) {
+		public ElseStmtNode(StmtNode parentIf, BlockNode elsePart) {
 			this.parentIf = parentIf;
 			this.elsePart = elsePart;
 		}
