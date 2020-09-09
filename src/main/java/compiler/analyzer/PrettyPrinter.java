@@ -207,9 +207,9 @@ public class PrettyPrinter implements Node.Visitor{
 	public void visitBinaryExpr(BinaryExprNode n) {
 		printWithTabs("BinaryExprNode");
 		tabs++;
-		printWithTabs("\t Operator"+n.op);
+		printWithTabs("Operator: "+n.op);
 		addBeautify("e1", n.e1);
-		addBeautify("e2", n.e1);
+		addBeautify("e2", n.e2);
 		
 		tabs--;
 	}
