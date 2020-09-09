@@ -2,11 +2,58 @@ package compiler.parser;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import compiler.ast.Node;
 
 // import com.google.errorprone.annotations.Var;
-
-import compiler.ast.Node.*;
+import compiler.ast.Node.AnnFuncNode;
+import compiler.ast.Node.ArgsListNode;
+import compiler.ast.Node.AsgnStmtNode;
+import compiler.ast.Node.BinaryExprNode;
+import compiler.ast.Node.BlockNode;
+import compiler.ast.Node.BoolLitNode;
+import compiler.ast.Node.BreakStmtNode;
+import compiler.ast.Node.CompIfNode;
+import compiler.ast.Node.CompLoopNode;
+import compiler.ast.Node.CompTypeNode;
+import compiler.ast.Node.ConstDeclNode;
+import compiler.ast.Node.ContinueStmtNode;
+import compiler.ast.Node.DeclNode;
+import compiler.ast.Node.ElseStmtNode;
+import compiler.ast.Node.ExprNode;
+import compiler.ast.Node.ForStmtNode;
+import compiler.ast.Node.FuncCallNode;
+import compiler.ast.Node.FuncDeclNode;
+import compiler.ast.Node.IdenNode;
+import compiler.ast.Node.IfStmtNode;
+import compiler.ast.Node.LinkCollNode;
+import compiler.ast.Node.LinkCompNode;
+import compiler.ast.Node.ListCollNode;
+import compiler.ast.Node.ListCompNode;
+import compiler.ast.Node.LoopStmtNode;
+import compiler.ast.Node.MapCollNode;
+import compiler.ast.Node.MapCompNode;
+import compiler.ast.Node.NullNode;
+import compiler.ast.Node.NumLitNode;
+import compiler.ast.Node.ObjCreationNode;
+import compiler.ast.Node.ObjectAccessNode;
+import compiler.ast.Node.ParameterListNode;
+import compiler.ast.Node.ProgramNode;
+import compiler.ast.Node.RangeNode;
+import compiler.ast.Node.ReturnStmtNode;
+import compiler.ast.Node.SetCollNode;
+import compiler.ast.Node.SetCompNode;
+import compiler.ast.Node.SliceNode;
+import compiler.ast.Node.StmtNode;
+import compiler.ast.Node.StrLitNode;
+import compiler.ast.Node.SubscriptNode;
+import compiler.ast.Node.ThisNode;
+import compiler.ast.Node.UnaryExprNode;
+import compiler.ast.Node.VarDeclNode;
 import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
@@ -756,7 +803,7 @@ public class MainParser extends Parser {
 		ExprNode iden, val;
 		if (token.kind == TokenKind.SEMICOLON) 
 			return init;
-		init = new ArrayList<StmtNode>();
+		init = new ArrayList<>();
 		while (token.kind == TokenKind.VAR || token.kind == TokenKind.IDENTIFIER) {
 			if (token.kind == TokenKind.VAR) {
 				accept(TokenKind.VAR);
@@ -805,7 +852,7 @@ public class MainParser extends Parser {
 			return incrNodes;
 		}
 
-		incrNodes = new ArrayList<AsgnStmtNode>();
+		incrNodes = new ArrayList<>();
 		while (token.kind == TokenKind.IDENTIFIER) {
 			iden = parseIdentifier();
 			while (token.kind == TokenKind.DOT) {
@@ -1507,7 +1554,7 @@ public class MainParser extends Parser {
 		 * parseBlockStatement() parseFlowStatement()
 		 */
 		if (error)  return null;
-		List<StmtNode> blockStats = new ArrayList<StmtNode>();
+		List<StmtNode> blockStats = new ArrayList<>();
 		BlockNode blockNode = new BlockNode();
 		while (token.kind != TokenKind.RCURLY) {
 			switch (token.kind) {
@@ -1636,7 +1683,7 @@ public class MainParser extends Parser {
 	}
 
 	@Override
-	public void parse() {
+	public Node parse() {
 		// while(token.kind != TokenKind.END) {
 		// if(token.kind == TokenKind.ERROR) {
 		// return;
@@ -1649,6 +1696,6 @@ public class MainParser extends Parser {
 		// Parser p = parseProgram();
 		// return p;
 
-		ProgramNode parser = parseProgram();
+		return parseProgram();
 	}
 }

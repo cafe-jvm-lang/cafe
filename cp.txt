@@ -15,6 +15,7 @@ for(;i<10;){
     }
 }
 
+/*
 if(a<10){
     print("Lesser");
 } else if(a>10){
@@ -31,7 +32,7 @@ if(a<=10){
 } else {
     print("Greater");
 }
-
+*/
 func test(a,b) {
     if(a<b) {
         print("A GREATER");

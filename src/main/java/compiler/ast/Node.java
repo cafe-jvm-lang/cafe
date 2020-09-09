@@ -18,7 +18,8 @@ public abstract class Node {
 	enum Tag {
 		VARDECL, IDEN, CONSTDECL, NUMLIT, STRLIT, BOOLLIT, FUNCDECL, OBJCREATION, BLOCK, ANNFUNC, LIST, SET, LINKEDLIST,
 		MAP, BINEXPR, UNEXPR, THIS, NULL, FUNCCALL, SUBSCRIPT, SLICE, OBJACCESS, ARGSLIST, PARAMLIST, IMPORT, ASGN, IF,
-		ELSE, FOR, LOOP, RETURN, CONTINUE, BREAK, LISTCOMP, SETCOMP, LINKCOMP, MAPCOMP, COMPLOOP, COMPIF,RANGE;
+		ELSE, FOR, LOOP, RETURN, CONTINUE, BREAK, LISTCOMP, SETCOMP, LINKCOMP, MAPCOMP, COMPLOOP, COMPIF,RANGE,
+		PROGRAM;
 	}
 
 	public static abstract class StmtNode extends Node {
@@ -34,21 +35,20 @@ public abstract class Node {
 	}
 
 	public static class ProgramNode extends StmtNode {
-		List<StmtNode> tree;
+		public List<StmtNode> stmts;
 
 		public ProgramNode(List<StmtNode> tr) {
-			tree = tr;
+			stmts = tr;
 		}
 
 		@Override
 		public Tag getTag() {
-			// return NODE;
-			return IDEN;
+			return PROGRAM;
 		}
 
 		@Override
 		public void accept(Visitor v) {
-			// v.visitIden(this);
+			v.visitProgram(this);
 		}
 
 	}
@@ -72,10 +72,10 @@ public abstract class Node {
 	}
 
 	public static class NumLitNode extends ExprNode {
-		public Number val;
+		public Number lit;
 
 		public NumLitNode(Number v) {
-			val = v;
+			lit = v;
 		}
 
 		@Override
@@ -345,7 +345,7 @@ public abstract class Node {
 	}
 
 	public static abstract class CompTypeNode extends ExprNode {
-		List<CompNode> nested;
+		public List<CompNode> nested;
 
 		public CompTypeNode() {
 			nested = new ArrayList<>();
@@ -849,7 +849,7 @@ public abstract class Node {
 	}
 
 	public static class ReturnStmtNode extends StmtNode {
-		ExprNode expr;
+		public ExprNode expr;
 
 		public ReturnStmtNode(ExprNode expr) {
 			this.expr = expr;
@@ -913,6 +913,8 @@ public abstract class Node {
 	}
 
 	public interface Visitor {
+		void visitProgram(ProgramNode n);
+		
 		void visitVarDecl(VarDeclNode n);
 
 		void visitIden(IdenNode n);

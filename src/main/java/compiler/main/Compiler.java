@@ -1,5 +1,7 @@
 package compiler.main;
 
+import compiler.analyzer.PrettyPrinter;
+import compiler.ast.Node;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;
 import compiler.parser.ParserType;
@@ -34,6 +36,7 @@ public class Compiler {
 
 	enum Phase{
 		PARSE,
+		ANALYZE
 	}
 	
 	boolean checkErrors() {
@@ -44,13 +47,19 @@ public class Compiler {
 	}
 	
 	public void compile() {
-	LOOP:for(Phase phase : Phase.values()) {
+		Node programNode = null;
+	    for(Phase phase : Phase.values()) {
 			switch(phase) {
-			case PARSE:
-				parser.parse();
-				if(checkErrors()) {
-					break LOOP;
-				}
+				case PARSE:
+					programNode = parser.parse();
+					break;
+				case ANALYZE:
+					System.out.println("PrettyPrint");
+					new PrettyPrinter().prettyPrint(programNode);
+					break;
+			}
+			if(checkErrors()) {
+				return;
 			}
 		}
 	}
