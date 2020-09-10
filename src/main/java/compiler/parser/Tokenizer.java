@@ -114,8 +114,9 @@ public class Tokenizer {
 				}
 				continue;
 			}
-			else if(reader.ch == ' ' || reader.ch == '\t' || reader.ch == '\n' || reader.ch=='\r') {
-				String word = reader. getSavedBufferAsString(true);
+			reader.putChar(reader.ch);
+			if(reader.ch == ' ' || reader.ch == '\t' || reader.ch == '\n' || reader.ch=='\r') {
+				String word = reader.getSavedBufferAsString(true);
 				comment.add(word);
 			}
 			else if(reader.ch == '\0') {
@@ -123,7 +124,6 @@ public class Tokenizer {
 				return;
 			}
 			reader.scanChar();
-			reader.putChar(reader.ch);
 		}
 	}
 	
@@ -323,7 +323,18 @@ public class Tokenizer {
             case '~':
             	reader.scanChar();tokenKind=TokenKind.TILDE;break LOOP;
             case '#':
-            	reader.scanChar();tokenKind=TokenKind.SINGLECOMMENT;break LOOP;
+				reader.scanChar();
+				comment = new ArrayList<>();
+				while(reader.ch != Character.MIN_VALUE){
+					reader.putChar(reader.ch);
+					if(reader.ch == '\r' || reader.ch == '\n'){
+						comment.add(reader.getSavedBufferAsString(true));
+						break;
+					}
+					reader.scanChar();
+				}
+				
+				tokenKind=TokenKind.SINGLECOMMENT;break LOOP;
             case '@':
             	reader.scanChar();tokenKind=TokenKind.IMPORT;break LOOP;
             case '%':
