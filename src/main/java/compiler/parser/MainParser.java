@@ -113,14 +113,14 @@ public class MainParser extends Parser {
 			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind+" "+ token.pos.line);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
-			System.exit(0);
+			// System.exit(0);
 			// return false;
 		} else {
 			// TODO: throw Error
 			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind);
 			log.error(token.pos, Errors.INVALID_IDENTIFIER);
-			System.exit(0);
+			// System.exit(0);
 			// return false;
 		}
 	}
@@ -557,8 +557,10 @@ public class MainParser extends Parser {
 				break;
 			case NULL:
 				exp1 = parseNull();
+				break;
 			case THIS:
 				exp1 = parseThis();
+				break;
 		}
 		if (error)  return null;
 		return (ExprNode) exp1;
@@ -1653,11 +1655,15 @@ public class MainParser extends Parser {
 		System.out.println("Stmt Node Token: "+token.kind);
 		List<StmtNode> tree = new ArrayList<>();
 		while (token.kind != TokenKind.END) {
+			if (error)
+				return null;
 			switch (token.kind ) {
 				case IMPORT:
 					break;
 				default:
-					tree.addAll(parseBlock());
+					List<StmtNode> stmt = parseBlock();
+					if (stmt == null ) return null;
+					tree.addAll(stmt);
 					break;
 			}
 		}
