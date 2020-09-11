@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -133,6 +134,8 @@ public class MainParser extends Parser {
 		if (error) return null;
 		ExprNode exp1 = parseLogicalAndExpression();
 		while (token.kind == TokenKind.OROP || token.kind == TokenKind.OR) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseLogicalAndExpression();
@@ -151,6 +154,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseLogicalNotExpression();
 		while (token.kind == TokenKind.ANDOP || token.kind == TokenKind.AND) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseLogicalNotExpression();
@@ -168,6 +173,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseNotEqualToExpression();
 		while (token.kind == TokenKind.NOTOP || token.kind == TokenKind.NOT) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseNotEqualToExpression();
@@ -185,6 +192,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseEqualEqualExpression();
 		while (token.kind == TokenKind.NOTEQU) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseEqualEqualExpression();
@@ -202,6 +211,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseRealtionalExpression();
 		while (token.kind == TokenKind.EQUEQU) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseRealtionalExpression();
@@ -221,6 +232,8 @@ public class MainParser extends Parser {
 		while (token.kind == TokenKind.LT || token.kind == TokenKind.GT || token.kind == TokenKind.LTE
 				|| token.kind == TokenKind.GTE || token.kind == TokenKind.IN || token.kind == TokenKind.IS
 				|| token.kind == TokenKind.NOT) {
+			if (error)
+				return null;
 			String op = token.value();
 			if (token.kind == TokenKind.IS) {
 				accept(token.kind);
@@ -254,6 +267,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseBitXorExpression();
 		while (token.kind == TokenKind.BITOR) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseBitXorExpression();
@@ -271,6 +286,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseBitAndExpression();
 		while (token.kind == TokenKind.BITAND) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseBitAndExpression();
@@ -288,6 +305,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseBitRightShiftExpression();
 		while (token.kind == TokenKind.ANDOP) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseBitRightShiftExpression();
@@ -305,6 +324,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseBitLeftShiftExpression();
 		while (token.kind == TokenKind.RSHIFT || token.kind == TokenKind.TRSHIFT) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseBitLeftShiftExpression();
@@ -322,6 +343,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseSubtractExpression();
 		while (token.kind == TokenKind.LSHIFT) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseSubtractExpression();
@@ -339,6 +362,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseAdditionExpression();
 		while (token.kind == TokenKind.SUB) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseAdditionExpression();
@@ -356,6 +381,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseMultiplicationExpression();
 		while (token.kind == TokenKind.ADD) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseMultiplicationExpression();
@@ -373,6 +400,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseDivisionExpression();
 		while (token.kind == TokenKind.MUL) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseDivisionExpression();
@@ -390,6 +419,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		ExprNode exp1 = parseFactorExpression();
 		while (token.kind == TokenKind.DIV || token.kind == TokenKind.MOD || token.kind == TokenKind.FLOORDIV) {
+			if (error)
+				return null;
 			String op = token.value();
 			accept(token.kind);
 			ExprNode exp2 = parseFactorExpression();
@@ -433,6 +464,8 @@ public class MainParser extends Parser {
 		try {
 			exp1 = parseAtomExpression();
 			while (token.kind == TokenKind.POWER) {
+				if (error)
+					return null;
 				String op = token.value();
 				accept(TokenKind.POWER);
 				exp2 = parseFactorExpression();
@@ -459,6 +492,8 @@ public class MainParser extends Parser {
 		ExprNode oExp = parseAtom();
 		System.out.println("Atom Expr Node Token: "+token.kind);
 		while (token.kind == TokenKind.LPAREN || token.kind == TokenKind.DOT || token.kind == TokenKind.LSQU) {
+			if (error)
+				return null;
 			switch (token.kind) {
 				case LPAREN:
 					accept(TokenKind.LPAREN);
@@ -470,6 +505,8 @@ public class MainParser extends Parser {
 					ExprNode exp1, exp2;
 					System.out.println("Atom Expr: "+token.kind);
 					while (token.kind == TokenKind.LSQU) {
+						if (error)
+							return null;
 						accept(TokenKind.LSQU);
 						exp1 = parseNumberLiteral();
 						if (token.kind == TokenKind.COLON) {
@@ -487,8 +524,10 @@ public class MainParser extends Parser {
 				case DOT:
 					ExprNode e1;
 					while (token.kind == TokenKind.DOT) {
+						if (error)
+							return null;
 						accept(TokenKind.DOT);
-						e1 = parseIdentifier();
+						e1 = parseAtomExpression();
 						oExp = new ObjectAccessNode(oExp, e1);
 					}
 					break;
@@ -670,6 +709,8 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		List<ExprNode> args = new ArrayList<>();
 		while (token.kind != TokenKind.RPAREN) {
+			if (error)
+				return null;
 			args.add(parseValue());
 			if (token.kind != TokenKind.RPAREN)
 				accept(TokenKind.COMMA);
@@ -736,13 +777,17 @@ public class MainParser extends Parser {
 		StmtNode elseBlock = null;
 		System.out.println("Before If Stmt Node Token: "+token.kind);
 		while (token.kind == TokenKind.ELSE) {
+			if (error)
+				return null;
 			accept(TokenKind.ELSE);
 			if (token.kind == TokenKind.IF) {
 				elseIfList.add(parseIf());
 			} else if (token.kind == TokenKind.LCURLY) {
 				accept(TokenKind.LCURLY);
 				BlockNode blockNode = new BlockNode();
-				blockNode.setStmt(parseBlock());
+				List<StmtNode> stmt = parseBlock();
+				if (stmt == null ) return null;
+				blockNode.setStmt(stmt);
 				elseBlock = new ElseStmtNode(ifNode, blockNode);
 				accept(TokenKind.RCURLY);
 				break;
@@ -783,6 +828,8 @@ public class MainParser extends Parser {
 		ExprNode exp1 = parseIdentifier();
 		ExprNode exp2;
 		while (token.kind == TokenKind.DOT) {
+			if (error)
+				return null;
 			accept(TokenKind.DOT);
 			exp2 = parseIdentifier();
 			exp1 = new ObjectAccessNode(exp1, exp2);
@@ -807,6 +854,8 @@ public class MainParser extends Parser {
 			return init;
 		init = new ArrayList<>();
 		while (token.kind == TokenKind.VAR || token.kind == TokenKind.IDENTIFIER) {
+			if (error)
+				return null;
 			if (token.kind == TokenKind.VAR) {
 				accept(TokenKind.VAR);
 				iden = parseIdentifier();
@@ -856,8 +905,12 @@ public class MainParser extends Parser {
 
 		incrNodes = new ArrayList<>();
 		while (token.kind == TokenKind.IDENTIFIER) {
+			if (error)
+				return null;
 			iden = parseIdentifier();
 			while (token.kind == TokenKind.DOT) {
+				if (error)
+					return null;
 				accept(TokenKind.DOT);
 				exp2 = parseIdentifier();
 				iden = new ObjectAccessNode(iden, exp2);
@@ -982,6 +1035,8 @@ public class MainParser extends Parser {
 		}
 		listNode.add(exp1);
 		while (token.kind != TokenKind.RSQU) {
+			if (error)
+				return null;
 			accept(TokenKind.COMMA);
 			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
 			listNode.add(parseValue());
@@ -1039,11 +1094,13 @@ public class MainParser extends Parser {
 		 * 
 		 */
 		if (error)  return null;
-		Map<ExprNode, ExprNode> pairs = new HashMap<>();
+		Map<ExprNode, ExprNode> pairs = new LinkedHashMap<>();
 		nextToken();
 		accept(TokenKind.LSQU);
 		System.out.println("Map Collection : "+token.kind);
 		while (token.kind != TokenKind.RSQU) {
+			if (error)
+				return null;
 			ExprNode exp2 = new MapCollNode(), exp1 = new MapCollNode();
 			if (token.kind == TokenKind.COMMA)
 				nextToken();
@@ -1081,6 +1138,8 @@ public class MainParser extends Parser {
 						: type == "set" ? new SetCompNode() : type == "link" ? new LinkCompNode() : null;
 
 		while (token.kind != TokenKind.RSQU) {
+			if (error)
+				return null;
 			switch (token.kind) {
 				case LOOP:
 					accept(TokenKind.LOOP);
@@ -1142,6 +1201,8 @@ public class MainParser extends Parser {
 		}
 		setNode.add(exp1);
 		while (token.kind != TokenKind.RSQU) {
+			if (error)
+				return null;
 			accept(TokenKind.COMMA);
 			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
 			setNode.add(parseValue());
@@ -1199,6 +1260,8 @@ public class MainParser extends Parser {
 		}
 		listNode.add(exp1);
 		while (token.kind != TokenKind.RSQU) {
+			if (error)
+				return null;
 			accept(TokenKind.COMMA);
 			if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
 			listNode.add(parseValue());
@@ -1279,12 +1342,14 @@ public class MainParser extends Parser {
 		 */
 
 		if (error)  return null;
-		Map<IdenNode, ExprNode> object = new HashMap<>();
+		Map<IdenNode, ExprNode> object = new LinkedHashMap<>();
 		IdenNode idenNode;
 		ExprNode exprNode;
 
 		accept(TokenKind.LCURLY);
 		while (token.kind != TokenKind.RCURLY) {
+			if (error)
+				return null;
 			idenNode = (IdenNode) parseIdentifier();
 			accept(TokenKind.COLON);
 			exprNode = parseValue();
@@ -1293,7 +1358,7 @@ public class MainParser extends Parser {
 			if (TokenKind.RCURLY != token.kind)
 				accept(TokenKind.COMMA);
 		}
-		System.out.println("Object Creation: "+token.kind);
+		System.out.println("Object Creation: "+object);
 		accept(TokenKind.RCURLY);
 		if (error)  return null;
 		return new ObjCreationNode(object);
@@ -1329,7 +1394,11 @@ public class MainParser extends Parser {
 		accept(TokenKind.LCURLY);
 		System.out.println("Ann Func Node: "+token.kind);
 		while(token.kind != TokenKind.RCURLY) {
-			stmt.addAll(parseBlock());
+			if (error)
+				return null;
+			List<StmtNode> stm = parseBlock();
+			if (stm == null ) return null;
+			stmt.addAll(stm);
 		}
 		System.out.println("Ann Func Node: "+token.kind);
 		accept(TokenKind.RCURLY);
@@ -1402,9 +1471,12 @@ public class MainParser extends Parser {
 		List<VarDeclNode> varDeclNodes = new ArrayList<>();
 		accept(TokenKind.VAR);
 		while (token.kind != TokenKind.SEMICOLON) {
+			if (error)
+				return null;
 			IdenNode idenNode = (IdenNode) parseIdentifier();
 			ExprNode exp = null;
-			
+			if (error)
+				return null;
 			if (token.kind == TokenKind.EQU) {
 				nextToken();
 				exp = parseValue();
@@ -1433,6 +1505,8 @@ public class MainParser extends Parser {
 		List<ConstDeclNode> constDeclNodes = new ArrayList<>();
 		accept(TokenKind.CONST);
 		while (token.kind != TokenKind.SEMICOLON) {
+			if (error)
+				return null;
 			IdenNode idenNode = (IdenNode) parseIdentifier();
 			accept(TokenKind.EQU);
 			ExprNode exp = parseValue();
@@ -1461,8 +1535,12 @@ public class MainParser extends Parser {
 		List<IdenNode> idenNodes = new ArrayList<>();
 
 		while (token.kind != TokenKind.RPAREN) {
+			if (error)
+				return null;
 			System.out.println("ARG List: "+token.kind);
 			System.out.println("ARG List: "+token.value());
+			if (error)
+				return null;
 			if (token.kind == TokenKind.VARARGS) {
 				accept(TokenKind.VARARGS);
 				varArg = true;
@@ -1502,8 +1580,13 @@ public class MainParser extends Parser {
 		accept(TokenKind.RPAREN);
 		accept(TokenKind.LCURLY);
 		List<StmtNode> stmt = new ArrayList<>();
-		while (token.kind != TokenKind.RCURLY)
-			stmt.addAll(parseBlock());
+		while (token.kind != TokenKind.RCURLY){
+			if (error)
+				return null;
+			List<StmtNode> stm = parseBlock();
+			if (stm == null ) return null;
+			stmt.addAll(stm);
+		}
 		accept(TokenKind.RCURLY);
 		BlockNode block = new BlockNode();
 		block.setStmt(stmt);
@@ -1559,13 +1642,17 @@ public class MainParser extends Parser {
 		List<StmtNode> blockStats = new ArrayList<>();
 		BlockNode blockNode = new BlockNode();
 		while (token.kind != TokenKind.RCURLY) {
+			if (error)
+				return null;
 			switch (token.kind) {
 				case CONTINUE:
 				case BREAK:
 					blockStats.add(parseFlowStatement());
 					break;
 				default:
-					blockStats.addAll(parseBlock());
+					List<StmtNode> stm = parseBlock();
+					if (stm == null ) return null;
+					blockStats.addAll(stm);
 			}
 		}
 		if (error)  return null;
@@ -1583,32 +1670,48 @@ public class MainParser extends Parser {
 		System.out.println("Token kind "+token.kind);
 		switch (token.kind) {
 			case VAR:
-				blockStmt.addAll(parseVariable());
+				List<VarDeclNode> stm = parseVariable();
+				if (stm == null ) return null;
+				blockStmt.addAll(stm);
 				break;
 			case CONST:
-				blockStmt.addAll(parseConstVariable());
+				List<ConstDeclNode> stm1 = parseConstVariable();
+				if (stm1 == null ) return null;
+				blockStmt.addAll(stm1);
 				break;
 			case FUNC:
-				blockStmt.add(parseFunctionDeclaration());
+				DeclNode decl = parseFunctionDeclaration();
+				if(decl == null) return null;
+				blockStmt.add(decl);
 				break;
 			case IF:
-				blockStmt.add(parseIfStatement());
+				StmtNode stm2 = parseIfStatement();
+				if (stm2 == null) return null;
+				blockStmt.add(stm2);
 				break;
 			case FOR:
 				innerLoop = breakAllowed ? true : false;
 				breakAllowed = true;
-				blockStmt.add(parseForStatement());
+				StmtNode stm3 = parseForStatement();
+				if (stm3 == null) return null;
+				blockStmt.add(stm3);
 				breakAllowed = innerLoop ? true : false;
 				innerLoop = false;
 				break;
 			case LOOP:
-				blockStmt.add(parseLoopStatement());
+				StmtNode stm4 = parseLoopStatement();
+				if (stm4 == null) return null;
+				blockStmt.add(stm4);
 				break;
 			case RET:
-				blockStmt.add(parseReturnStatement());
+				StmtNode stm5 = parseReturnStatement();
+				if(stm5 == null) return null; 
+				blockStmt.add(stm5);
 				break;
 			case IDENTIFIER:
-				blockStmt.add(parseExprStmt());
+				StmtNode stm6 = parseExprStmt();
+				if(stm6 == null) return null; 
+				blockStmt.add(stm6);
 				System.out.println("Block Stmt: "+token.kind);
 				accept(TokenKind.SEMICOLON);
 				break;
