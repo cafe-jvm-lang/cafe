@@ -1,0 +1,146 @@
+Objects:
+DynamicObject
+Function extends DynamicObject
+
+var a= {
+	a: 5,
+	b: func(){
+		this.a; #5
+		func Hello(){
+			this.a #5
+		}
+	},
+	c: this.a
+}
+
+var x = DynamicObject.delegate(a)
+x.a #5
+
+func Hello(){
+	this.a = 5;
+	var z = 10;
+}
+
+Variable a{
+	type: object
+	parent: global
+	this = [ var1: ref, var2: ref ]
+}
+
+Variable a.a{
+	type: Expr
+	parent: a
+	value: 5
+}
+
+Variable a.b{
+	type: AnnFunc
+	parent: a
+	map: [  ]
+}
+
+Variable global{
+	parent: null
+}
+
+SymbolTable
+	parent: null
+	a	|   #ref-CafeVariable
+
+SymbolTable
+	parent:
+
+
+---------------------------------------------------------------------
+
+var a = 110
+func Hello(){
+	a = 11;
+	this.b = 10;
+}
+
+var z = DO.delegate(Hello)
+
+-------------------------------------
+DynamicObject {
+	__proto__
+}
+
+Function extends DynamicObject{
+	prototype
+}
+
+every func is an instance of Function
+
+
+
+
+
+
+
+------------------------------------------------
+SEMANTICS
+1. Local scope variable checking
+2. LHS checking
+3. Loop collection-type checking
+4. Range checking
+
+1. Local scope variable checking
+	SymbolTable
+		1. Global Scope
+		2. func
+		
+		structure:
+			parent SymbolTable
+			Set<Identifier>
+			
+			void insert(Identifier)
+			boolean present(Identifier)
+		
+		Algo:
+			1. create GlobalSymbolTable(GST) & CurrentSymbolTable(CST).
+				init CST = GST
+			2. iterate stmts.
+			3. If stmt type = funcDecl:
+				create new SymbolTable
+					1. set parent = CST
+					2. CST = this
+				iterate through func stmt till method exists
+				reset CST = CST.parent
+			4.  if stmt type = VarDecl 
+					cst.insert(identifier):
+				else other ExprNodes with identifiers:
+					cst.present(identifier)
+
+2. LHS checking:
+	LHS shouldnt consist:
+		1. FuncCallNode
+		2. Literal Nodes
+		3. null & this nodes
+		4. ExprNodes with operations like +,- etc.
+	
+3. Loop collection type checking
+	Loop node collection expr shouldnt consist of:
+		1. Literal Nodes
+		2. null & this nodes
+
+4. Range Checking
+	Both nodes in range ie start & end, should be
+		1. NumLit or String Lit
+		2. both of same type.
+
+structure for
+class SemanticsChecker implements Node.Visitor{
+	private final GST = new SymbolTable(parent=null),
+	
+	private static final enum Expr {
+		LHS,
+		RHS
+	}
+	
+	private exprType = { LHS/RHS }
+	
+	// this node is set while visiting calling accept() on specific node,
+	// to refer the type of caller.
+	private Node.Tag callerNode = null;
+}
