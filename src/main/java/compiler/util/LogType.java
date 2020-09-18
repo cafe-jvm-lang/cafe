@@ -52,7 +52,11 @@ public class LogType {
 		INVALID_IDENTIFIER("Invalid identifier"),
 		INVALID_FRACTIONAL_VAL("Invalid fractional value"),
 		EOF("Unexpected end of file"),
-		EOF_PARSING_COMMENT("Reached EOF while parsing comment");
+		EOF_PARSING_COMMENT("Reached EOF while parsing comment"),
+		
+		// Semantic errors
+		SYMBOL_NOT_DECLARED("Symbol is not declared"),
+		LHS_EXPR_ERROR("LHS cannot be a literal");
 		
 		Errors(String desc) {
 			this.desc = desc;

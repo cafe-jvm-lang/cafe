@@ -486,11 +486,11 @@ public abstract class Node {
 		 * Ex | invoked-on | args sum(5,x) | sum | (5,x); a[2](10) | a[5] | (10);
 		 */
 		public ExprNode invokedOn;
-		public ArgsListNode params;
+		public ArgsListNode args;
 
 		public FuncCallNode(ExprNode e, ArgsListNode p) {
 			invokedOn = e;
-			params = p;
+			args = p;
 		}
 
 		@Override
