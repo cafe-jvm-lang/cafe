@@ -757,7 +757,8 @@ public class MainParser extends Parser {
 		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.LCURLY);
 		System.out.println("If Node Token: "+token.kind);
-		ifBlock = parseLoopBlock();
+		if (token.kind != TokenKind.RCURLY)
+			ifBlock = parseLoopBlock();
 		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.RCURLY);
 		if (error)  return null;
@@ -785,7 +786,9 @@ public class MainParser extends Parser {
 			} else if (token.kind == TokenKind.LCURLY) {
 				accept(TokenKind.LCURLY);
 				BlockNode blockNode = new BlockNode();
-				List<StmtNode> stmt = parseBlock();
+				List<StmtNode> stmt = new ArrayList<>();
+				if (token.kind != TokenKind.RCURLY)
+					stmt = parseBlock();
 				if (stmt == null ) return null;
 				blockNode.setStmt(stmt);
 				elseBlock = new ElseStmtNode(ifNode, blockNode);
@@ -793,9 +796,11 @@ public class MainParser extends Parser {
 				break;
 			}
 		}
-		if (elseBlock != null)
+		if (elseBlock != null) 
 			elseIfList.add(elseBlock);
-		ifNode.setElsePart(elseIfList);
+		BlockNode blockNode = new BlockNode();
+		blockNode.setStmt(elseIfList);
+		ifNode.setElsePart(blockNode);
 		if (error)  return null;
 		return ifNode;
 	}
@@ -969,15 +974,17 @@ public class MainParser extends Parser {
 			iden2 = (IdenNode) parseIdentifier();
 		}
 		accept(TokenKind.IN);
-		exp = parseCollection();
+		try {
+			exp = parseAtomExpression();
+		} catch (ParseException e) {
+		}
+		
 		if (exp == null) {
 			if (token.kind == TokenKind.LCURLY)
-				exp = parseObjectCreation();
+				exp = parseCollection();
 			else
-				try {
-					exp = parseAtomExpression();
-				} catch (ParseException e) {
-				}
+				exp = parseObjectCreation();
+				
 		}
 		accept(TokenKind.LCURLY);
 		block = parseLoopBlock();
