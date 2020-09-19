@@ -1,4 +1,7 @@
 func Hello(a,b){
     var b = 10;
-    a = [i loop i in [1,2,3]];
+    
+    if(i == 2 ){}
+    
+    else{}
 }

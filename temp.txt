@@ -135,10 +135,12 @@ class SemanticsChecker implements Node.Visitor{
 	
 	private static final enum Expr {
 		LHS,
-		RHS
+		LOOP_COLL,
+		RANGE,
+		NONE
 	}
 	
-	private exprType = { LHS/RHS }
+	private exprType = { Expr }
 	
 	// this node is set while visiting calling accept() on specific node,
 	// to refer the type of caller.

@@ -238,7 +238,7 @@ public class PrettyPrinter implements Node.Visitor{
 		printWithTabs("FuncCallNode");
 		tabs++;
 		addBeautify("invoked-on", n.invokedOn);
-		addBeautify("params", n.params);
+		addBeautify("params", n.args);
 		
 		tabs--;
 	}
