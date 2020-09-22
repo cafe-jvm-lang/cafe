@@ -2,7 +2,7 @@ package compiler.util;
 
 public class LogType {
 
-	public static enum Type {
+	public enum Type {
 		ERROR, WARNING
 	}
 
@@ -10,37 +10,40 @@ public class LogType {
 		Position pos;
 		Type type;
 		T issue;
+		String val;
 
-		public Issues(Position pos, Type type, T issue) {
+		public Issues(Position pos, Type type, T issue, String val) {
 			this.pos = pos;
 			this.type = type;
 			this.issue = issue;
+			this.val = val;
 		}
 
 		@Override
 		public String toString() {
+			String msg = val+ ": " + issue.toString();
 			if(pos == null) {
-				return issue.toString();
+				return msg;
 			}
-			String error = issue.toString() + " at " + pos.toString();
-			return error;
+			return msg + " at " + pos.toString();
 		}
 	}
 
 	public static final class Error extends Issues<Errors> {
-		public Error(Position pos, Errors err) {
-			super(pos, Type.ERROR, err);
+		public Error(Position pos, Errors err, String val) {
+			super(pos, Type.ERROR, err, val);
 		}
 	}
 
 	public static final class Warning extends Issues<Warnings> {
 
-		public Warning(Position pos, Warnings warn) {
-			super(pos, Type.WARNING, warn);
+		public Warning(Position pos, Warnings warn, String val)
+		{
+			super(pos, Type.WARNING, warn,val);
 		}
 	}
 	
-	public static enum Errors {
+	public enum Errors {
 		
 		NO_FILE_PATH_GIVEN_IN_CLI("No file path provided in arguments"),
 		INVALID_CLI_FILE_PATH("File not found or invalid file path"),
@@ -56,7 +59,7 @@ public class LogType {
 		
 		// Semantic errors
 		SYMBOL_NOT_DECLARED("Symbol is not declared"),
-		LHS_EXPR_ERROR("LHS cannot be a literal");
+		LHS_EXPR_ERROR("Invalid LHS expression");
 		
 		Errors(String desc) {
 			this.desc = desc;
@@ -70,7 +73,7 @@ public class LogType {
 		String desc;
 	}
 
-	public static enum Warnings {
+	public enum Warnings {
 		WARNING_1("Warning desciption");
 
 		Warnings(String desc) {

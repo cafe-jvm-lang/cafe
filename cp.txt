@@ -1,7 +1,71 @@
-func Hello(a,b){
-    var b = 10;
-    
-    if(i == 2 ){}
-    
-    else{}
-}
+var System;
+func QuickSort()
+{
+    func partition(arr,low,high)
+    { 
+        var pivot = arr[high];
+        var i = (low-1); // index of smaller element
+        for (var j=low; j<high; j=j+1)
+        { 
+            // If current element is smaller than the pivot
+            if (arr[j] < pivot) 
+            { 
+                i=i+1;
+  
+                // swap arr[i] and arr[j] 
+                var temp = arr[i];
+                arr[i] = arr[j]; 
+                arr[j] = temp; 
+            } 
+        } 
+  
+        // swap arr[i+1] and arr[high] (or pivot) 
+        var temp = arr[i];
+        arr[i] = arr[high];
+        arr[high] = temp; 
+  
+        return i+1; 
+    } 
+  
+  
+    /* The main function that implements QuickSort() 
+      arr[] --> Array to be sorted, 
+      low  --> Starting index, 
+      high  --> Ending index */
+    func sort(arr,  low, high)
+    { 
+        if (low < high) 
+        { 
+            /* pi is partitioning index, arr[pi] is  
+              now at right place */
+            var pi = partition(arr, low, high);
+  
+            // Recursively sort elements before 
+            // partition and after partition 
+            sort(arr, low, pi-1); 
+            sort(arr, pi+1, high); 
+        } 
+    } 
+  
+    /* A utility function to prvar array of size n */
+    func printArray(arr)
+    { 
+        var n = arr.length;
+        for (var i=0; i<n; )
+            System.out.print(arr[i]+" ");
+        System.out.println();
+    } 
+  
+    // Driver program 
+    func main(args)
+    { 
+        var arr = [10, 7, 8, 9, 1, 5];
+        var n = arr.length;
+  
+        var ob = QuickSort();
+        ob.sort(arr, 0, n-1); 
+  
+        System.out.println("sorted array");
+        printArray(arr);
+    } 
+} 

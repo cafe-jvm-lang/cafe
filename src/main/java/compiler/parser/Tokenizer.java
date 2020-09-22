@@ -313,9 +313,10 @@ public class Tokenizer {
             		reader.scanChar();tokenKind=TokenKind.FLOORDIV;break LOOP;
             	}
             	else if(reader.ch == '*') {
+            		// TODO: Comments not supported in parsing, so tokens are ignored
             		scanComment();
-            		tokenKind=TokenKind.MULTICOMMENT;
-            		break LOOP;
+            		//tokenKind=TokenKind.MULTICOMMENT;
+            		break;
             	}
             	else {
             		tokenKind=TokenKind.DIV;break LOOP;	
@@ -334,7 +335,8 @@ public class Tokenizer {
 					reader.scanChar();
 				}
 				
-				tokenKind=TokenKind.SINGLECOMMENT;break LOOP;
+				//tokenKind=TokenKind.SINGLECOMMENT;
+				break;
             case '@':
             	reader.scanChar();tokenKind=TokenKind.IMPORT;break LOOP;
             case '%':

@@ -67,7 +67,8 @@ public class PrettyPrinter implements Node.Visitor{
 		addTabs();
 		tabs++;
 		System.out.println(msg);
-		n.accept(this);
+		if(n!=null)
+			n.accept(this);
 		tabs--;
 	}
 
@@ -325,8 +326,7 @@ public class PrettyPrinter implements Node.Visitor{
 		addBeautify("if-condition", n.ifCond);
 		addBeautify("if-block", n.ifBlock);
 		if(n.elsePart != null)
-			for(StmtNode node: n.elsePart)
-				addBeautify("else-part", node);
+			n.elsePart.accept(this);
 
 		tabs--;
 	}

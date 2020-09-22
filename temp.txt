@@ -1,84 +1,69 @@
-Objects:
-DynamicObject
-Function extends DynamicObject
 
-var a= {
-	a: 5,
-	b: func(){
-		this.a; #5
-		func Hello(){
-			this.a #5
-		}
-	},
-	c: this.a
+ObjectPrototype{
+	Map<key,value>  = [];
+	Map.put(__proto__ , null)
 }
-
-var x = DynamicObject.delegate(a)
-x.a #5
-
-func Hello(){
-	this.a = 5;
-	var z = 10;
-}
-
-Variable a{
-	type: object
-	parent: global
-	this = [ var1: ref, var2: ref ]
-}
-
-Variable a.a{
-	type: Expr
-	parent: a
-	value: 5
-}
-
-Variable a.b{
-	type: AnnFunc
-	parent: a
-	map: [  ]
-}
-
-Variable global{
-	parent: null
-}
-
-SymbolTable
-	parent: null
-	a	|   #ref-CafeVariable
-
-SymbolTable
-	parent:
-
-
----------------------------------------------------------------------
-
-var a = 110
-func Hello(){
-	a = 11;
-	this.b = 10;
-}
-
-var z = DO.delegate(Hello)
-
--------------------------------------
 DynamicObject {
-	__proto__
+	private prototype = ObjectPrototype()
+	
+	Map<key,value>  = [];
+	Map.put("__proto__",prototype)
+	
+	static create(){
+		
+	}
 }
 
-Function extends DynamicObject{
-	prototype
+var x = {a:10}
+x.__proto__ == DynamicObject.prototype
+
+FunctionPrototype{
+	Map<key,value>  = [];
+	Map.put("__proto__" , ObjectPrototype())
 }
+Function extends DynamicObject{
+	Map<key,value>  = [];
+	Map.put("prototype" , FunctionPrototype)
+	Map.put("__proto__",Map.get("prototype"))
+}
+func A(){
+	this.x = func(){};
+}
+
+A.someMethod = func(){
+	this.hello =  func(){
+		return x;
+	}
+}
+func B(){
+	this.x = 10;
+}
+B.prototype = DO.delegate(A)
+
 
 every func is an instance of Function
 
 
+function foo() {
+	console.log( this.a );
+}
 
+var obj1 = { a:42 }
 
-
+var obj2 = Do.delegate(obj1)
 
 
 ------------------------------------------------
+
+Function
+
+
+
+
+
+
+
+-----------------------------------------------
 SEMANTICS
 1. Local scope variable checking
 2. LHS checking
@@ -118,6 +103,7 @@ SEMANTICS
 		2. Literal Nodes
 		3. null & this nodes
 		4. ExprNodes with operations like +,- etc.
+		
 	
 3. Loop collection type checking
 	Loop node collection expr shouldnt consist of:

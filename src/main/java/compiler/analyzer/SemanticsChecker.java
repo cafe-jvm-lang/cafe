@@ -60,12 +60,16 @@ public class SemanticsChecker implements Node.Visitor {
 	// Current Symbol Table
 	private SymbolTable CST;
 
-	private static enum Expr {
-		LHS, LOOP, RANGE, NONE
+	private enum Expr {
+		LHS, RHS
+	}
+
+	private enum ObjAcc{
+		accesedOn,prop
 	}
 
 	private Expr exprType = null;
-
+	private ObjAcc objType = null;
 	// caller node
 	private Node.Tag caller = null;
 
@@ -89,7 +93,6 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitProgram(ProgramNode n) {
-		caller = Node.Tag.PROGRAM;
 		for (StmtNode stmt : n.stmts) {
 			stmt.accept(this);
 		}
@@ -97,43 +100,44 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitVarDecl(VarDeclNode n) {
-		CST.insert(n.var);
-		n.value.accept(this);
+		CST.insert(n.var.name);
+		if(n.value != null)
+			n.value.accept(this);
 	}
 
 	@Override
 	public void visitIden(IdenNode n) {
-		if (!CST.isPresent(n))
-			log.error(Errors.SYMBOL_NOT_DECLARED);
+		if (!CST.isPresent(n.name))
+			logErrors(Errors.SYMBOL_NOT_DECLARED,n.name);
 	}
 
 	@Override
 	public void visitConstDecl(ConstDeclNode n) {
-		CST.insert(n.var);
+		CST.insert(n.var.name);
 		n.val.accept(this);
 	}
 
 	@Override
 	public void visitNumLit(NumLitNode n) {
-		if (exprType == Expr.LHS || exprType == Expr.LOOP)
-			log.error(Errors.LHS_EXPR_ERROR);
+		if (exprType == Expr.LHS )
+			logErrors(Errors.LHS_EXPR_ERROR,n.lit.toString());
 	}
 
 	@Override
 	public void visitStrLit(StrLitNode n) {
-		if (exprType == Expr.LHS || exprType == Expr.LOOP)
-			log.error(Errors.LHS_EXPR_ERROR);
+		if (exprType == Expr.LHS)
+			logErrors(Errors.LHS_EXPR_ERROR,n.lit);
 	}
 
 	@Override
 	public void visitBoolLit(BoolLitNode n) {
-		if (exprType == Expr.LHS || exprType == Expr.LOOP)
-			log.error(Errors.LHS_EXPR_ERROR);
+		if (exprType == Expr.LHS)
+			logErrors(Errors.LHS_EXPR_ERROR,String.valueOf(n.lit));
 	}
 
 	@Override
 	public void visitFuncDecl(FuncDeclNode n) {
-		CST.insert(n.name);
+		CST.insert(n.name.name);
 		CST = new SymbolTable(CST);
 		n.params.accept(this);
 		n.block.accept(this);
@@ -156,7 +160,6 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitAnnFunc(AnnFuncNode n) {
-		caller = Node.Tag.ANNFUNC;
 		CST = new SymbolTable(CST);
 		n.params.accept(this);
 		n.block.accept(this);
@@ -165,28 +168,24 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitListColl(ListCollNode n) {
-		caller = Node.Tag.LIST;
 		for (ExprNode expr : n.val)
 			expr.accept(this);
 	}
 
 	@Override
 	public void visitSetColl(SetCollNode n) {
-		caller = Node.Tag.SET;
 		for (ExprNode expr : n.val)
 			expr.accept(this);
 	}
 
 	@Override
 	public void visitLinkColl(LinkCollNode n) {
-		caller = Node.Tag.LINKEDLIST;
 		for (ExprNode expr : n.val)
 			expr.accept(this);
 	}
 
 	@Override
 	public void visitMapColl(MapCollNode n) {
-		caller = Node.Tag.MAP;
 		for (Map.Entry<ExprNode, ExprNode> entry : n.pairs.entrySet()) {
 			entry.getKey().accept(this);
 			entry.getValue().accept(this);
@@ -199,7 +198,7 @@ public class SemanticsChecker implements Node.Visitor {
 			n.e1.accept(this);
 			n.e2.accept(this);
 		} else {
-			log.error(Errors.LHS_EXPR_ERROR);
+			logErrors(Errors.LHS_EXPR_ERROR,"");
 		}
 	}
 
@@ -208,48 +207,76 @@ public class SemanticsChecker implements Node.Visitor {
 		if (exprType != Expr.LHS) {
 			n.e.accept(this);
 		} else {
-			log.error(Errors.LHS_EXPR_ERROR);
+			logErrors(Errors.LHS_EXPR_ERROR,"");
 		}
 	}
 
 	@Override
 	public void visitThis(ThisNode n) {
-		if (exprType == Expr.LHS || exprType == Expr.LOOP)
-			log.error(Errors.LHS_EXPR_ERROR);
+		if (exprType == Expr.LHS)
+			logErrors(Errors.LHS_EXPR_ERROR,"this");
 	}
 
 	@Override
 	public void visitNull(NullNode n) {
-		if (exprType == Expr.LHS || exprType == Expr.LOOP)
-			log.error(Errors.LHS_EXPR_ERROR);
+		if (exprType == Expr.LHS )
+			logErrors(Errors.LHS_EXPR_ERROR,"null");
 	}
 
 	@Override
 	public void visitFuncCall(FuncCallNode n) {
-		if (exprType != Expr.LHS) {
-			n.invokedOn.accept(this);
+		if (exprType == Expr.LHS && objType != ObjAcc.prop){
+			logErrors(Errors.LHS_EXPR_ERROR,"");
+			return;
+		}
+		if(objType == ObjAcc.prop) {
 			n.args.accept(this);
-		} else
-			log.error(Errors.LHS_EXPR_ERROR);
+		}
+
 	}
 
 	@Override
 	public void visitSubscript(SubscriptNode n) {
-		n.subscriptOf.accept(this);
+		if(objType == ObjAcc.accesedOn)
+			n.subscriptOf.accept(this);
 		n.index.accept(this);
 	}
 
 	@Override
 	public void visitObjAccess(ObjectAccessNode n) {
-		if (caller != Node.Tag.OBJACCESS) {
-			caller = Node.Tag.OBJACCESS;
-			n.accessedOn.accept(this);
+		ObjectAccessNode node = n;
+		Node.Tag tag = n.prop.getTag();
+		if(exprType == Expr.LHS){
+			while(tag == Node.Tag.OBJACCESS){
+				node = (ObjectAccessNode) node.prop;
+				tag = node.prop.getTag();
+			}
+
+			if(tag != Node.Tag.IDEN && tag != Node.Tag.SUBSCRIPT){
+				logErrors(Errors.LHS_EXPR_ERROR,"");
+				return;
+			}
+			exprType = null;
 		}
+		n.accessedOn.accept(this);
+		tag = n.prop.getTag();
+		node = n;
+		objType = ObjAcc.prop;
+		while(tag == Node.Tag.OBJACCESS){
+			node = (ObjectAccessNode) node.prop;
+			node.accessedOn.accept(this);
+			tag = node.prop.getTag();
+		}
+		if(node.prop.getTag() != Node.Tag.IDEN){
+			node.prop.accept(this);
+		}
+		objType = null;
 	}
 
 	@Override
 	public void visitSlice(SliceNode n) {
-		n.slicedOn.accept(this);
+		if(objType == ObjAcc.accesedOn)
+			n.slicedOn.accept(this);
 		n.start.accept(this);
 		n.end.accept(this);
 	}
@@ -263,7 +290,8 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitParamList(ParameterListNode n) {
-		CST.insertAll(n.params);
+		for(IdenNode iden : n.params)
+			CST.insert(iden.name);
 	}
 
 	@Override
@@ -275,23 +303,27 @@ public class SemanticsChecker implements Node.Visitor {
 	public void visitAsgnStmt(AsgnStmtNode n) {
 		exprType = Expr.LHS;
 		n.lhs.accept(this);
-		exprType = Expr.NONE;
+		exprType = Expr.RHS;
 		n.rhs.accept(this);
 	}
 
 	@Override
 	public void visitIfStmt(IfStmtNode n) {
 		n.ifCond.accept(this);
+
+		CST = new SymbolTable(CST);
 		n.ifBlock.accept(this);
-		if (n.elsePart != null)
-			for (StmtNode stmt : n.elsePart)
-				stmt.accept(this);
+		CST = CST.parent;
+		if (n.elsePart != null){
+			CST = new SymbolTable(CST);
+			n.elsePart.accept(this);
+			CST = CST.parent;
+		}
 	}
 
 	@Override
 	public void visitElseStmt(ElseStmtNode n) {
-		// TODO Auto-generated method stub
-
+		n.elsePart.accept(this);
 	}
 
 	@Override
@@ -364,6 +396,10 @@ public class SemanticsChecker implements Node.Visitor {
 	@Override
 	public void visitListRange(RangeNode n) {
 
+	}
+
+	private void logErrors(Errors err,String val){
+		log.error(err,val);
 	}
 
 }

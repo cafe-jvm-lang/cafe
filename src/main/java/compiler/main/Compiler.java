@@ -1,7 +1,9 @@
 package compiler.main;
 
 import compiler.analyzer.PrettyPrinter;
+import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
+import compiler.ast.Node.ProgramNode;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;
 import compiler.parser.ParserType;
@@ -16,6 +18,7 @@ public class Compiler {
 	private SourceFileManager fileManager;
 	
 	private Parser parser;
+	private SemanticsChecker analyzer;
 	
 	public static Compiler instance(Context context) {
 		Compiler instance = context.get(compilerKey);
@@ -32,6 +35,8 @@ public class Compiler {
 		
 		parserFactory = ParserFactory.instance(context);
 		parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.getSourceFileCharList());
+		
+		analyzer = SemanticsChecker.instance(context);
 	}
 
 	enum Phase{
@@ -56,6 +61,7 @@ public class Compiler {
 				case ANALYZE:
 					System.out.println((char)27+"[33m"+"\nPrettyPrint");
 					new PrettyPrinter().prettyPrint(programNode);
+					analyzer.visitProgram((ProgramNode)programNode);
 					break;
 			}
 			if(checkErrors()) {
