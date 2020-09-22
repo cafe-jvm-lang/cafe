@@ -1071,7 +1071,7 @@ public class MainParser extends Parser {
 			return new ListCollNode();
 		} else if (token.kind == TokenKind.LOOP) {
 			if (error)  return null;
-			return parseComprehension("list");
+			return parseComprehension("list");		// Accept Identifier Before
 		} else {
 			if (error)  return null;
 			return parseList();
@@ -1118,7 +1118,7 @@ public class MainParser extends Parser {
 				accept(TokenKind.COMMA);
 				continue;
 			} else if (token.kind == TokenKind.LOOP) {
-				return parseComprehension("map");
+				return parseComprehension("map");		// Accept Identifier Before
 			} else {
 				exp1 = parseValue();
 				accept(TokenKind.COMMA);
@@ -1238,7 +1238,7 @@ public class MainParser extends Parser {
 			return new SetCollNode();
 		} else if (token.kind == TokenKind.LOOP) {
 			if (error)  return null;
-			return parseComprehension("set");
+			return parseComprehension("set");	// Accept Identifier Before
 		} else {
 			if (error)  return null;
 			return parseSet();
@@ -1297,7 +1297,7 @@ public class MainParser extends Parser {
 			return new LinkCollNode();
 		} else if (token.kind == TokenKind.LOOP) {
 			if (error)  return null;
-			return parseComprehension("link");
+			return parseComprehension("link");		// Accept Identifier Before
 		} else {
 			if (error)  return null;
 			return parseLink();
