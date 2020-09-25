@@ -24,7 +24,7 @@ public class SymbolReference extends CafeElement<SymbolReference>{
         this.name = name;
     }
 
-    private static SymbolReference of(String name, Kind kind){
+    public static SymbolReference of(String name, Kind kind){
         return new SymbolReference(name,kind);
     }
 

@@ -55,31 +55,14 @@ var obj2 = Do.delegate(obj1)
 
 ------------------------------------------------
 
-var x = [1,2,3];
-const y = a();
-
-Map<> closureVars ;
-
-Object #get(String name, block){
-}
-
-Object set(){
-}
-
-func Hello(){				Hello = func(){
-										var Hi = func(){}
-										return Hi;
-									}
-	var z  = 10;
+var z = 10;
+func Hello(){
 	
-	func Hi(){
-		z = 100;
-	}
-	
-	return Hi;
 }
 
-var z = Hello();
+algo:
+	
+
 -----------------------------------------------
 SEMANTICS
 1. Local scope variable checking
