@@ -1,6 +1,9 @@
 package compiler.cafelang.ir;
 
-public class AssignmentStatement extends CafeStatement<AssignmentStatement>{
+import java.util.List;
+
+public class AssignmentStatement extends CafeStatement<AssignmentStatement>
+                                 implements ReferencesHolder{
     private SymbolReference symbolReference;
     private boolean declaring = false;
     private ExpressionStatement<?> expressionStatement;
@@ -30,5 +33,10 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement>{
     @Override
     public void accept(CafeIrVisitor visitor) {
         visitor.visitAssignment(this);
+    }
+
+    @Override
+    public List<SymbolReference> getReferences() {
+        return List.of(symbolReference);
     }
 }

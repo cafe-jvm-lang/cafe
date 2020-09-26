@@ -5,5 +5,6 @@ public abstract class ExpressionStatement<T extends ExpressionStatement<T>> exte
         if(expr instanceof ExpressionStatement)
             return (ExpressionStatement<?>) expr;
 
+        throw cantConvert("ExpressionStatement",expr);
     }
 }

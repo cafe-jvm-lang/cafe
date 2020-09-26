@@ -1,28 +1,73 @@
 package compiler.gen;
 
 import compiler.ast.Node;
+import compiler.cafelang.ir.Block;
 import compiler.cafelang.ir.CafeModule;
 import compiler.cafelang.ir.ReferenceTable;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 
 public class ASTToCafeIr implements Node.Visitor {
 
     private static final class Context{
+        final static Context context = new Context();
+
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
+        private final Deque<Deque<Object>> objectStack = new LinkedList<>();
+        private boolean isModuleScope = true;
 
-        public CafeModule createModule(){
+        private Context(){}
+
+        public CafeModule createModule(String name){
             ReferenceTable global = new ReferenceTable();
             referenceTableStack.push(global);
-            module = CafeModule
+            module = CafeModule.create(name, global);
+            return module;
         }
+
+        public Block enterScope(){
+            ReferenceTable blockReferenceTable = referenceTableStack.peek().fork();
+            referenceTableStack.push(blockReferenceTable);
+            isModuleScope = false;
+            return Block.create(blockReferenceTable);
+        }
+
+        public void leaveScope(){
+            referenceTableStack.pop();
+            isModuleScope = true;
+        }
+
+        public void newObjectStack() {
+            objectStack.push(new LinkedList<>());
+        }
+
+        public void popObjectStack() {
+            objectStack.pop();
+        }
+
+        public boolean isModuleScope() {
+            return isModuleScope;
+        }
+    }
+
+    private <T extends Node> void iterChildern(Collection<T> nodes){
+        for(T child: nodes)
+            child.accept(this);
+    }
+
+    public CafeModule transform(Node.ProgramNode n){
+        Context.context.newObjectStack();
+        visitProgram(n);
+        return Context.context.module;
     }
 
     @Override
     public void visitProgram(Node.ProgramNode n) {
 
+        iterChildern(n.stmts);
     }
 
     @Override

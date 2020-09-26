@@ -63,6 +63,7 @@ func Hello(){
 algo:
 	
 
+
 -----------------------------------------------
 SEMANTICS
 1. Local scope variable checking
@@ -132,3 +133,30 @@ class SemanticsChecker implements Node.Visitor{
 	// to refer the type of caller.
 	private Node.Tag callerNode = null;
 }
+
+---------------------------------------------------
+can u make a change in parser:
+in ObjAccessNode :
+eg : o.a.b
+then ast aise bann raha h:
+ObjectAccessNode
+      AccessedOn
+        IdenNode: o
+      Property
+        ObjectAccessNode
+          AccessedOn
+            IdenNode: a
+          Property
+            IdenNode: b
+
+But ObjectCreation node left assciative h so,
+ObjectAccessNode
+	AccessedOn
+		ObjectAccessNode
+			AccessedOn
+				IdenNode: o
+			Property
+				IdenNode: a      
+	Property
+		IdenNode: b
+can u check this?
