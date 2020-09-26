@@ -508,10 +508,16 @@ public class MainParser extends Parser {
 						if (error)
 							return null;
 						accept(TokenKind.LSQU);
-						exp1 = parseNumberLiteral();
+						if (token.kind == TokenKind.IDENTIFIER)
+							exp1 = parseIdentifier();
+						else
+							exp1 = parseNumberLiteral();
 						if (token.kind == TokenKind.COLON) {
 							accept(TokenKind.COLON);
-							exp2 = parseNumberLiteral();
+							if (token.kind == TokenKind.IDENTIFIER)
+								exp2 = parseIdentifier();
+							else
+								exp2 = parseNumberLiteral();
 							accept(TokenKind.RSQU);
 							oExp = new SliceNode(oExp, exp1, exp2);
 						} else {
@@ -523,12 +529,18 @@ public class MainParser extends Parser {
 					break;
 				case DOT:
 					ExprNode e1;
+					System.out.println("Atom DOT:"+oExp);
+					accept(TokenKind.DOT);
+					e1 = parseAtom();
+					oExp = new ObjectAccessNode(oExp, e1);
+					System.out.println("Token Kind: "+ token.kind);
 					while (token.kind == TokenKind.DOT) {
 						if (error)
 							return null;
 						accept(TokenKind.DOT);
-						e1 = parseAtomExpression();
+						e1 = parseAtom();
 						oExp = new ObjectAccessNode(oExp, e1);
+						System.out.println("In While: "+oExp);
 					}
 					break;
 			}
@@ -831,7 +843,10 @@ public class MainParser extends Parser {
 		if (error)  return null;
 
 		ExprNode exp1 = parseIdentifier();
-		ExprNode exp2;
+		accept(TokenKind.DOT);
+		ExprNode exp2 = parseIdentifier();
+		exp1 = new ObjectAccessNode(exp1, exp2);
+		System.out.println("Obj Access Parse Assign: "+exp1);
 		while (token.kind == TokenKind.DOT) {
 			if (error)
 				return null;
@@ -913,6 +928,9 @@ public class MainParser extends Parser {
 			if (error)
 				return null;
 			iden = parseIdentifier();
+			accept(TokenKind.DOT);
+			ExprNode expn = parseIdentifier();
+			iden = new ObjectAccessNode(iden, expn);
 			while (token.kind == TokenKind.DOT) {
 				if (error)
 					return null;
