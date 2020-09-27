@@ -21,7 +21,10 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement>
     }
 
     public AssignmentStatement as(Object expr){
-        this.expressionStatement = ExpressionStatement.of(expr);
+        if(expr == null)
+            this.expressionStatement = null;
+        else
+            this.expressionStatement = ExpressionStatement.of(expr);
         return this;
     }
 

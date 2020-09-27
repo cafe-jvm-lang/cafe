@@ -13,7 +13,7 @@ public abstract class Node {
 
 	public abstract Tag getTag();
 
-	public abstract void accept(Visitor v);
+	public abstract void accept(Visitor visitor);
 
 	public enum Tag {
 		VARDECL, IDEN, CONSTDECL, NUMLIT, STRLIT, BOOLLIT, FUNCDECL, OBJCREATION, BLOCK, ANNFUNC, LIST, SET, LINKEDLIST,

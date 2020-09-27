@@ -1,9 +1,7 @@
 package compiler.gen;
 
 import compiler.ast.Node;
-import compiler.cafelang.ir.Block;
-import compiler.cafelang.ir.CafeModule;
-import compiler.cafelang.ir.ReferenceTable;
+import compiler.cafelang.ir.*;
 
 import java.util.Collection;
 import java.util.Deque;
@@ -24,7 +22,7 @@ public class ASTToCafeIr implements Node.Visitor {
         public CafeModule createModule(String name){
             ReferenceTable global = new ReferenceTable();
             referenceTableStack.push(global);
-            module = CafeModule.create(name, global);
+            module = CafeModule.create(name,global);
             return module;
         }
 
@@ -48,17 +46,51 @@ public class ASTToCafeIr implements Node.Visitor {
             objectStack.pop();
         }
 
-        public boolean isModuleScope() {
-            return isModuleScope;
+        public void push(Object object) {
+            if (objectStack.isEmpty()) {
+                newObjectStack();
+            }
+            objectStack.peek().push(object);
+        }
+
+        public Object pop(){
+            return objectStack.peek().pop();
+        }
+
+        SymbolReference createSymbolReference(String name, SymbolReference.Kind kind){
+            SymbolReference ref = SymbolReference.of(name, kind);
+            referenceTableStack.peek().add(ref);
+            return ref;
+        }
+
+        public SymbolReference createSymbolReference(String name, Class<?> clazz){
+            return createSymbolReference(name,getSymbolKind(clazz));
+        }
+
+        SymbolReference.Kind getSymbolKind(Class<?> clazz){
+            if(clazz == Node.VarDeclNode.class) {
+                if (isModuleScope)
+                    return SymbolReference.Kind.GLOBAL_VAR;
+                else
+                    return SymbolReference.Kind.VAR;
+            }
+            else if(clazz == Node.ConstDeclNode.class){
+                if(isModuleScope)
+                    return SymbolReference.Kind.GLOBAL_CONST;
+                else
+                    return SymbolReference.Kind.CONST;
+            }
+            throw new AssertionError("Invalid Symbol Kind");
         }
     }
 
-    private <T extends Node> void iterChildern(Collection<T> nodes){
+    private <T extends Node> void iterChildren(Collection<T> nodes){
         for(T child: nodes)
             child.accept(this);
     }
 
-    public CafeModule transform(Node.ProgramNode n){
+    public CafeModule transform(Node.ProgramNode n,String name){
+        Context.context.createModule(name);
         Context.context.newObjectStack();
         visitProgram(n);
         return Context.context.module;
@@ -66,13 +98,22 @@ public class ASTToCafeIr implements Node.Visitor {
 
     @Override
     public void visitProgram(Node.ProgramNode n) {
-
-        iterChildern(n.stmts);
+        iterChildren(n.stmts);
     }
 
     @Override
     public void visitVarDecl(Node.VarDeclNode n) {
+        Node.IdenNode iden = n.var;
+        SymbolReference sym = Context.context.createSymbolReference(iden.name, Node.VarDeclNode.class);
 
+        if(n.value != null)
+            n.value.accept(this);
+
+        AssignmentStatement stmt = AssignmentStatement.create(sym,Context.context.pop(),true);
+        if(Context.context.isModuleScope)
+            Context.context.module.add(stmt);
+        else
+            Context.context.push(stmt);
     }
 
     @Override

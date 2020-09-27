@@ -1,18 +1,36 @@
 package compiler.cafelang.ir;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public class CafeModule extends CafeElement<CafeModule> {
 
     private String sourceFile;
     private final String clazz;
     private final ReferenceTable globalReferenceTable;
+    private CafeFunction initFunc;
+    private Set<CafeFunction> functions = new LinkedHashSet<>();
 
-    public CafeModule(String clazz, ReferenceTable referenceTable) {
+    public static final String INIT_FUNCTION = "#init";
+
+    private CafeModule(String clazz, ReferenceTable referenceTable) {
         this.clazz = clazz;
         this.globalReferenceTable = referenceTable;
+
+        initFunc = CafeFunction.function(INIT_FUNCTION)
+                .block(
+                        Block.create(globalReferenceTable)
+                );
+        functions.add(initFunc);
     }
 
     public static CafeModule create(String clazz, ReferenceTable referenceTable){
         return new CafeModule(clazz,referenceTable);
+    }
+
+    public CafeModule add(CafeStatement<?> statement){
+        initFunc.getBlock().add(statement);
+        return this;
     }
 
     @Override

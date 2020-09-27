@@ -28,7 +28,7 @@ public class Block extends ExpressionStatement<Block>{
     public Block add(Object statement){
         if(statement != null)
             this.addStatement(CafeStatement.of(statement));
-    return this;
+        return this;
     }
 
     private void addStatement(CafeStatement<?> statement){

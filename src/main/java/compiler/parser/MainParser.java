@@ -481,23 +481,13 @@ public class MainParser extends Parser {
 
 	}
 
-	ExprNode parseAtomExpression() throws ParseException {
-		/*
-		 * List of Trailers parseAtom()
-		 * 
-		 * trail = parseTrailer() while (trail) trail = parseTrailer()
-		 */
-		if (error)  return null;
-		System.out.println("Atom Expr Node Token: "+token.kind);
-		ExprNode oExp = parseAtom();
-		System.out.println("Atom Expr Node Token: "+token.kind);
-		while (token.kind == TokenKind.LPAREN || token.kind == TokenKind.DOT || token.kind == TokenKind.LSQU) {
-			if (error)
-				return null;
+	ExprNode parseTrailer(ExprNode oExp) throws ParseException{
+		ExprNode node=null;
+		if(token.kind == TokenKind.LPAREN || token.kind == TokenKind.DOT || token.kind == TokenKind.LSQU){
 			switch (token.kind) {
 				case LPAREN:
 					accept(TokenKind.LPAREN);
-					oExp = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
+					node = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
 					accept(TokenKind.RPAREN);
 					break;
 
@@ -519,10 +509,10 @@ public class MainParser extends Parser {
 							else
 								exp2 = parseNumberLiteral();
 							accept(TokenKind.RSQU);
-							oExp = new SliceNode(oExp, exp1, exp2);
+							node = new SliceNode(oExp, exp1, exp2);
 						} else {
 							accept(TokenKind.RSQU);
-							oExp = new SubscriptNode(oExp, exp1);
+							node = new SubscriptNode(oExp, exp1);
 						}
 
 					}
@@ -531,20 +521,39 @@ public class MainParser extends Parser {
 					ExprNode e1;
 					System.out.println("Atom DOT:"+oExp);
 					accept(TokenKind.DOT);
-					e1 = parseAtom();
-					oExp = new ObjectAccessNode(oExp, e1);
+					e1 = parseIdentifier();
+					if(error)
+						return null;
+					ExprNode trail = parseTrailer(e1);
+					if(trail == null)
+						node = new ObjectAccessNode(oExp, e1);
+					else
+						node = new ObjectAccessNode(oExp, trail);
 					System.out.println("Token Kind: "+ token.kind);
-					while (token.kind == TokenKind.DOT) {
-						if (error)
-							return null;
-						accept(TokenKind.DOT);
-						e1 = parseAtom();
-						oExp = new ObjectAccessNode(oExp, e1);
-						System.out.println("In While: "+oExp);
-					}
 					break;
 			}
 		}
+		return node;
+	}
+
+	ExprNode parseAtomExpression() throws ParseException {
+		/*
+		 * List of Trailers parseAtom()
+		 * 
+		 * trail = parseTrailer() while (trail) trail = parseTrailer()
+		 */
+
+		if (error)  return null;
+		System.out.println("Atom Expr Node Token: "+token.kind);
+		ExprNode oExp = parseAtom();
+		System.out.println("Atom Expr Node Token: "+token.kind);
+		if(oExp instanceof IdenNode){
+			ExprNode trailer;
+			while((trailer = parseTrailer(oExp)) != null){
+				oExp = trailer;
+			}
+		}
+
 		if (error)  return null;
 		return oExp;
 	}
@@ -738,13 +747,13 @@ public class MainParser extends Parser {
 		 */
 	}
 
-	void parseTrailer() {
+	//void parseTrailer() {
 		/*
 		 * if (LPAREN) parseArgList() else if (DOT) parseIdentifier() else if (LBRACKET)
 		 * parseSubscriptList() else return false
 		 * 
 		 */
-	}
+	//}
 
 	void parseExpressionStatement() {
 		/*
