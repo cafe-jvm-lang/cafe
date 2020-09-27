@@ -91,6 +91,10 @@ public class SemanticsChecker implements Node.Visitor {
 		log = Log.instance(context);
 	}
 
+	private Symbol symbol(String name){
+		return new Symbol(name);
+	}
+
 	@Override
 	public void visitProgram(ProgramNode n) {
 		for (StmtNode stmt : n.stmts) {
@@ -100,7 +104,9 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitVarDecl(VarDeclNode n) {
-		CST.insert(n.var.name);
+		Symbol sym = symbol(n.var.name);
+		if(!CST.insert(sym))
+			logErrors(Errors.DUPLICATE_SYMBOL,n.var.name);
 		if(n.value != null)
 			n.value.accept(this);
 	}
@@ -113,7 +119,9 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitConstDecl(ConstDeclNode n) {
-		CST.insert(n.var.name);
+		Symbol sym = symbol(n.var.name);
+		if(!CST.insert(sym))
+			logErrors(Errors.DUPLICATE_SYMBOL,n.var.name);
 		n.val.accept(this);
 	}
 
@@ -137,7 +145,9 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitFuncDecl(FuncDeclNode n) {
-		CST.insert(n.name.name);
+		Symbol sym = symbol(n.name.name);
+		if(!CST.insert(sym))
+			logErrors(Errors.DUPLICATE_SYMBOL,n.name.name);
 		CST = new SymbolTable(CST);
 		n.params.accept(this);
 		n.block.accept(this);
@@ -225,13 +235,14 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitFuncCall(FuncCallNode n) {
-		if (exprType == Expr.LHS && objType != ObjAcc.prop){
-			logErrors(Errors.LHS_EXPR_ERROR,"");
-			return;
+//		if (exprType == Expr.LHS && objType == ObjAcc.accesedOn){
+//			logErrors(Errors.LHS_EXPR_ERROR,"");
+//			return;
+//		}
+		if(objType != ObjAcc.prop) {
+			n.invokedOn.accept(this);
 		}
-		if(objType == ObjAcc.prop) {
-			n.args.accept(this);
-		}
+		n.args.accept(this);
 
 	}
 
@@ -247,29 +258,20 @@ public class SemanticsChecker implements Node.Visitor {
 		ObjectAccessNode node = n;
 		Node.Tag tag = n.prop.getTag();
 		if(exprType == Expr.LHS){
-			while(tag == Node.Tag.OBJACCESS){
-				node = (ObjectAccessNode) node.prop;
-				tag = node.prop.getTag();
-			}
-
+			tag = node.prop.getTag();
 			if(tag != Node.Tag.IDEN && tag != Node.Tag.SUBSCRIPT){
 				logErrors(Errors.LHS_EXPR_ERROR,"");
 				return;
 			}
 			exprType = null;
 		}
+
+
+		objType = ObjAcc.accesedOn;
 		n.accessedOn.accept(this);
-		tag = n.prop.getTag();
-		node = n;
 		objType = ObjAcc.prop;
-		while(tag == Node.Tag.OBJACCESS){
-			node = (ObjectAccessNode) node.prop;
-			node.accessedOn.accept(this);
-			tag = node.prop.getTag();
-		}
-		if(node.prop.getTag() != Node.Tag.IDEN){
-			node.prop.accept(this);
-		}
+		if(n.prop.getTag() != Node.Tag.IDEN)
+			n.prop.accept(this);
 		objType = null;
 	}
 
@@ -290,8 +292,11 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitParamList(ParameterListNode n) {
-		for(IdenNode iden : n.params)
-			CST.insert(iden.name);
+		for(IdenNode iden : n.params) {
+			Symbol sym = symbol(iden.name);
+			if (!CST.insert(sym))
+				logErrors(Errors.DUPLICATE_SYMBOL, iden.name);
+		}
 	}
 
 	@Override

@@ -59,8 +59,9 @@ public class LogType {
 		
 		// Semantic errors
 		SYMBOL_NOT_DECLARED("Symbol is not declared"),
-		LHS_EXPR_ERROR("Invalid LHS expression");
-		
+		LHS_EXPR_ERROR("Invalid LHS expression"),
+		DUPLICATE_SYMBOL("Duplicate Symbol");
+
 		Errors(String desc) {
 			this.desc = desc;
 		}
