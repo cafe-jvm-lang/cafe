@@ -1,7 +1,4 @@
-package compiler.cafelang.base;
-
-import java.util.HashMap;
-import java.util.Map;
+package cafe;
 
 public class FunctionPrototype extends Obj{
     FunctionPrototype(){

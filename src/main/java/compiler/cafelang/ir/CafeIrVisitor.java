@@ -9,4 +9,10 @@ public interface CafeIrVisitor {
     void visitFunction(CafeFunction cafeFunction);
 
     void visitAssignment(AssignmentStatement assignmentStatement);
+
+    void visitBinaryExpression(BinaryExpression binaryExpression);
+
+    void visitUnaryExpression(UnaryExpression unaryExpression);
+
+    void visitConstantStatement(ConstantStatement constantStatement);
 }

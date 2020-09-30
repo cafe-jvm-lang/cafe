@@ -6,6 +6,7 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement>
                                  implements ReferencesHolder{
     private SymbolReference symbolReference;
     private boolean declaring = false;
+    private boolean isAssigned = false;
     private ExpressionStatement<?> expressionStatement;
 
     public static AssignmentStatement create(SymbolReference ref, Object value, boolean declaring){
@@ -21,11 +22,23 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement>
     }
 
     public AssignmentStatement as(Object expr){
-        if(expr == null)
+        if(expr == null) {
             this.expressionStatement = null;
-        else
+            isAssigned = false;
+        }
+        else {
             this.expressionStatement = ExpressionStatement.of(expr);
+            isAssigned = true;
+        }
         return this;
+    }
+
+    public boolean isAssigned() {
+        return isAssigned;
+    }
+
+    public boolean isDeclaring() {
+        return declaring;
     }
 
     @Override

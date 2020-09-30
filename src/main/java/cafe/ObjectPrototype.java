@@ -1,4 +1,4 @@
-package compiler.cafelang.base;
+package cafe;
 
 public class ObjectPrototype extends Obj{
     ObjectPrototype(){

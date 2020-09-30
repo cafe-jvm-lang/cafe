@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 
-public class ASTToCafeIr implements Node.Visitor {
+public class ASTToCafeIrVisitor implements Node.Visitor {
 
     private static final class Context{
         final static Context context = new Context();
@@ -57,6 +57,10 @@ public class ASTToCafeIr implements Node.Visitor {
             return objectStack.peek().pop();
         }
 
+        public Object peek(){
+            return objectStack.peek();
+        }
+
         SymbolReference createSymbolReference(String name, SymbolReference.Kind kind){
             SymbolReference ref = SymbolReference.of(name, kind);
             referenceTableStack.peek().add(ref);
@@ -98,7 +102,11 @@ public class ASTToCafeIr implements Node.Visitor {
 
     @Override
     public void visitProgram(Node.ProgramNode n) {
-        iterChildren(n.stmts);
+        Context context = Context.context;
+        for(Node.StmtNode stmt: n.stmts){
+            stmt.accept(this);
+            context.module.add((CafeStatement) context.pop());
+        }
     }
 
     @Override
@@ -108,17 +116,16 @@ public class ASTToCafeIr implements Node.Visitor {
 
         if(n.value != null)
             n.value.accept(this);
-
-        AssignmentStatement stmt = AssignmentStatement.create(sym,Context.context.pop(),true);
-        if(Context.context.isModuleScope)
-            Context.context.module.add(stmt);
         else
-            Context.context.push(stmt);
+            Context.context.push(null);
+        AssignmentStatement stmt = AssignmentStatement.create(sym,Context.context.pop(),true);
+        Context.context.push(stmt);
     }
 
     @Override
     public void visitIden(Node.IdenNode n) {
-
+        Context context = Context.context;
+        context.push(ReferenceLookup.of(n.name));
     }
 
     @Override
@@ -128,17 +135,20 @@ public class ASTToCafeIr implements Node.Visitor {
 
     @Override
     public void visitNumLit(Node.NumLitNode n) {
-
+        ConstantStatement c = ConstantStatement.of(n.lit);
+        Context.context.push(c);
     }
 
     @Override
     public void visitStrLit(Node.StrLitNode n) {
-
+        ConstantStatement c = ConstantStatement.of(n.lit);
+        Context.context.push(c);
     }
 
     @Override
     public void visitBoolLit(Node.BoolLitNode n) {
-
+        ConstantStatement c = ConstantStatement.of(n.lit);
+        Context.context.push(c);
     }
 
     @Override
@@ -183,12 +193,20 @@ public class ASTToCafeIr implements Node.Visitor {
 
     @Override
     public void visitBinaryExpr(Node.BinaryExprNode n) {
-
+        n.e1.accept(this);
+        n.e2.accept(this);
+        BinaryExpression expr = BinaryExpression.of(n.op)
+                .left(Context.context.pop())
+                .right(Context.context.pop());
     }
 
     @Override
     public void visitUnaryExpr(Node.UnaryExprNode n) {
-
+        n.e.accept(this);
+        UnaryExpression expr = UnaryExpression.create(
+                n.op,
+                Context.context.pop()
+        );
     }
 
     @Override

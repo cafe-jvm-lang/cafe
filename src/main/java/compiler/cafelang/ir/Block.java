@@ -20,6 +20,10 @@ public class Block extends ExpressionStatement<Block>{
         return referenceTable;
     }
 
+    public List<CafeStatement<?>> getStatements(){
+        return statements;
+    }
+
     @Override
     protected Block self() {
         return this;

@@ -1,4 +1,4 @@
-package compiler.cafelang.base;
+package cafe;
 
 import java.util.HashMap;
 import java.util.Map;

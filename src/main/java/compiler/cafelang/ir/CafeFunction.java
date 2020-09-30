@@ -10,7 +10,7 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
     private Block block;
     private List<String> parameterNames = new LinkedList<>();
     private boolean isSynthetic = false;
-    private boolean isVarArgs = false;
+    private boolean isVarargs = false;
 
     public enum Scope{
         MODULE, CLOSURE
@@ -40,6 +40,14 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
 
     public Block getBlock() {
         return block;
+    }
+
+    public boolean isSynthetic(){
+        return isSynthetic;
+    }
+
+    public boolean isVarargs(){
+        return isVarargs;
     }
 
     @Override

@@ -524,7 +524,9 @@ public class MainParser extends Parser {
 					e1 = parseIdentifier();
 					if(error)
 						return null;
-					ExprNode trail = parseTrailer(e1);
+					ExprNode trail=null;
+					if(token.kind != TokenKind.DOT)
+						trail = parseTrailer(e1);
 					if(trail == null)
 						node = new ObjectAccessNode(oExp, e1);
 					else

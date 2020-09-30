@@ -21,7 +21,7 @@ import compiler.util.Position;
  */
 public class SourceFileManager {
 	public static final Context.Key<SourceFileManager> fileKey = new Context.Key<>();
-
+	private String fileName;
 	private File file;
 	private Log log;
 
@@ -30,6 +30,7 @@ public class SourceFileManager {
 		if (instance == null) {
 			instance = new SourceFileManager(context);
 		}
+
 		return instance;
 	}
 
@@ -42,6 +43,7 @@ public class SourceFileManager {
 		File f = new File(path);
 		if (f.exists() && !f.isDirectory()) {
 			this.file = f;
+			this.fileName = f.getName();
 		} else {
 			log.error(Errors.INVALID_CLI_FILE_PATH);
 		}
@@ -49,6 +51,10 @@ public class SourceFileManager {
 
 	File getSourceFile() {
 		return file;
+	}
+
+	String getSourceFileName(){
+		return this.fileName;
 	}
 
 	List<Character> getSourceFileCharList() {

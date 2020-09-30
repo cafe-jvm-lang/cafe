@@ -1,6 +1,8 @@
 package compiler.cafelang.ir;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class CafeModule extends CafeElement<CafeModule> {
@@ -9,6 +11,7 @@ public class CafeModule extends CafeElement<CafeModule> {
     private final String clazz;
     private final ReferenceTable globalReferenceTable;
     private CafeFunction initFunc;
+
     private Set<CafeFunction> functions = new LinkedHashSet<>();
 
     public static final String INIT_FUNCTION = "#init";
@@ -21,7 +24,7 @@ public class CafeModule extends CafeElement<CafeModule> {
                 .block(
                         Block.create(globalReferenceTable)
                 );
-        functions.add(initFunc);
+        //functions.add(initFunc);
     }
 
     public static CafeModule create(String clazz, ReferenceTable referenceTable){
@@ -31,6 +34,20 @@ public class CafeModule extends CafeElement<CafeModule> {
     public CafeModule add(CafeStatement<?> statement){
         initFunc.getBlock().add(statement);
         return this;
+    }
+
+    public void addFunction(CafeFunction function){
+        this.functions.add(function);
+    }
+
+    public List<CafeElement<?>> children(){
+        LinkedList<CafeElement<?>> children  = new LinkedList<>();
+        children.addAll(functions);
+        return children;
+    }
+
+    public CafeFunction getInitFunc(){
+        return initFunc;
     }
 
     @Override
