@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "gradle",
+			"id": "d:\\Dhyey\\compiler\\compiler-projectrunCompiler",
+			"script": "run",
+			"description": "Runs this project as a JVM application",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"project": "Compiler",
+			"buildFile": "D:\\Dhyey\\compiler\\compiler-project\\build.gradle",
+			"rootProject": "Compiler",
+			"path": "",
+			"projectFolder": "d:\\Dhyey\\compiler\\compiler-project",
+			"workspaceFolder": "d:\\Dhyey\\compiler\\compiler-project",
+			"args": "",
+			"javaDebug": false,
+			"problemMatcher": [
+				"$gradle"
+			],
+			"label": "gradle: run"
+		}
+	]
+}

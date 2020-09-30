@@ -38,7 +38,7 @@ public class CLIArguments {
 	public void checkArgs(String... args) {
 		
 		if(args.length <1) {
-			log.error(new Position(0, 0, 0),Errors.NO_FILE_PATH_GIVEN_IN_CLI);
+			log.error(Errors.NO_FILE_PATH_GIVEN_IN_CLI);
 			log.printErrorLog();
 			return;
 		}

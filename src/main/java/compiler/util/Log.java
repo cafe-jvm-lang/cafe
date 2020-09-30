@@ -31,14 +31,34 @@ public class Log {
 		return instance;
 	}
 
+	public void error(Errors err) {
+		nerrors++;
+		errorList.add(new Error(null, err,""));
+	}
+	
+	public void error(int strtPos, Errors err) {
+		nerrors++;
+		errorList.add(new Error(new Position(strtPos), err,""));
+	}
+	
+	public void error(int strtPos,int lineNum, Errors err) {
+		nerrors++;
+		errorList.add(new Error(new Position(lineNum, strtPos), err,""));
+	}
+	
 	public void error(Position pos, Errors err) {
 		nerrors++;
-		errorList.add(new Error(pos, err));
+		errorList.add(new Error(pos, err,""));
+	}
+
+	public void error(Errors err, String val){
+		nerrors++;
+		errorList.add(new Error( null,err,val));
 	}
 
 	public void warning(Position pos, Warnings warn) {
 		nwarnings++;
-		warningList.add(new Warning(pos, warn));
+		warningList.add(new Warning(pos, warn,""));
 	}
 	
 	public void printErrorLog() {

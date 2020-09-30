@@ -24,11 +24,19 @@ dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:28.2-jre'
 
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm
+    compile group: 'org.ow2.asm', name: 'asm', version: '7.3.1'
+
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
 
+
+run {
+    args = [".\\cp.txt"]
+}
+
 application {
     // Define the main class for the application.
-    mainClassName = 'compiler.main.Main'
+    mainClassName = 'compiler.Main'
 }

@@ -1,0 +1,162 @@
+
+ObjectPrototype{
+	Map<key,value>  = [];
+	Map.put(__proto__ , null)
+}
+DynamicObject {
+	private prototype = ObjectPrototype()
+	
+	Map<key,value>  = [];
+	Map.put("__proto__",prototype)
+	
+	static create(){
+		
+	}
+}
+
+var x = {a:10}
+x.__proto__ == DynamicObject.prototype
+
+FunctionPrototype{
+	Map<key,value>  = [];
+	Map.put("__proto__" , ObjectPrototype())
+}
+Function extends DynamicObject{
+	Map<key,value>  = [];
+	Map.put("prototype" , FunctionPrototype)
+	Map.put("__proto__",Map.get("prototype"))
+}
+func A(){
+	this.x = func(){};
+}
+
+A.someMethod = func(){
+	this.hello =  func(){
+		return x;
+	}
+}
+func B(){
+	this.x = 10;
+}
+B.prototype = DO.delegate(A)
+
+
+every func is an instance of Function
+
+
+function foo() {
+	console.log( this.a );
+}
+
+var obj1 = { a:42 }
+
+var obj2 = Do.delegate(obj1)
+
+
+------------------------------------------------
+
+var z = 10;
+func Hello(){
+	
+}
+
+algo:
+	
+
+
+-----------------------------------------------
+SEMANTICS
+1. Local scope variable checking
+2. LHS checking
+3. Loop collection-type checking
+4. Range checking
+
+1. Local scope variable checking
+	SymbolTable
+		1. Global Scope
+		2. func
+		
+		structure:
+			parent SymbolTable
+			Set<Identifier>
+			
+			void insert(Identifier)
+			boolean present(Identifier)
+		
+		Algo:
+			1. create GlobalSymbolTable(GST) & CurrentSymbolTable(CST).
+				init CST = GST
+			2. iterate stmts.
+			3. If stmt type = funcDecl:
+				create new SymbolTable
+					1. set parent = CST
+					2. CST = this
+				iterate through func stmt till method exists
+				reset CST = CST.parent
+			4.  if stmt type = VarDecl 
+					cst.insert(identifier):
+				else other ExprNodes with identifiers:
+					cst.present(identifier)
+
+2. LHS checking:
+	LHS shouldnt consist:
+		1. FuncCallNode
+		2. Literal Nodes
+		3. null & this nodes
+		4. ExprNodes with operations like +,- etc.
+		
+	
+3. Loop collection type checking
+	Loop node collection expr shouldnt consist of:
+		1. Literal Nodes
+		2. null & this nodes
+
+4. Range Checking
+	Both nodes in range ie start & end, should be
+		1. NumLit or String Lit
+		2. both of same type.
+
+structure for
+class SemanticsChecker implements Node.Visitor{
+	private final GST = new SymbolTable(parent=null),
+	
+	private static final enum Expr {
+		LHS,
+		LOOP_COLL,
+		RANGE,
+		NONE
+	}
+	
+	private exprType = { Expr }
+	
+	// this node is set while visiting calling accept() on specific node,
+	// to refer the type of caller.
+	private Node.Tag callerNode = null;
+}
+
+---------------------------------------------------
+can u make a change in parser:
+in ObjAccessNode :
+eg : o.a.b
+then ast aise bann raha h:
+ObjectAccessNode
+      AccessedOn
+        IdenNode: o
+      Property
+        ObjectAccessNode
+          AccessedOn
+            IdenNode: a
+          Property
+            IdenNode: b
+
+But ObjectCreation node left assciative h so,
+ObjectAccessNode
+	AccessedOn
+		ObjectAccessNode
+			AccessedOn
+				IdenNode: o
+			Property
+				IdenNode: a      
+	Property
+		IdenNode: b
+can u check this?

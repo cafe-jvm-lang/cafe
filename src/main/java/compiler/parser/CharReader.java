@@ -14,7 +14,7 @@ public class CharReader {
 	/**
 	 * Input Buffer pointer
 	 */
-	private int bp = -1;
+	protected int bp = -1;
 
 	/**
 	 * Input Buffer Length
@@ -54,8 +54,10 @@ public class CharReader {
 	}
 
 	protected void scanChar() {
-		if (bp < buffLen)
+		if (bp < buffLen-1)
 			ch = buff.get(++bp);
+		else
+			ch = Character.MIN_VALUE;
 	}
 
 	protected void putChar(char c) {
@@ -74,10 +76,11 @@ public class CharReader {
 	}
 
 	protected String getSavedBufferAsString(boolean clearSavedBuffer) {
+		String s = sbuff.stream().map(e->e.toString()).collect(Collectors.joining());
 		if (clearSavedBuffer) {
 			clearSavedBufer();
 		}
-		return sbuff.stream().map(e->e.toString()).collect(Collectors.joining());
+		return s;
 	}
 
 	private void clearSavedBufer() {
