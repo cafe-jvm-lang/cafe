@@ -7,7 +7,7 @@ import compiler.ast.Node.ProgramNode;
 import compiler.cafelang.ir.CafeModule;
 import compiler.gen.ASTToCafeIrVisitor;
 import compiler.gen.JVMByteCodeGen;
-import compiler.gen.SymbolReferenceAssignment;
+import compiler.gen.SymbolReferenceAssignmentVisitor;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;
 import compiler.parser.ParserType;
@@ -15,7 +15,6 @@ import compiler.util.Context;
 import compiler.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -82,7 +81,7 @@ public class Compiler {
 					break;
 				case IR:
 					module = new ASTToCafeIrVisitor().transform((ProgramNode)programNode,classFileName);
-					module.accept(new SymbolReferenceAssignment());
+					module.accept(new SymbolReferenceAssignmentVisitor());
 					break;
 				case GEN:
 					byteCode = new JVMByteCodeGen().generateByteCode(module,classFileName);

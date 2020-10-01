@@ -524,9 +524,10 @@ public class MainParser extends Parser {
 					e1 = parseIdentifier();
 					if(error)
 						return null;
-					ExprNode trail=null;
-					if(token.kind != TokenKind.DOT)
-						trail = parseTrailer(e1);
+					ExprNode trail=e1;
+					while(token.kind != TokenKind.DOT && (token.kind == TokenKind.LSQU || token.kind == TokenKind.LPAREN)) {
+						trail = parseTrailer(trail);
+					}
 					if(trail == null)
 						node = new ObjectAccessNode(oExp, e1);
 					else

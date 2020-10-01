@@ -5,7 +5,7 @@ import compiler.cafelang.ir.*;
 import java.util.Deque;
 import java.util.LinkedList;
 
-public class SymbolReferenceAssignment extends AbstractCafeIrVisitor{
+public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
 
     private CafeModule module = null;
     private final AssignmentCounter assignmentCounter = new AssignmentCounter();
@@ -31,10 +31,9 @@ public class SymbolReferenceAssignment extends AbstractCafeIrVisitor{
     }
 
     @Override
-    public void visitAssignment(AssignmentStatement assignmentStatement) {
+    public void visitDeclarativeAssignment(DeclarativeAssignmentStatement assignmentStatement) {
         SymbolReference reference = assignmentStatement.getSymbolReference();
-        if(assignmentStatement.isDeclaring())
-            bindReference(reference);
+        bindReference(reference);
     }
 
     private void bindReference(SymbolReference reference) {

@@ -17,6 +17,20 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         private final Deque<Deque<Object>> objectStack = new LinkedList<>();
         private boolean isModuleScope = true;
 
+        private boolean isProperty = false;
+
+        public void enterProperty(){
+            isProperty = true;
+        }
+
+        public void leaveProperty(){
+            isProperty = false;
+        }
+
+        public boolean isProperty(){
+            return isProperty;
+        }
+
         private Context(){}
 
         public CafeModule createModule(String name){
@@ -117,18 +131,18 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitVarDecl(Node.VarDeclNode n) {
         Node.IdenNode iden = n.var;
         SymbolReference sym = Context.context.createSymbolReference(iden.name, Node.VarDeclNode.class);
-
         if(n.value != null)
             n.value.accept(this);
         else
             Context.context.push(null);
-        AssignmentStatement stmt = AssignmentStatement.create(sym,Context.context.pop(),true).setDeclaring(true);
+        DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym,Context.context.pop());
         Context.context.push(stmt);
     }
 
     @Override
     public void visitIden(Node.IdenNode n) {
-
+        Context context = Context.context;
+        context.push(ReferenceLookup.of(n.name));
     }
 
     @Override
@@ -219,7 +233,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitNull(Node.NullNode n) {
-
+        Context context = Context.context;
+        context.push(new NullStatement());
     }
 
     @Override
@@ -234,7 +249,16 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitObjAccess(Node.ObjectAccessNode n) {
+        Context context = Context.context;
 
+        context.enterProperty();
+        n.prop.accept(this);
+        context.leaveProperty();
+
+
+
+        n.accessedOn.accept(this);
+        context.push(ObjectAccessStatement.create(context.pop(), context.pop()));
     }
 
     @Override
@@ -260,11 +284,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitAsgnStmt(Node.AsgnStmtNode n) {
         Context context = Context.context;
-        Node ac = n.lhs;
-        while(ac.getTag() == Node.Tag.OBJACCESS){
-            ac = ((Node.ObjectAccessNode) n.lhs).accessedOn;
-        }
-        //SymbolReference reference = context.getReference(n.lhs);
+        n.rhs.accept(this);
+        n.lhs.accept(this);
+        AssignmentStatement statement = AssignmentStatement.create(context.pop(),context.pop());
+        context.push(statement);
     }
 
     @Override

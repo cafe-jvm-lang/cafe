@@ -1,6 +1,5 @@
 package compiler.gen;
 
-import compiler.cafelang.Temp;
 import compiler.cafelang.ir.*;
 
 import org.objectweb.asm.ClassWriter;
@@ -123,6 +122,21 @@ public class JVMByteCodeGen implements CafeIrVisitor {
         return accessFlags;
     }
 
+    @Override
+    public void visitObjectAccess(ObjectAccessStatement objectAccessStatement) {
+
+    }
+
+    @Override
+    public void visitMethodInvoke(MethodInvoke methodInvoke) {
+
+    }
+
+    @Override
+    public void visitFunctionInvoke(FunctionInvoke functionInvoke) {
+
+    }
+
     private void visitInitFunc(CafeFunction function) {
         mv = cw.visitMethod(functionFlags(function),
                 function.getName(),
@@ -132,15 +146,12 @@ public class JVMByteCodeGen implements CafeIrVisitor {
         currentFunction = function;
 
         for (CafeStatement<?> stmt : function.getBlock().getStatements()) {
-            if (stmt instanceof AssignmentStatement) {
-                AssignmentStatement s = (AssignmentStatement) stmt;
-                if (s.isDeclaring()) {
-                    String key = s.getSymbolReference().getName();
-                    mv.visitLdcInsn(key);
-                    s.walk(this);
-                    This.invokeInsertThis(mv,className);
-                } else
-                    visitAssignment(s);
+            if (stmt instanceof DeclarativeAssignmentStatement) {
+                DeclarativeAssignmentStatement s = (DeclarativeAssignmentStatement) stmt;
+                String key = s.getSymbolReference().getName();
+                mv.visitLdcInsn(key);
+                s.walk(this);
+                This.invokeInsertThis(mv,className);
             }
         }
 
@@ -248,5 +259,15 @@ public class JVMByteCodeGen implements CafeIrVisitor {
     @Override
     public void visitFunctionReference(FunctionReference functionReference) {
 
+    }
+
+    @Override
+    public void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement) {
+
+    }
+
+    @Override
+    public void visitNull(NullStatement aNull) {
+        mv.visitInsn(ACONST_NULL);
     }
 }

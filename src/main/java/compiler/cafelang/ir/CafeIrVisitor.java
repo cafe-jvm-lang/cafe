@@ -19,4 +19,14 @@ public interface CafeIrVisitor {
     void visitRefereceLookup(ReferenceLookup referenceLookup);
 
     void visitFunctionReference(FunctionReference functionReference);
+
+    void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement);
+
+    void visitObjectAccess(ObjectAccessStatement objectAccessStatement);
+
+    void visitMethodInvoke(MethodInvoke methodInvoke);
+
+    void visitFunctionInvoke(FunctionInvoke functionInvoke);
+
+    void visitNull(NullStatement aNull);
 }

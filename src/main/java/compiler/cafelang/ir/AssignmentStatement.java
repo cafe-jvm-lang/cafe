@@ -1,60 +1,42 @@
 package compiler.cafelang.ir;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
-public class AssignmentStatement extends CafeStatement<AssignmentStatement>
-                                 implements ReferencesHolder{
+public class AssignmentStatement extends CafeStatement<AssignmentStatement> {
 
-    private SymbolReference symbolReference;
-    private boolean declaring = false;
-    private boolean isAssigned = false;
-    private ExpressionStatement<?> expressionStatement;
+    private ExpressionStatement<?> lhsExpression;
+    private ExpressionStatement<?> rhsExpression;
 
-    public static AssignmentStatement create(SymbolReference ref, Object value, boolean declaring){
+    public static AssignmentStatement create(Object ref, Object value){
         return new AssignmentStatement().to(ref).as(value);
     }
 
-    public AssignmentStatement to(SymbolReference ref){
+    public AssignmentStatement to(Object ref){
         if(ref == null){
             throw new IllegalArgumentException("Must assign to a reference");
         }
-        this.symbolReference = ref;
+        this.lhsExpression = ExpressionStatement.of(ref);
         return this;
     }
 
-    public AssignmentStatement as(Object expr){
-        if(expr == null) {
-            this.expressionStatement = null;
-            isAssigned = false;
-        }
-        else {
-            this.expressionStatement = ExpressionStatement.of(expr);
-            isAssigned = true;
-        }
+    public AssignmentStatement as(Object expr) {
+
+        this.rhsExpression = ExpressionStatement.of(expr);
+
         return this;
     }
 
-    public boolean isAssigned() {
-        return isAssigned;
-    }
-
-    public boolean isDeclaring() {
-        return declaring;
-    }
-
-    public AssignmentStatement setDeclaring(boolean v){
-        declaring = v;
-        return this;
-    }
-
-    public SymbolReference getSymbolReference() {
-        return symbolReference;
+    public ExpressionStatement<?> getLhsExpression() {
+        return lhsExpression;
     }
 
     @Override
     public List<CafeElement<?>> children() {
-        return Collections.singletonList(expressionStatement);
+        LinkedList<CafeElement<?>> children = new LinkedList<>();
+        children.add(lhsExpression);
+        children.add(rhsExpression);
+        return children;
     }
 
     @Override
@@ -67,8 +49,8 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement>
         visitor.visitAssignment(this);
     }
 
-    @Override
-    public List<SymbolReference> getReferences() {
-        return List.of(symbolReference);
-    }
+//    @Override
+//    public List<SymbolReference> getReferences() {
+//        return List.of(symbolReference);
+//    }
 }

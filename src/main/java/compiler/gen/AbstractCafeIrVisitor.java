@@ -9,6 +9,31 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitObjectAccess(ObjectAccessStatement objectAccessStatement) {
+
+    }
+
+    @Override
+    public void visitMethodInvoke(MethodInvoke methodInvoke) {
+
+    }
+
+    @Override
+    public void visitFunctionInvoke(FunctionInvoke functionInvoke) {
+
+    }
+
+    @Override
+    public void visitNull(NullStatement aNull) {
+
+    }
+
+    @Override
+    public void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement) {
+
+    }
+
+    @Override
     public void visitFunctionReference(FunctionReference functionReference) {
 
     }
