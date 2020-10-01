@@ -18,6 +18,7 @@ public class SymbolReference extends CafeElement<SymbolReference>{
 
     private final String name;
     private final Kind kind;
+    private int index = -1;
 
     private SymbolReference(String name, Kind kind){
         this.kind = kind;
@@ -34,6 +35,14 @@ public class SymbolReference extends CafeElement<SymbolReference>{
 
     public Kind getKind() {
         return kind;
+    }
+
+    public void setIndex(int index){
+        this.index = index;
+    }
+
+    public int getIndex(){
+        return index;
     }
 
 }

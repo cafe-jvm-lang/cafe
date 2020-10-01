@@ -43,4 +43,8 @@ public class ReferenceTable {
     public ReferenceTable fork(){
         return new ReferenceTable(this);
     }
+
+    public boolean hasReferenceFor(String name) {
+        return table.containsKey(name) || parent != null && parent.hasReferenceFor(name);
+    }
 }

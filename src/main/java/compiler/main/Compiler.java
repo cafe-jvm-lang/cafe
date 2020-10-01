@@ -7,6 +7,7 @@ import compiler.ast.Node.ProgramNode;
 import compiler.cafelang.ir.CafeModule;
 import compiler.gen.ASTToCafeIrVisitor;
 import compiler.gen.JVMByteCodeGen;
+import compiler.gen.SymbolReferenceAssignment;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;
 import compiler.parser.ParserType;
@@ -54,6 +55,7 @@ public class Compiler {
 	enum Phase{
 		PARSE,
 		ANALYZE,
+		IR,
 		GEN
 	}
 	
@@ -77,7 +79,10 @@ public class Compiler {
 					System.out.println((char)27+"[33m"+"\nPrettyPrint");
 					new PrettyPrinter().prettyPrint(programNode);
 					analyzer.visitProgram((ProgramNode)programNode);
+					break;
+				case IR:
 					module = new ASTToCafeIrVisitor().transform((ProgramNode)programNode,classFileName);
+					module.accept(new SymbolReferenceAssignment());
 					break;
 				case GEN:
 					byteCode = new JVMByteCodeGen().generateByteCode(module,classFileName);

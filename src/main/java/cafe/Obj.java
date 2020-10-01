@@ -10,7 +10,7 @@ public abstract class Obj {
         map.put("__proto__",__proto__);
     }
 
-    public void define(String key, Obj value){
+    public void define(String key, Object value){
         map.put(key,value);
     }
 

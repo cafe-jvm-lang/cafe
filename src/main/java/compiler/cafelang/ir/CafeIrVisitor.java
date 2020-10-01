@@ -15,4 +15,8 @@ public interface CafeIrVisitor {
     void visitUnaryExpression(UnaryExpression unaryExpression);
 
     void visitConstantStatement(ConstantStatement constantStatement);
+
+    void visitRefereceLookup(ReferenceLookup referenceLookup);
+
+    void visitFunctionReference(FunctionReference functionReference);
 }

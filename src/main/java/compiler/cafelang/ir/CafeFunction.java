@@ -50,6 +50,10 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
         return isVarargs;
     }
 
+    public List<String> getParameterNames(){
+        return parameterNames;
+    }
+
     @Override
     protected CafeFunction self() {
         return this;

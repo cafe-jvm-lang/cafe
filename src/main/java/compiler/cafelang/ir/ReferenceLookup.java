@@ -1,6 +1,6 @@
 package compiler.cafelang.ir;
 
-public class ReferenceLookup {
+public class ReferenceLookup extends ExpressionStatement<ReferenceLookup>{
 
     private final String name;
 
@@ -16,5 +16,15 @@ public class ReferenceLookup {
             return new ReferenceLookup(((SymbolReference) name).getName());
         }
         return new ReferenceLookup(name.toString());
+    }
+
+    @Override
+    protected ReferenceLookup self() {
+        return this;
+    }
+
+    @Override
+    public void accept(CafeIrVisitor visitor) {
+        visitor.visitRefereceLookup(this);
     }
 }

@@ -1,9 +1,11 @@
 package compiler.cafelang.ir;
 
+import java.util.Collections;
 import java.util.List;
 
 public class AssignmentStatement extends CafeStatement<AssignmentStatement>
                                  implements ReferencesHolder{
+
     private SymbolReference symbolReference;
     private boolean declaring = false;
     private boolean isAssigned = false;
@@ -39,6 +41,20 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement>
 
     public boolean isDeclaring() {
         return declaring;
+    }
+
+    public AssignmentStatement setDeclaring(boolean v){
+        declaring = v;
+        return this;
+    }
+
+    public SymbolReference getSymbolReference() {
+        return symbolReference;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return Collections.singletonList(expressionStatement);
     }
 
     @Override

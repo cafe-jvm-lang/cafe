@@ -71,6 +71,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             return createSymbolReference(name,getSymbolKind(clazz));
         }
 
+        public SymbolReference getReference(String name){
+            return referenceTableStack.peek().get(name);
+        }
+
         SymbolReference.Kind getSymbolKind(Class<?> clazz){
             if(clazz == Node.VarDeclNode.class) {
                 if (isModuleScope)
@@ -118,14 +122,13 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             n.value.accept(this);
         else
             Context.context.push(null);
-        AssignmentStatement stmt = AssignmentStatement.create(sym,Context.context.pop(),true);
+        AssignmentStatement stmt = AssignmentStatement.create(sym,Context.context.pop(),true).setDeclaring(true);
         Context.context.push(stmt);
     }
 
     @Override
     public void visitIden(Node.IdenNode n) {
-        Context context = Context.context;
-        context.push(ReferenceLookup.of(n.name));
+
     }
 
     @Override
@@ -256,7 +259,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitAsgnStmt(Node.AsgnStmtNode n) {
-
+        Context context = Context.context;
+        Node ac = n.lhs;
+        while(ac.getTag() == Node.Tag.OBJACCESS){
+            ac = ((Node.ObjectAccessNode) n.lhs).accessedOn;
+        }
+        //SymbolReference reference = context.getReference(n.lhs);
     }
 
     @Override

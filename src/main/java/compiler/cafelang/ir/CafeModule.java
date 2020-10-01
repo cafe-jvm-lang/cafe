@@ -24,7 +24,7 @@ public class CafeModule extends CafeElement<CafeModule> {
                 .block(
                         Block.create(globalReferenceTable)
                 );
-        //functions.add(initFunc);
+        functions.add(initFunc);
     }
 
     public static CafeModule create(String clazz, ReferenceTable referenceTable){
