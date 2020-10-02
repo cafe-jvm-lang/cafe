@@ -1,4 +1,4 @@
-package compiler.cafelang;
+package cafelang;
 
 import cafe.DynamicObject;
 
@@ -18,6 +18,7 @@ public class Temp {
     }
 
     public static void main(String[] args) {
+        int a = 10;
         init();
     }
 

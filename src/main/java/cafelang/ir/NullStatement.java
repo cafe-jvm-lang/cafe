@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class NullStatement extends ExpressionStatement<NullStatement>{
     @Override

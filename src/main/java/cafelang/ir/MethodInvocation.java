@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +35,6 @@ public class MethodInvocation extends ExpressionStatement<MethodInvocation>{
 
     @Override
     public void accept(CafeIrVisitor visitor) {
-        visitor.visitMethodInvoke(this);
+        visitor.visitMethodInvocation(this);
     }
 }

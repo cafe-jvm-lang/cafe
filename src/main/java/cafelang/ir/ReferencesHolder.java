@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 import java.util.List;
 

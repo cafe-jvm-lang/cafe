@@ -4,7 +4,7 @@ import compiler.analyzer.PrettyPrinter;
 import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
 import compiler.ast.Node.ProgramNode;
-import compiler.cafelang.ir.CafeModule;
+import cafelang.ir.CafeModule;
 import compiler.gen.ASTToCafeIrVisitor;
 import compiler.gen.JVMByteCodeGen;
 import compiler.gen.SymbolReferenceAssignmentVisitor;

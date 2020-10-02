@@ -1,2 +1,7 @@
 var a = 10;
-a[1].b().c()[1];
+
+func hello(a){
+    var x =100;
+}
+
+hello("Hello Dhyey");

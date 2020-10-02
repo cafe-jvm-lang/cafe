@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public interface CafeIrVisitor {
     void visitModule(CafeModule module);
@@ -16,21 +16,23 @@ public interface CafeIrVisitor {
 
     void visitConstantStatement(ConstantStatement constantStatement);
 
-    void visitRefereceLookup(ReferenceLookup referenceLookup);
+    void visitReferenceLookup(ReferenceLookup referenceLookup);
 
-    void visitFunctionReference(FunctionReference functionReference);
+    void visitFunctionWrapper(FunctionWrapper functionWrapper);
 
     void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement);
 
     void visitObjectAccess(ObjectAccessStatement objectAccessStatement);
 
-    void visitMethodInvoke(MethodInvocation methodInvocation);
+    void visitMethodInvocation(MethodInvocation methodInvocation);
 
-    void visitFunctionInvoke(FunctionInvocation functionInvocation);
+    void visitFunctionInvocation(FunctionInvocation functionInvocation);
 
     void visitNull(NullStatement aNull);
 
     void visitSubscript(SubscriptStatement subscriptStatement);
 
     void visitPropertyAccess(PropertyAccess propertyAccess);
+
+    void visitReturn(ReturnStatement returnStatement);
 }

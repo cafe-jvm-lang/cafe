@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class SymbolReference extends CafeElement<SymbolReference>{
 
@@ -35,6 +35,10 @@ public class SymbolReference extends CafeElement<SymbolReference>{
 
     public Kind getKind() {
         return kind;
+    }
+
+    public boolean isGlobal(){
+        return kind == Kind.GLOBAL_VAR || kind == Kind.GLOBAL_CONST;
     }
 
     public void setIndex(int index){

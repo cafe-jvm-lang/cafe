@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class ConstantStatement extends ExpressionStatement<ConstantStatement>{
     private Object value;

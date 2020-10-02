@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class SubscriptStatement extends ExpressionStatement<SubscriptStatement>{
     private ExpressionStatement<?> subscriptOf;

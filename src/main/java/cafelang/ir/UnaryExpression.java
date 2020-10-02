@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class UnaryExpression extends ExpressionStatement<UnaryExpression>{
     private final OperatorType type;

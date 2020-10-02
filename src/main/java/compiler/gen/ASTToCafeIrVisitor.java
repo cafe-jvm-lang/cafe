@@ -1,9 +1,9 @@
 package compiler.gen;
 
 import compiler.ast.Node;
-import compiler.cafelang.ir.*;
+import cafelang.ir.*;
 
-import java.net.ConnectException;
+import javax.naming.Reference;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -106,6 +106,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             }
             throw new AssertionError("Invalid Symbol Kind");
         }
+
+        public void addFunction(CafeFunction function){
+            context.module.addFunction(function);
+        }
     }
 
     private <T extends Node> void iterChildren(Collection<T> nodes){
@@ -175,8 +179,24 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitFuncDecl(Node.FuncDeclNode n) {
-
+        Context context = Context.context;
+        String name = n.name.name;
+        n.params.accept(this);
+        List<String> params = (List) context.pop();
+        n.block.accept(this);
+        Block block = (Block) context.pop();
+        if(!block.hasReturn())
+            block.add(ReturnStatement.of(null));
+        CafeFunction function = CafeFunction.function(name)
+                                .block(block)
+                                .withParameters(params);
+        context.addFunction(function);
+        FunctionWrapper wrapper = FunctionWrapper.wrap(function);
+        SymbolReference ref = context.createSymbolReference(name, Node.VarDeclNode.class);
+        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref,wrapper);
+        context.push(statement);
     }
+
 
     @Override
     public void visitObjCreation(Node.ObjCreationNode n) {
@@ -185,7 +205,16 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitBlock(Node.BlockNode n) {
+        Context context = Context.context;
+        Block block = context.enterScope();
 
+        for(Node.StmtNode stmt: n.block){
+            stmt.accept(this);
+            CafeStatement<?> statement = (CafeStatement) context.pop();
+            block.add(statement);
+        }
+        context.push(block);
+        context.leaveScope();
     }
 
     @Override
@@ -254,7 +283,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             if(n.invokedOn.getTag() == Node.Tag.IDEN){
                 n.invokedOn.accept(this);
                 context.push(FunctionInvocation.create(
-                        context.pop(), context.pop()
+                        context.pop(), (List)context.pop()
                 ));
             }
             else{
@@ -301,7 +330,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitParamList(Node.ParameterListNode n) {
-
+        Context context = Context.context;
+        List<String> params = new LinkedList<>();
+        for(Node.IdenNode param : n.params){
+            params.add(param.name);
+        }
+        context.push(params);
     }
 
     @Override

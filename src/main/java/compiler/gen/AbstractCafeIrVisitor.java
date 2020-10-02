@@ -1,8 +1,23 @@
 package compiler.gen;
 
-import compiler.cafelang.ir.*;
+import cafelang.ir.*;
 
 public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
+    @Override
+    public void visitSubscript(SubscriptStatement subscriptStatement) {
+        subscriptStatement.walk(this);
+    }
+
+    @Override
+    public void visitPropertyAccess(PropertyAccess propertyAccess) {
+
+    }
+
+    @Override
+    public void visitReturn(ReturnStatement returnStatement) {
+
+    }
+
     @Override
     public void visitModule(CafeModule module) {
         module.walk(this);
@@ -10,16 +25,16 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
 
     @Override
     public void visitObjectAccess(ObjectAccessStatement objectAccessStatement) {
-
+        objectAccessStatement.walk(this);
     }
 
     @Override
-    public void visitMethodInvoke(MethodInvocation methodInvocation) {
-
+    public void visitMethodInvocation(MethodInvocation methodInvocation) {
+        methodInvocation.walk(this);
     }
 
     @Override
-    public void visitFunctionInvoke(FunctionInvocation functionInvocation) {
+    public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
 
     }
 
@@ -30,12 +45,12 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
 
     @Override
     public void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement) {
-
+        declarativeAssignmentStatement.walk(this);
     }
 
     @Override
-    public void visitFunctionReference(FunctionReference functionReference) {
-
+    public void visitFunctionWrapper(FunctionWrapper functionWrapper) {
+        functionWrapper.walk(this);
     }
 
     @Override
@@ -74,7 +89,7 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
-    public void visitRefereceLookup(ReferenceLookup referenceLookup) {
-
+    public void visitReferenceLookup(ReferenceLookup referenceLookup) {
+        referenceLookup.walk(this);
     }
 }

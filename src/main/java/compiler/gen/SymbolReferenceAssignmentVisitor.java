@@ -1,6 +1,6 @@
 package compiler.gen;
 
-import compiler.cafelang.ir.*;
+import cafelang.ir.*;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -39,9 +39,10 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
     private void bindReference(SymbolReference reference) {
         ReferenceTable table = tableStack.peek();
         if (reference.getIndex() < 0) {
-            if (table.hasReferenceFor(reference.getName())) {
-                reference.setIndex(table.get(reference.getName()).getIndex());
-            }
+//            if (table.hasReferenceFor(reference.getName())) {
+//                reference.setIndex(table.get(reference.getName()).getIndex());
+//            }
+            reference.setIndex(assignmentCounter.next());
         }
     }
 
@@ -65,12 +66,13 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
     public void visitBlock(Block block) {
         ReferenceTable table = block.getReferenceTable();
         tableStack.push(table);
-        block.walk(this);
+        for(CafeStatement<?> statement : block.getStatements())
+            statement.accept(this);
         tableStack.pop();
     }
 
     @Override
-    public void visitRefereceLookup(ReferenceLookup referenceLookup) {
+    public void visitReferenceLookup(ReferenceLookup referenceLookup) {
 
     }
 }

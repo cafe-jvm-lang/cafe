@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public abstract class ExpressionStatement<T extends ExpressionStatement<T>> extends CafeStatement<T> {
     public static ExpressionStatement<?> of(Object expr){

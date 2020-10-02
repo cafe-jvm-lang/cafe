@@ -1,5 +1,7 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
     private List<String> parameterNames = new LinkedList<>();
     private boolean isSynthetic = false;
     private boolean isVarargs = false;
+    private boolean isInit = false;
 
     public enum Scope{
         MODULE, CLOSURE
@@ -27,6 +30,15 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
     public CafeFunction name(String n){
         name = n;
         return this;
+    }
+
+    public CafeFunction asInit(){
+        isInit = true;
+        return this;
+    }
+
+    public boolean isInit(){
+        return isInit;
     }
 
     public String getName(){
@@ -50,8 +62,34 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
         return isVarargs;
     }
 
+    public CafeFunction withVarargs(){
+        isVarargs = true;
+        return this;
+    }
+
+    public CafeFunction withParameters(Collection<?> names){
+        for(Object name: names){
+            addParamterToBlockReferences(name.toString());
+            parameterNames.add(name.toString());
+        }
+        return this;
+    }
+
+    private void addParamterToBlockReferences(String name){
+        this.getBlock().getReferenceTable().add(SymbolReference.of(name, SymbolReference.Kind.VAR));
+    }
+
+    public int getArity(){
+        return parameterNames.size();
+    }
+
     public List<String> getParameterNames(){
         return parameterNames;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return Collections.singletonList(block);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +12,11 @@ public class FunctionInvocation extends ExpressionStatement<FunctionInvocation>{
         this.arguments = arguments;
     }
 
-    public static FunctionInvocation create(Object ref,Object... args){
+    public ReferenceLookup getReference() {
+        return ref;
+    }
+
+    public static FunctionInvocation create(Object ref, List<Object> args){
         List<CafeElement<?>> arguments = new LinkedList<>();
         for(Object arg: args){
             if(arg instanceof CafeElement){
@@ -28,6 +32,14 @@ public class FunctionInvocation extends ExpressionStatement<FunctionInvocation>{
         );
     }
 
+    public int getArity(){
+        return arguments.size();
+    }
+
+    public List<CafeElement<?>> getArguments() {
+        return arguments;
+    }
+
     @Override
     protected FunctionInvocation self() {
         return this;
@@ -35,6 +47,6 @@ public class FunctionInvocation extends ExpressionStatement<FunctionInvocation>{
 
     @Override
     public void accept(CafeIrVisitor visitor) {
-        visitor.visitFunctionInvoke(this);
+        visitor.visitFunctionInvocation(this);
     }
 }

@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessStatement>{
     private ExpressionStatement<?> accessedOn;

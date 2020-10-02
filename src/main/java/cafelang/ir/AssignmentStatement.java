@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +31,9 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement> {
         return lhsExpression;
     }
 
+    public ExpressionStatement<?> getRhsExpression(){
+        return rhsExpression;
+    }
     @Override
     public List<CafeElement<?>> children() {
         LinkedList<CafeElement<?>> children = new LinkedList<>();

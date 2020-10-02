@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -23,7 +23,7 @@ public class CafeModule extends CafeElement<CafeModule> {
         initFunc = CafeFunction.function(INIT_FUNCTION)
                 .block(
                         Block.create(globalReferenceTable)
-                );
+                ).asInit();
         functions.add(initFunc);
     }
 
@@ -40,6 +40,7 @@ public class CafeModule extends CafeElement<CafeModule> {
         this.functions.add(function);
     }
 
+    @Override
     public List<CafeElement<?>> children(){
         LinkedList<CafeElement<?>> children  = new LinkedList<>();
         children.addAll(functions);

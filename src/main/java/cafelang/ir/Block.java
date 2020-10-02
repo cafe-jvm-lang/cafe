@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,8 +45,14 @@ public class Block extends ExpressionStatement<Block>{
         checkForReturns(statement);
     }
 
+    public boolean hasReturn() {
+        return hasReturn;
+    }
+
     private void checkForReturns(CafeStatement<?> statement){
-        // TODO: remaining
+        if(statement instanceof ReturnStatement)
+
+            hasReturn = true;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class PropertyAccess extends ExpressionStatement<PropertyAccess>{
     private String name;

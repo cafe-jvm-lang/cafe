@@ -1,4 +1,4 @@
-package compiler.cafelang.ir;
+package cafelang.ir;
 
 public class BinaryExpression extends ExpressionStatement<BinaryExpression>{
     private final OperatorType type;

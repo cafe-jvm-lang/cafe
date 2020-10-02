@@ -1,18 +1,25 @@
 package compiler.gen;
 
-import compiler.cafelang.ir.*;
+import cafelang.FunctionReference;
+import cafelang.ir.*;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 import static compiler.gen.JVMBytecodeUtils.loadInteger;
 import static compiler.gen.JVMBytecodeUtils.loadLong;
+import static java.lang.invoke.MethodType.genericMethodType;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 import static org.objectweb.asm.Opcodes.*;
+import static java.lang.invoke.MethodType.methodType;
 
 public class JVMByteCodeGen implements CafeIrVisitor {
 
@@ -24,13 +31,44 @@ public class JVMByteCodeGen implements CafeIrVisitor {
 
     private static final String INIT_FUNC_SIGN = "()V";
 
+    private static final Handle FUNC_REF_HANDLE = makeHandle(
+            "FunctionReferenceID","Ljava/lang/String;II"
+    );
+
+    private static final Handle FUNC_INVOCATION_HANDLE = makeHandle(
+            "FunctionInvocationID","[Ljava/lang/Object;"
+    );
+
+    private static Handle makeHandle(String methodName, String description) {
+        return new Handle(H_INVOKESTATIC,
+                "cafelang/runtime/" + methodName,
+                "bootstrap",
+                "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;"
+                        + description + ")Ljava/lang/invoke/CallSite;", false);
+    }
+
+    private String functionSignature(CafeFunction function) {
+        if(function.isInit())
+            return INIT_FUNC_SIGN;
+
+        MethodType signature;
+        if (function.isVarargs()) {
+            signature = MethodType.genericMethodType(function.getArity() - 1, true);
+        } else {
+            signature = MethodType.genericMethodType(function.getArity());
+        }
+        return signature.toMethodDescriptorString();
+    }
+
     private ClassWriter cw;
     private MethodVisitor mv;
     private CafeFunction currentFunction = null;
     private Context context;
     private String className;
+
     private static final class Context {
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
+        private final Deque<Object> objectStack = new LinkedList<>();
     }
 
     private static class This{
@@ -43,6 +81,10 @@ public class JVMByteCodeGen implements CafeIrVisitor {
 
         private static void invokeInsertThis(MethodVisitor mv,String className){
             mv.visitMethodInsn(INVOKESTATIC, className, INSERT_THIS, INSERT_THIS_DESC, false);
+        }
+
+        private static void invokeRetrieveThis(MethodVisitor mv, String className){
+            mv.visitMethodInsn(INVOKESTATIC, className, RETRIEVE_THIS, RETRIEVE_THIS_DESC, false);
         }
 
         private static void visitInsertIntoThisFunc(ClassWriter cw, String className){
@@ -128,7 +170,7 @@ public class JVMByteCodeGen implements CafeIrVisitor {
     }
 
     @Override
-    public void visitMethodInvoke(MethodInvocation methodInvocation) {
+    public void visitMethodInvocation(MethodInvocation methodInvocation) {
 
     }
 
@@ -143,8 +185,29 @@ public class JVMByteCodeGen implements CafeIrVisitor {
     }
 
     @Override
-    public void visitFunctionInvoke(FunctionInvocation functionInvocation) {
+    public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
+        ReferenceTable table = context.referenceTableStack.peek();
+        SymbolReference reference = functionInvocation.getReference().resolveIn(table);
 
+        if(reference.isGlobal()){
+            mv.visitLdcInsn(reference.getName());
+            This.invokeRetrieveThis(mv,className);
+            mv.visitTypeInsn(CHECKCAST, "cafelang/FunctionReference");
+        }
+
+        MethodType type = genericMethodType(functionInvocation.getArity()+1).changeParameterType(0,FunctionReference.class);
+        String name = reference.getName();
+        String typedef = type.toMethodDescriptorString();
+        Handle handle = FUNC_INVOCATION_HANDLE;
+
+        visitInvocationArguments(functionInvocation.getArguments());
+        mv.visitInvokeDynamicInsn(name,typedef, handle,new Object[]{});
+    }
+
+    private void visitInvocationArguments(List<CafeElement<?>> arguments){
+        for(CafeElement<?> argument : arguments){
+            argument.accept(this);
+        }
     }
 
     private void visitInitFunc(CafeFunction function) {
@@ -155,15 +218,20 @@ public class JVMByteCodeGen implements CafeIrVisitor {
         mv.visitCode();
         currentFunction = function;
 
-        for (CafeStatement<?> stmt : function.getBlock().getStatements()) {
-            if (stmt instanceof DeclarativeAssignmentStatement) {
-                DeclarativeAssignmentStatement s = (DeclarativeAssignmentStatement) stmt;
-                String key = s.getSymbolReference().getName();
-                mv.visitLdcInsn(key);
-                s.walk(this);
-                This.invokeInsertThis(mv,className);
-            }
-        }
+
+//        for (CafeStatement<?> stmt : function.getBlock().getStatements()) {
+//            if (stmt instanceof DeclarativeAssignmentStatement) {
+//                DeclarativeAssignmentStatement s = (DeclarativeAssignmentStatement) stmt;
+//                String key = s.getSymbolReference().getName();
+//                mv.visitLdcInsn(key);
+//                s.walk(this);
+//                This.invokeInsertThis(mv,className);
+//            }else {
+//                stmt.accept(this);
+//            }
+//        }
+
+        function.walk(this);
 
         currentFunction = null;
         mv.visitInsn(RETURN);
@@ -186,7 +254,8 @@ public class JVMByteCodeGen implements CafeIrVisitor {
         cw.visitSource(className,null);
 
         This.loadThis(cw,className);
-        visitInitFunc(module.getInitFunc());
+        //visitInitFunc(module.getInitFunc());
+        //context.referenceTableStack.push(module.getInitFunc().getBlock().getReferenceTable());
         visitMainFunc();
         module.walk(this);
     }
@@ -198,17 +267,65 @@ public class JVMByteCodeGen implements CafeIrVisitor {
 
     @Override
     public void visitBlock(Block block) {
+        ReferenceTable table = block.getReferenceTable();
+        context.referenceTableStack.push(table);
+        for(CafeStatement<?> statement : block.getStatements()){
+            statement.accept(this);
+        }
+        context.referenceTableStack.pop();
+    }
 
+    @Override
+    public void visitReturn(ReturnStatement returnStatement) {
+        CafeStatement<?> statement = returnStatement.getExpressionStatement();
+        if(statement != null)
+            statement.accept(this);
+        else
+            mv.visitInsn(ACONST_NULL);
+        mv.visitInsn(ARETURN);
     }
 
     @Override
     public void visitFunction(CafeFunction cafeFunction) {
+        currentFunction = cafeFunction;
 
+        mv = cw.visitMethod(
+            functionFlags(cafeFunction),
+            cafeFunction.getName(),
+            functionSignature(cafeFunction),
+            null,null
+        );
+
+        for(String parameter : cafeFunction.getParameterNames()){
+            mv.visitParameter(parameter,ACC_PRIVATE);
+        }
+
+        mv.visitCode();
+        cafeFunction.walk(this);
+        if(cafeFunction.isInit())
+            mv.visitInsn(RETURN);
+
+        mv.visitMaxs(0, 0);
+        mv.visitEnd();
+
+        currentFunction = null;
     }
 
     @Override
     public void visitAssignment(AssignmentStatement assignmentStatement) {
-
+        assignmentStatement.walk(this);
+        ExpressionStatement<?> lhs = assignmentStatement.getLhsExpression();
+        if(lhs instanceof ReferenceLookup){
+            SymbolReference ref = (SymbolReference) context.objectStack.pop();
+            if(ref.isGlobal())
+                This.invokeInsertThis(mv,className);
+            else
+                mv.visitVarInsn(ALOAD,ref.getIndex());
+            return;
+        }
+        if(lhs instanceof ObjectAccessStatement){
+            // TODO: remaining
+        }
     }
 
     @Override
@@ -262,18 +379,44 @@ public class JVMByteCodeGen implements CafeIrVisitor {
     }
 
     @Override
-    public void visitRefereceLookup(ReferenceLookup referenceLookup) {
-
+    public void visitReferenceLookup(ReferenceLookup referenceLookup) {
+        SymbolReference reference = referenceLookup.resolveIn(context.referenceTableStack.peek());
+        context.objectStack.push(reference);
+        if(reference.isGlobal()){
+            mv.visitLdcInsn(reference.getName());
+        }else{
+            mv.visitVarInsn(ALOAD, reference.getIndex());
+        }
     }
 
     @Override
-    public void visitFunctionReference(FunctionReference functionReference) {
-
+    public void visitFunctionWrapper(FunctionWrapper functionWrapper) {
+        //functionWrapper.walk(this);
+        CafeFunction target = functionWrapper.getTarget();
+        int arity = (target.isVarargs()) ? target.getArity()-1 : target.getArity();
+        mv.visitInvokeDynamicInsn(
+                target.getName(),
+                methodType(FunctionReference.class).toMethodDescriptorString(),
+                FUNC_REF_HANDLE,
+                className,
+                (Integer) arity,
+                (Boolean) target.isVarargs()
+        );
     }
 
     @Override
     public void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement) {
-
+        SymbolReference reference = declarativeAssignmentStatement.getSymbolReference();
+        if(reference.isGlobal()){
+            String key = reference.getName();
+            mv.visitLdcInsn(key);
+            declarativeAssignmentStatement.walk(this);
+            This.invokeInsertThis(mv,className);
+        }
+        else{
+            declarativeAssignmentStatement.walk(this);
+            mv.visitVarInsn(ASTORE, reference.getIndex());
+        }
     }
 
     @Override
