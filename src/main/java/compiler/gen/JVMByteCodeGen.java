@@ -128,12 +128,22 @@ public class JVMByteCodeGen implements CafeIrVisitor {
     }
 
     @Override
-    public void visitMethodInvoke(MethodInvoke methodInvoke) {
+    public void visitMethodInvoke(MethodInvocation methodInvocation) {
 
     }
 
     @Override
-    public void visitFunctionInvoke(FunctionInvoke functionInvoke) {
+    public void visitSubscript(SubscriptStatement subscriptStatement) {
+
+    }
+
+    @Override
+    public void visitPropertyAccess(PropertyAccess propertyAccess) {
+
+    }
+
+    @Override
+    public void visitFunctionInvoke(FunctionInvocation functionInvocation) {
 
     }
 

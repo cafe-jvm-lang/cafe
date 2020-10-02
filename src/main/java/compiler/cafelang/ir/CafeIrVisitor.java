@@ -24,9 +24,13 @@ public interface CafeIrVisitor {
 
     void visitObjectAccess(ObjectAccessStatement objectAccessStatement);
 
-    void visitMethodInvoke(MethodInvoke methodInvoke);
+    void visitMethodInvoke(MethodInvocation methodInvocation);
 
-    void visitFunctionInvoke(FunctionInvoke functionInvoke);
+    void visitFunctionInvoke(FunctionInvocation functionInvocation);
 
     void visitNull(NullStatement aNull);
+
+    void visitSubscript(SubscriptStatement subscriptStatement);
+
+    void visitPropertyAccess(PropertyAccess propertyAccess);
 }

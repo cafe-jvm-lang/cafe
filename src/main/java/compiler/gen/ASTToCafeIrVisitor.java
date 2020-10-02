@@ -3,9 +3,11 @@ package compiler.gen;
 import compiler.ast.Node;
 import compiler.cafelang.ir.*;
 
+import java.net.ConnectException;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ASTToCafeIrVisitor implements Node.Visitor {
 
@@ -142,7 +144,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitIden(Node.IdenNode n) {
         Context context = Context.context;
-        context.push(ReferenceLookup.of(n.name));
+        if(context.isProperty())
+            context.push(PropertyAccess.of(n.name));
+        else
+            context.push(ReferenceLookup.of(n.name));
     }
 
     @Override
@@ -239,12 +244,31 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitFuncCall(Node.FuncCallNode n) {
-
+        Context context = Context.context;
+        n.args.accept(this);
+        if(context.isProperty()){
+            n.invokedOn.accept(this);
+            context.push(MethodInvocation.create(context.pop(),context.pop()));
+        }
+        else{
+            if(n.invokedOn.getTag() == Node.Tag.IDEN){
+                n.invokedOn.accept(this);
+                context.push(FunctionInvocation.create(
+                        context.pop(), context.pop()
+                ));
+            }
+            else{
+                throw new AssertionError("Expected Identifier");
+            }
+        }
     }
 
     @Override
     public void visitSubscript(Node.SubscriptNode n) {
-
+        Context context = Context.context;
+        n.index.accept(this);
+        n.subscriptOf.accept(this);
+        context.push(SubscriptStatement.create(context.pop(),context.pop()));
     }
 
     @Override
@@ -254,8 +278,6 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         context.enterProperty();
         n.prop.accept(this);
         context.leaveProperty();
-
-
 
         n.accessedOn.accept(this);
         context.push(ObjectAccessStatement.create(context.pop(), context.pop()));
@@ -268,7 +290,13 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitArgsList(Node.ArgsListNode n) {
-
+        Context context = Context.context;
+        List<Object> args = new LinkedList<>();
+        for(Node.ExprNode arg : n.args){
+            arg.accept(this);
+            args.add(context.pop());
+        }
+        context.push(args);
     }
 
     @Override

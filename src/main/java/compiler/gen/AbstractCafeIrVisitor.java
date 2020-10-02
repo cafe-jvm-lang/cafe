@@ -14,12 +14,12 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
-    public void visitMethodInvoke(MethodInvoke methodInvoke) {
+    public void visitMethodInvoke(MethodInvocation methodInvocation) {
 
     }
 
     @Override
-    public void visitFunctionInvoke(FunctionInvoke functionInvoke) {
+    public void visitFunctionInvoke(FunctionInvocation functionInvocation) {
 
     }
 
