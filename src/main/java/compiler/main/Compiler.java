@@ -6,7 +6,7 @@ import compiler.ast.Node;
 import compiler.ast.Node.ProgramNode;
 import cafelang.ir.CafeModule;
 import compiler.gen.ASTToCafeIrVisitor;
-import compiler.gen.JVMByteCodeGen;
+import compiler.gen.JVMByteCodeGenVisitor;
 import compiler.gen.SymbolReferenceAssignmentVisitor;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;
@@ -84,7 +84,7 @@ public class Compiler {
 					module.accept(new SymbolReferenceAssignmentVisitor());
 					break;
 				case GEN:
-					byteCode = new JVMByteCodeGen().generateByteCode(module,classFileName);
+					byteCode = new JVMByteCodeGenVisitor().generateByteCode(module,classFileName);
 					File op = new File(classFileName+".class");
 					try (FileOutputStream out = new FileOutputStream(op)) {
 						out.write(byteCode);

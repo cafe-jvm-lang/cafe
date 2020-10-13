@@ -262,7 +262,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitThis(Node.ThisNode n) {
-
+        Context context = Context.context;
+        boolean isGlobal = false;
+        if(context.isModuleScope){
+            isGlobal = true;
+        }
+        context.push(ThisStatement.create(isGlobal));
     }
 
     @Override

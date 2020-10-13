@@ -1,7 +1,3 @@
 var a = 10;
-
-func hello(a){
-    var x =100;
-}
-
-hello("Hello Dhyey");
+var d = 1;
+a.b.d = 100;

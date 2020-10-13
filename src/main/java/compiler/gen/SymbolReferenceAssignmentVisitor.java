@@ -13,7 +13,8 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
 
     private static class AssignmentCounter {
 
-        private int counter = 0;
+        // starts from 1 because 1st parameter is always DynamicObject
+        private int counter = 1;
 
         public int next() {
             return counter++;

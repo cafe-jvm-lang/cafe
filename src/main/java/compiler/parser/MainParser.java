@@ -513,6 +513,7 @@ public class MainParser extends Parser {
 						} else {
 							accept(TokenKind.RSQU);
 							node = new SubscriptNode(oExp, exp1);
+							oExp = node;
 						}
 
 					}

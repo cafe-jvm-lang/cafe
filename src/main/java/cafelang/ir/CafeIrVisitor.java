@@ -35,4 +35,6 @@ public interface CafeIrVisitor {
     void visitPropertyAccess(PropertyAccess propertyAccess);
 
     void visitReturn(ReturnStatement returnStatement);
+
+    void visitThis(ThisStatement thisStatement);
 }

@@ -2,6 +2,9 @@ package cafelang;
 
 import cafe.DynamicObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Temp {
     static DynamicObject doo= new DynamicObject()  ;
 
@@ -19,6 +22,9 @@ public class Temp {
 
     public static void main(String[] args) {
         int a = 10;
+        List<Integer> l = new ArrayList<>();
+        l.add(a);
+        l.set(0,11);
         init();
     }
 

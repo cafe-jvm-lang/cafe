@@ -1,5 +1,6 @@
 package cafelang.ir;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +27,19 @@ public class MethodInvocation extends ExpressionStatement<MethodInvocation>{
                 ExpressionStatement.of(invokedOn),
                 arguments
         );
+    }
+
+    public List<CafeElement<?>> getArguments() {
+        return arguments;
+    }
+
+    public int getArity(){
+        return arguments.size();
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return Collections.singletonList(invokedUpon);
     }
 
     @Override

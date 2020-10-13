@@ -22,6 +22,10 @@ public class ReferenceLookup extends ExpressionStatement<ReferenceLookup>{
         return table.get(name);
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     protected ReferenceLookup self() {
         return this;

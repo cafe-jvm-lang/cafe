@@ -19,6 +19,11 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitThis(ThisStatement thisStatement) {
+
+    }
+
+    @Override
     public void visitModule(CafeModule module) {
         module.walk(this);
     }

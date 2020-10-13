@@ -1,5 +1,8 @@
 package cafelang.ir;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessStatement>{
     private ExpressionStatement<?> accessedOn;
     private ExpressionStatement<?> property;
@@ -14,6 +17,22 @@ public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessState
                 ExpressionStatement.of(accessedOn),
                 ExpressionStatement.of(property)
         );
+    }
+
+    public ExpressionStatement<?> getProperty() {
+        return property;
+    }
+
+    public ExpressionStatement<?> getAccessedOn() {
+        return accessedOn;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        LinkedList<CafeElement<?>> list = new LinkedList();
+        list.add(accessedOn);
+        list.add(property);
+        return list;
     }
 
     @Override

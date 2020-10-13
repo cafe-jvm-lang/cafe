@@ -1,7 +1,6 @@
 package cafelang.runtime;
 
 import cafe.Function;
-import cafelang.FunctionReference;
 
 import java.lang.invoke.*;
 
@@ -32,11 +31,13 @@ public final class FunctionInvocationID {
     }
 
     public static Object fallback(Object[] args) throws Throwable{
-        FunctionReference targetRef = (FunctionReference) args[0];
-        MethodHandle target = targetRef.getHandle();
-        MethodHandle invoker = MethodHandles.dropArguments(target, 0, FunctionReference.class);
-        MethodType type = invoker.type();
-        System.out.println(args[1]);
+        for(int i=0;i<args.length;i++){
+            System.out.println(args[i]);
+        }
+        Function targetRef = (Function) args[0];
+        MethodHandle target = targetRef.handle();
+        MethodHandle invoker = MethodHandles.dropArguments(target, 0, Function.class);
+        System.out.println(invoker);
         return invoker.invokeWithArguments(args);
     }
 }

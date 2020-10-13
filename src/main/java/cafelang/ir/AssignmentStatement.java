@@ -37,7 +37,7 @@ public class AssignmentStatement extends CafeStatement<AssignmentStatement> {
     @Override
     public List<CafeElement<?>> children() {
         LinkedList<CafeElement<?>> children = new LinkedList<>();
-        children.add(lhsExpression);
+        //children.add(lhsExpression);
         children.add(rhsExpression);
         return children;
     }

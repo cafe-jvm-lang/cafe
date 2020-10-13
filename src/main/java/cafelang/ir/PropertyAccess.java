@@ -13,6 +13,10 @@ public class PropertyAccess extends ExpressionStatement<PropertyAccess>{
         throw cantConvert("String",name);
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     protected PropertyAccess self() {
         return this;
