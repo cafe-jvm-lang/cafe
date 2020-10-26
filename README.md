@@ -2,7 +2,14 @@
 A simple, dynamic, weakly typed, prototype based language for the JVM.
 Built with `invokedynamic` instruction introduced in Java 7, Cafe takes advantage of latest advances of JVM.
 
-This project is developed with intent to learn and explore `how a programming language runs internally` and is also a major project for the graduation year.
+This project is developed with an explore `how a programming language runs internally` and is also a major project for the graduation year.
+
+---
+**NOTE**
+
+This project is still under development.
+
+---
 
 ## Building CAFE
 Cafe is built with [Gradle](https://gradle.org).
