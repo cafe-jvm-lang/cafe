@@ -4,10 +4,7 @@ import compiler.ast.Node;
 import cafelang.ir.*;
 
 import javax.naming.Reference;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ASTToCafeIrVisitor implements Node.Visitor {
 
@@ -200,7 +197,15 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitObjCreation(Node.ObjCreationNode n) {
+        Context context = Context.context;
+        Map<Node.IdenNode, Node.ExprNode> map = n.prop;
+        Map<String, ExpressionStatement<?>> mapped = new LinkedHashMap<>();
 
+        for(Map.Entry<Node.IdenNode, Node.ExprNode> entry : map.entrySet()){
+            String key = entry.getKey().name;
+            entry.getValue().accept(this);
+            mapped.put(key, ExpressionStatement.of(context.pop()));
+        }
     }
 
     @Override
@@ -282,7 +287,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         n.args.accept(this);
         if(context.isProperty()){
             n.invokedOn.accept(this);
-            context.push(MethodInvocation.create(context.pop(),context.pop()));
+            context.push(MethodInvocation.create(context.pop(),(List)context.pop()));
         }
         else{
             if(n.invokedOn.getTag() == Node.Tag.IDEN){

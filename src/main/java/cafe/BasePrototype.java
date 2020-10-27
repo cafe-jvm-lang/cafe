@@ -3,10 +3,15 @@ package cafe;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Obj {
-    private final Map<String, Object> map = new HashMap<>();
+public abstract class BasePrototype {
+    private final Map<String, Object> map;
 
-    Obj(Object __proto__){
+    BasePrototype(Object __proto__){
+        this(__proto__,new HashMap<>());
+    }
+
+    BasePrototype(Object __proto__, Map<String, Object> map){
+        this.map = map;
         map.put("__proto__",__proto__);
     }
 

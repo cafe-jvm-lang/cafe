@@ -49,4 +49,12 @@ public class SymbolReference extends CafeElement<SymbolReference>{
         return index;
     }
 
+    @Override
+    public String toString() {
+        return "SymbolReference{" +
+                "name='" + name + '\'' +
+                ", kind=" + kind +
+                ", index=" + index +
+                '}';
+    }
 }

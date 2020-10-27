@@ -2,10 +2,7 @@ package compiler.ast;
 
 import static compiler.ast.Node.Tag.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // import org.graalvm.compiler.word.ObjectAccess;
 
@@ -126,7 +123,7 @@ public abstract class Node {
 	}
 
 	public static class ObjCreationNode extends ExprNode {
-		public Map<IdenNode, ExprNode> prop = new HashMap<>();
+		public Map<IdenNode, ExprNode> prop = new LinkedHashMap<>();
 
 		public ObjCreationNode() {
 		}

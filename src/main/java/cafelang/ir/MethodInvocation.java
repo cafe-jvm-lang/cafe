@@ -13,7 +13,7 @@ public class MethodInvocation extends ExpressionStatement<MethodInvocation>{
         this.arguments = arguments;
     }
 
-    public static MethodInvocation create(Object invokedOn,Object... args){
+    public static MethodInvocation create(Object invokedOn,List<Object> args){
         List<CafeElement<?>> arguments = new LinkedList<>();
         for(Object arg: args){
             if(arg instanceof CafeElement){

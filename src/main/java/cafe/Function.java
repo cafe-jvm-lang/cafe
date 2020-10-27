@@ -2,7 +2,7 @@ package cafe;
 
 import java.lang.invoke.MethodHandle;
 
-public class Function extends Obj {
+public class Function extends BasePrototype {
     private final MethodHandle handle;
 
     public Function(MethodHandle handle){

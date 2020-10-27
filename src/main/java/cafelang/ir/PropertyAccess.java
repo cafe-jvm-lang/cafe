@@ -26,4 +26,11 @@ public class PropertyAccess extends ExpressionStatement<PropertyAccess>{
     public void accept(CafeIrVisitor visitor) {
         visitor.visitPropertyAccess(this);
     }
+
+    @Override
+    public String toString() {
+        return "PropertyAccess{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

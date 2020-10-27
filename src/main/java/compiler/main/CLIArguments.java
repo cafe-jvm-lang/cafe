@@ -36,7 +36,7 @@ public class CLIArguments {
 	
 	
 	public void checkArgs(String... args) {
-		
+
 		if(args.length <1) {
 			log.error(Errors.NO_FILE_PATH_GIVEN_IN_CLI);
 			log.printErrorLog();
@@ -44,7 +44,9 @@ public class CLIArguments {
 		}
 
 		fileManager.addSourceFile(args[0]);
-		
+
+
+
 		if(log.nerrors > 0)
 			log.printErrorLog();
 	}

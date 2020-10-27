@@ -56,9 +56,10 @@ public final class MethodInvocationID {
     }
 
     private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args){
+        for(Object arg : args)
+            System.out.println(arg);
         if(args[0] instanceof DynamicObject){
             DynamicObject object = (DynamicObject) args[0];
-
         }
         return null;
     }

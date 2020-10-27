@@ -37,4 +37,6 @@ public interface CafeIrVisitor {
     void visitReturn(ReturnStatement returnStatement);
 
     void visitThis(ThisStatement thisStatement);
+
+    void visitObjectCreation(ObjectCreationStatement creationStatement);
 }

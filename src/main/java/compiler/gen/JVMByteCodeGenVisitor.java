@@ -13,6 +13,7 @@ import java.lang.invoke.MethodType;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static compiler.gen.JVMBytecodeUtils.loadInteger;
 import static compiler.gen.JVMBytecodeUtils.loadLong;
@@ -332,6 +333,26 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitEnd();
 
         currentFunction = null;
+    }
+
+    @Override
+    public void visitObjectCreation(ObjectCreationStatement creationStatement) {
+        Map<String, ExpressionStatement<?>> map = creationStatement.getMap();
+
+        // Create DynamicObject instance
+        mv.visitTypeInsn(NEW, JDYNAMIC);
+        mv.visitInsn(DUP);
+        mv.visitMethodInsn(INVOKESPECIAL, JDYNAMIC, "<init>", "()V", false);
+
+        
+
+        // define every property
+        for(Map.Entry<String, ExpressionStatement<?>> entry: map.entrySet()){
+            String key = entry.getKey();
+            mv.visitLdcInsn(key);
+            entry.getValue().accept(this);
+
+        }
     }
 
     @Override

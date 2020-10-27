@@ -35,4 +35,11 @@ public class ReferenceLookup extends ExpressionStatement<ReferenceLookup>{
     public void accept(CafeIrVisitor visitor) {
         visitor.visitReferenceLookup(this);
     }
+
+    @Override
+    public String toString() {
+        return "ReferenceLookup{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

@@ -672,7 +672,7 @@ public class MainParser extends Parser {
 		if (error)  return null;
 		Token prevToken = token;
 		accept(TokenKind.NUMLIT);
-		Number num;
+		Number num,num2;
 		System.out.println("Num Literal PrevToken: "+prevToken.kind);
 		System.out.println("Num Literal Token: "+token.kind);
 		if (token.kind == TokenKind.DOT) {
@@ -687,8 +687,18 @@ public class MainParser extends Parser {
 			}
 		} else {
 			num = NumberFormat.getInstance().parse(prevToken.value());
+			if(num instanceof Long) {
+				if ((long) num <= Integer.MAX_VALUE) {
+					num2 = num.intValue();
+				} else {
+					num2 = num;
+				}
+			}
+			else{
+				num2 = num;
+			}
 			if (error)  return null;
-			return new NumLitNode(num);
+			return new NumLitNode(num2);
 		}
 		
 		return null;
