@@ -21,4 +21,9 @@ public class DynamicObject extends BasePrototype {
     public static final DynamicObject create(Map<String, Object> map){
         return new DynamicObject(map);
     }
+
+    @Override
+    public String toString() {
+        return super.toString("DynamicObject");
+    }
 }

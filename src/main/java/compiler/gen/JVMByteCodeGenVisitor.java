@@ -215,7 +215,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         if(reference.isGlobal()){
             mv.visitLdcInsn(reference.getName());
             GlobalThis.retrieve(mv,className);
-            mv.visitTypeInsn(CHECKCAST, "cafelang/FunctionReference");
+            mv.visitTypeInsn(CHECKCAST, "cafe/Function");
             GlobalThis.loadThis(mv,className);
         }
         else{
@@ -338,21 +338,22 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitObjectCreation(ObjectCreationStatement creationStatement) {
         Map<String, ExpressionStatement<?>> map = creationStatement.getMap();
-
+        int index = creationStatement.index();
         // Create DynamicObject instance
         mv.visitTypeInsn(NEW, JDYNAMIC);
         mv.visitInsn(DUP);
         mv.visitMethodInsn(INVOKESPECIAL, JDYNAMIC, "<init>", "()V", false);
-
-        
+        mv.visitVarInsn(ASTORE, index);
 
         // define every property
         for(Map.Entry<String, ExpressionStatement<?>> entry: map.entrySet()){
+            mv.visitVarInsn(ALOAD, index);
             String key = entry.getKey();
             mv.visitLdcInsn(key);
             entry.getValue().accept(this);
-
+            mv.visitMethodInsn(INVOKEVIRTUAL, JDYNAMIC, "define", "(Ljava/lang/String;Ljava/lang/Object;)V", false);
         }
+        mv.visitVarInsn(ALOAD, index);
     }
 
     @Override

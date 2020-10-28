@@ -25,7 +25,7 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
 
     @Override
     public void visitObjectCreation(ObjectCreationStatement creationStatement) {
-
+        creationStatement.walk(this);
     }
 
     @Override

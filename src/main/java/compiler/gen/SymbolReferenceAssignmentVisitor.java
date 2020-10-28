@@ -35,6 +35,7 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
     public void visitDeclarativeAssignment(DeclarativeAssignmentStatement assignmentStatement) {
         SymbolReference reference = assignmentStatement.getSymbolReference();
         bindReference(reference);
+        assignmentStatement.walk(this);
     }
 
     private void bindReference(SymbolReference reference) {
@@ -61,6 +62,12 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
         }
 
         cafeFunction.walk(this);
+    }
+
+    @Override
+    public void visitObjectCreation(ObjectCreationStatement creationStatement) {
+        if(creationStatement.index() < 0)
+            creationStatement.setIndex(assignmentCounter.next());
     }
 
     @Override

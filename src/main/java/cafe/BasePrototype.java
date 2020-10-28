@@ -22,4 +22,17 @@ public abstract class BasePrototype {
     public Object get(String key){
         return map.get(key);
     }
+
+    public String toString(String clazz){
+        return clazz+'{' +
+                 map +
+                '}';
+    }
+
+    @Override
+    public String toString() {
+        return "BasePrototype{" +
+                "map=" + map +
+                '}';
+    }
 }

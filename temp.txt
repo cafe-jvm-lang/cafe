@@ -63,6 +63,8 @@ a.b.c[d] = 100;
 a.b.c[d][e] = 100;	
 a.b.c()[d] = 100;
 
+someFunc({1:2, 2:3});
+
 -----------------------------------------------
 SEMANTICS
 1. Local scope variable checking

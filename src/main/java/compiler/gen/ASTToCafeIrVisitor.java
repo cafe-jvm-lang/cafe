@@ -206,6 +206,9 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             entry.getValue().accept(this);
             mapped.put(key, ExpressionStatement.of(context.pop()));
         }
+
+        ObjectCreationStatement creationStatement = ObjectCreationStatement.of(mapped);
+        context.push(creationStatement);
     }
 
     @Override
