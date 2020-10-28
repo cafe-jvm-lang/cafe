@@ -13,4 +13,9 @@ public class Function extends BasePrototype {
     public MethodHandle handle(){
         return handle;
     }
+
+    @Override
+    public String toString() {
+        return super.toString("Function");
+    }
 }

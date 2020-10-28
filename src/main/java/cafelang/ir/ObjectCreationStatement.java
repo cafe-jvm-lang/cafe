@@ -1,6 +1,8 @@
 package cafelang.ir;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ObjectCreationStatement extends ExpressionStatement<ObjectCreationStatement>{
@@ -25,6 +27,11 @@ public class ObjectCreationStatement extends ExpressionStatement<ObjectCreationS
 
     public int index() {
         return index;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return new LinkedList<>(map.values());
     }
 
     @Override

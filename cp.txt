@@ -1,7 +1,9 @@
-var a = { a: 10, b: 20 };
+var a = { a: 10, b: { c:1000 } };
+a.__proto__ = a.b;
 
-func hello(a){
+func A(a){
 
 }
 
-hello(a);
+a.f = A({a:10});
+A(a);

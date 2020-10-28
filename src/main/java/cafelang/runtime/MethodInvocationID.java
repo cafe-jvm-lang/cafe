@@ -45,7 +45,7 @@ public final class MethodInvocationID {
 
     public static Object fallback(MethodCallSite callSite, Object[] args) throws Throwable {
         for (int i = 0; i < args.length; i++) {
-            System.out.print(args[i]+" ");
+            System.out.println(args[i]);
         }
         Class<?> clazz = args[0].getClass();
         MethodHandle target = lookupTarget(clazz,callSite,args);
@@ -60,6 +60,7 @@ public final class MethodInvocationID {
             System.out.println(arg);
         if(args[0] instanceof DynamicObject){
             DynamicObject object = (DynamicObject) args[0];
+            return object.invoker(callSite.name, callSite.type());
         }
         return null;
     }

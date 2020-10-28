@@ -4,6 +4,7 @@ import cafelang.ir.*;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
 
@@ -68,6 +69,14 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
     public void visitObjectCreation(ObjectCreationStatement creationStatement) {
         if(creationStatement.index() < 0)
             creationStatement.setIndex(assignmentCounter.next());
+        creationStatement.walk(this);
+    }
+
+    @Override
+    public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
+        for(CafeElement<?> arg: functionInvocation.getArguments()){
+            arg.accept(this);
+        }
     }
 
     @Override
