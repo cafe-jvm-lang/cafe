@@ -7,11 +7,12 @@ import java.util.List;
 
 public class Temp {
 
+    static Object rr(){
+        return  null;
+    }
 
     public static void main(String[] args) {
-
-        DynamicObject doo= new DynamicObject()  ;
-        doo.define("s","j");
+        Object doo= rr().hashCode() ;
     }
 
 }

@@ -1,9 +1,3 @@
-var a = { a: 10, b: { c:1000 } };
-a.__proto__ = a.b;
-
-func A(a){
-
-}
-
-a.f = A({a:10});
-A(a);
+func A(){}
+var a = {b: A};
+a.b();

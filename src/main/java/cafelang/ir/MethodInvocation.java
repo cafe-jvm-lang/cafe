@@ -37,6 +37,10 @@ public class MethodInvocation extends ExpressionStatement<MethodInvocation>{
         return arguments.size();
     }
 
+    public ExpressionStatement<?> getInvokedUpon() {
+        return invokedUpon;
+    }
+
     @Override
     public List<CafeElement<?>> children() {
         return Collections.singletonList(invokedUpon);
@@ -50,5 +54,12 @@ public class MethodInvocation extends ExpressionStatement<MethodInvocation>{
     @Override
     public void accept(CafeIrVisitor visitor) {
         visitor.visitMethodInvocation(this);
+    }
+
+    @Override
+    public String toString() {
+        return "MethodInvocation{" +
+                "name=" + invokedUpon +
+                "(...)}";
     }
 }

@@ -14,6 +14,10 @@ public class Function extends BasePrototype {
         return handle;
     }
 
+    public Object invoke(Object... args) throws Throwable {
+        return handle.invokeWithArguments(args);
+    }
+
     @Override
     public String toString() {
         return super.toString("Function");

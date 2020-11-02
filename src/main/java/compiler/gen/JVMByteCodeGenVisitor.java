@@ -4,7 +4,6 @@ import cafe.DynamicObject;
 import cafe.Function;
 import cafelang.ir.*;
 
-import compiler.ast.Node;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
@@ -25,6 +24,13 @@ import static java.lang.invoke.MethodType.methodType;
 
 public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
+    private void printTopOperandStack(MethodVisitor mv){
+        mv.visitInsn(DUP_X1); //duplicat the top value so we only work on the copy
+        mv.visitFieldInsn(GETSTATIC,"java/lang/System", "out", "Ljava/io/PrintStream;");//put System.out to operand stack
+        mv.visitInsn(SWAP); // swap of the top two values of the opestack: value1 value2 => value2 value1
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V");
+    }
+
     private static final String JOBJECT = "java/lang/Object";
     private static final String TOBJECT = "Ljava/lang/Object;";
 
@@ -42,7 +48,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     );
 
     private static final Handle METHOD_INVOCATION_HANDLE = makeHandle(
-            "MethodInvocationID", "");
+            "MethodInvocationID",""
+    );
+
+    private static final Handle OBJECT_ACCESS_HANDLE = makeHandle(
+            "ObjectAccessID", "");
 
     private static Handle makeHandle(String methodName, String description) {
         return new Handle(H_INVOKESTATIC,
@@ -67,7 +77,8 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     private String methodSignature(int arity){
-        return genericMethodType(arity).toMethodDescriptorString();
+        return genericMethodType(arity+1).changeParameterType(0, DynamicObject.class)
+                                         .toMethodDescriptorString();
     }
 
     private ClassWriter cw;
@@ -188,18 +199,36 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     public void visitPropertyAccess(PropertyAccess propertyAccess) {
         mv.visitInvokeDynamicInsn(propertyAccess.getName(),
                 methodSignature(1),
-                METHOD_INVOCATION_HANDLE
+                OBJECT_ACCESS_HANDLE
                 );
     }
 
     @Override
     public void visitMethodInvocation(MethodInvocation methodInvocation) {
-        methodInvocation.walk(this);
-        visitInvocationArguments(methodInvocation.getArguments());
+        ExpressionStatement<?> expr = methodInvocation.getInvokedUpon();
 
-        mv.visitInvokeDynamicInsn("methodInvocation",
-                methodSignature(methodInvocation.getArity()),
-                METHOD_INVOCATION_HANDLE);
+        if(expr instanceof PropertyAccess){
+            mv.visitTypeInsn(CHECKCAST, "cafe/DynamicObject");
+            visitInvocationArguments(methodInvocation.getArguments());
+            mv.visitInvokeDynamicInsn(((PropertyAccess) expr).getName(),
+                    methodSignature(methodInvocation.getArity()),
+                    METHOD_INVOCATION_HANDLE);
+            return;
+        }
+
+        methodInvocation.walk(this);
+        mv.visitTypeInsn(CHECKCAST, "cafe/Function");
+        GlobalThis.loadThis(mv,className);
+
+        MethodType type = genericMethodType(methodInvocation.getArity()+2).changeParameterType(0, Function.class)
+                .changeParameterType(1, DynamicObject.class);
+        String typedef = type.toMethodDescriptorString();
+        Handle handle = FUNC_INVOCATION_HANDLE;
+
+        visitInvocationArguments(methodInvocation.getArguments());
+        mv.visitInvokeDynamicInsn("#_ANNCALL",
+                typedef,
+                handle);
     }
 
     @Override
@@ -236,22 +265,6 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         for(CafeElement<?> argument : arguments){
             argument.accept(this);
         }
-    }
-
-    private void visitInitFunc(CafeFunction function) {
-        mv = cw.visitMethod(functionFlags(function),
-                function.getName(),
-                INIT_FUNC_SIGN,
-                null, null);
-        mv.visitCode();
-        currentFunction = function;
-
-        function.walk(this);
-
-        currentFunction = null;
-        mv.visitInsn(RETURN);
-        mv.visitMaxs(0, 0);
-        mv.visitEnd();
     }
 
     private void visitMainFunc(){
@@ -303,8 +316,9 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         CafeStatement<?> statement = returnStatement.getExpressionStatement();
         if(statement != null)
             statement.accept(this);
-        else
+        else {
             mv.visitInsn(ACONST_NULL);
+        }
         mv.visitInsn(ARETURN);
     }
 
@@ -386,7 +400,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         if(expressionStatement instanceof PropertyAccess){
             mv.visitInvokeDynamicInsn(((PropertyAccess) expressionStatement).getName(),
                     methodSignature(2),
-                    METHOD_INVOCATION_HANDLE
+                    OBJECT_ACCESS_HANDLE
                     );
         }
         else if( expressionStatement instanceof SubscriptStatement){

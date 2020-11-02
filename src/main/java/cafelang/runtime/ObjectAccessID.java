@@ -1,12 +1,13 @@
 package cafelang.runtime;
 
 import cafe.DynamicObject;
+import cafe.Function;
 
 import java.lang.invoke.*;
 
 import static java.lang.invoke.MethodType.methodType;
 
-public final class MethodInvocationID {
+public final class ObjectAccessID {
 
     private static final MethodHandle FALLBACK;
 
@@ -14,7 +15,7 @@ public final class MethodInvocationID {
         try {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             FALLBACK = lookup.findStatic(
-                    MethodInvocationID.class,
+                    ObjectAccessID.class,
                     "fallback",
                     methodType(Object.class, MethodCallSite.class, Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {

@@ -16,7 +16,7 @@ public final class FunctionInvocationID {
             FALLBACK = lookup.findStatic(
                     FunctionInvocationID.class,
                     "fallback",
-                    methodType(Object.class, Object[].class));
+                    methodType(Object.class,String.class, Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
@@ -24,17 +24,21 @@ public final class FunctionInvocationID {
     public static CallSite bootstrap(MethodHandles.Lookup caller, String name, MethodType type, Object... bsmArgs) {
         MutableCallSite callSite = new MutableCallSite(type);
         MethodHandle fallbackHandle = FALLBACK
+                .bindTo(name)
                 .asCollector(Object[].class, type.parameterCount())
                 .asType(type);
         callSite.setTarget(fallbackHandle);
         return callSite;
     }
 
-    public static Object fallback(Object[] args) throws Throwable{
+    public static Object fallback(String name,Object[] args) throws Throwable{
         for(int i=0;i<args.length;i++){
             System.out.println(args[i]);
         }
         Function targetRef = (Function) args[0];
+        if(args[0] == null)
+            throw new NullPointerException("On method:"+name);
+
         MethodHandle target = targetRef.handle();
         MethodHandle invoker = MethodHandles.dropArguments(target, 0, Function.class);
         System.out.println(invoker);

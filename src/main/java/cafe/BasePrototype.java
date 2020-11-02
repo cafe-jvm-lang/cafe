@@ -3,6 +3,7 @@ package cafe;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,14 +14,14 @@ public abstract class BasePrototype {
     private final Map<String, Object> map;
     private static final String __PROTO__ = "__proto__";
 
-    //public static final MethodHandle DISPATCH_CALL;
+    public static final MethodHandle DISPATCH_CALL;
     public static final MethodHandle DISPATCH_GET;
     public static final MethodHandle DISPATCH_SET;
-    //public static final MethodHandle DISPATCH_DELEGATE;
 
     static {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
+            DISPATCH_CALL = lookup.findStatic(DynamicObject.class, "dispatchCall", methodType(Object.class, String.class, Object[].class));
             DISPATCH_GET = lookup.findStatic(BasePrototype.class, "dispatchGetterStyle", methodType(Object.class, String.class, BasePrototype.class));
             DISPATCH_SET = lookup.findStatic(BasePrototype.class, "dispatchSetterStyle", methodType(Object.class, String.class, BasePrototype.class, Object.class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
@@ -58,6 +59,10 @@ public abstract class BasePrototype {
         return null;
     }
 
+    public MethodHandle dispatchCallHandle(String property, MethodType type){
+        return DISPATCH_CALL.bindTo(property).asCollector(Object[].class, type.parameterCount());
+    }
+
     public static Object dispatchGetterStyle(String property, BasePrototype object) throws Throwable {
         while(object != null){
             if(object.get(property) != null)
@@ -69,6 +74,10 @@ public abstract class BasePrototype {
 
     public static Object dispatchSetterStyle(String property, BasePrototype object, Object arg) throws Throwable {
         object.define(property, arg);
+        return null;
+    }
+
+    public static Object dispatchCall(String property, Object... args) throws Throwable {
         return null;
     }
 
