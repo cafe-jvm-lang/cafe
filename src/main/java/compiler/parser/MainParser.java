@@ -444,9 +444,10 @@ public class MainParser extends Parser {
 				// UnaryOperator
 				exp1 = parsePowerExpression();
 			} else {
-				exp1 = parseFactorExpression();
-				exp1 = new UnaryExprNode(exp1, token.value());
+				Token operatorToken = token;
 				accept(token.kind);
+				exp1 = parsePowerExpression();
+				exp1 = new UnaryExprNode(exp1, operatorToken.value());
 			}
 		} else {
 			exp1 = parsePowerExpression();
