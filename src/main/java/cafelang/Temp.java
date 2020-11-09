@@ -12,7 +12,16 @@ public class Temp {
     }
 
     public static void main(String[] args) {
-        Object doo= rr().hashCode() ;
+        int a= 1;
+        if(a > 2){
+            System.out.println("2");
+        }
+        else if(a > 3){
+            System.out.println();
+        }
+        else {
+            System.out.println("here");
+        }
     }
 
 }

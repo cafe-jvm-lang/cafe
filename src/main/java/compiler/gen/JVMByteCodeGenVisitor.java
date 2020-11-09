@@ -6,6 +6,7 @@ import cafelang.ir.*;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import java.lang.invoke.MethodType;
@@ -52,7 +53,12 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     );
 
     private static final Handle OBJECT_ACCESS_HANDLE = makeHandle(
-            "ObjectAccessID", "");
+            "ObjectAccessID", ""
+    );
+
+    private static final Handle OPERATOR_HANDLE = makeHandle(
+            "OperatorID", "I"
+    );
 
     private static Handle makeHandle(String methodName, String description) {
         return new Handle(H_INVOKESTATIC,
@@ -413,7 +419,69 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitBinaryExpression(BinaryExpression binaryExpression) {
+        switch (binaryExpression.getType()) {
+            case AND:
+                andOperator(binaryExpression);
+                break;
+            case OR:
+                orOperator(binaryExpression);
+                break;
+            default:
+                binaryExpression.walk(this);
+                genericBinaryOperator(binaryExpression);
+        }
+    }
 
+    private void genericBinaryOperator(BinaryExpression binaryOperation) {
+        String name = binaryOperation.getType().name().toLowerCase();
+        mv.visitInvokeDynamicInsn(name,
+                MethodType.genericMethodType(2).toMethodDescriptorString()
+                , OPERATOR_HANDLE, (Integer) 2);
+    }
+
+    private void orOperator(BinaryExpression binaryOperation) {
+        Label exitLabel = new Label();
+        Label trueLabel = new Label();
+        binaryOperation.left().accept(this);
+        asmBooleanValue();
+        mv.visitJumpInsn(IFNE, trueLabel);
+        binaryOperation.right().accept(this);
+        asmBooleanValue();
+        mv.visitJumpInsn(IFNE, trueLabel);
+        asmFalseObject();
+        mv.visitJumpInsn(GOTO, exitLabel);
+        mv.visitLabel(trueLabel);
+        asmTrueObject();
+        mv.visitLabel(exitLabel);
+    }
+
+    private void andOperator(BinaryExpression binaryOperation) {
+        Label exitLabel = new Label();
+        Label falseLabel = new Label();
+        binaryOperation.left().accept(this);
+        asmBooleanValue();
+        mv.visitJumpInsn(IFEQ, falseLabel);
+        binaryOperation.right().accept(this);
+        asmBooleanValue();
+        mv.visitJumpInsn(IFEQ, falseLabel);
+        asmTrueObject();
+        mv.visitJumpInsn(GOTO, exitLabel);
+        mv.visitLabel(falseLabel);
+        asmFalseObject();
+        mv.visitLabel(exitLabel);
+    }
+
+    private void asmFalseObject() {
+        mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
+    }
+
+    private void asmTrueObject() {
+        mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
+    }
+
+    private void asmBooleanValue() {
+        mv.visitTypeInsn(CHECKCAST, "java/lang/Boolean");
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
     }
 
     @Override

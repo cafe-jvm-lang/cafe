@@ -28,6 +28,18 @@ public class BinaryExpression extends ExpressionStatement<BinaryExpression>{
         return this;
     }
 
+    public ExpressionStatement<?> right() {
+        return rightExpression;
+    }
+
+    public ExpressionStatement<?> left() {
+        return leftExpression;
+    }
+
+    public OperatorType getType() {
+        return type;
+    }
+
     @Override
     public void accept(CafeIrVisitor visitor) {
         visitor.visitBinaryExpression(this);

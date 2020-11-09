@@ -10,6 +10,9 @@ public enum OperatorType {
     DIVIDE("/"),
     MODULO("%"),
 
+    POWER("**"),
+    FLOOR("//"),
+
     EQUALS("=="),
     NOTEQUALS("!="),
     LESS("<"),
@@ -22,9 +25,9 @@ public enum OperatorType {
     NOT("not"),
 
     IS("is"),
-    ISNT("isnt");
-
-    //METHOD_CALL("."),
+    ISNOT("isnot"),
+    IN("in"),
+    NOTIN("notin");
 
     private final String symbol;
 
