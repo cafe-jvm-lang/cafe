@@ -10,7 +10,7 @@ public enum OperatorType {
     DIVIDE("/"),
     MODULO("%"),
 
-    POWER("**"),
+    POW("**"),
     FLOOR("//"),
 
     EQUALS("=="),
@@ -19,6 +19,13 @@ public enum OperatorType {
     LESSOREQUALS("<="),
     MORE(">"),
     MOREOREQUALS(">="),
+
+    BITOR("|"),
+    BITAND("&"),
+    BITXOR("^"),
+    BITRIGHTSHIFT_SIGNED(">>"),
+    BITRIGHTSHIFT_UNSIGNED(">>>"),
+    BITLEFTSHIFT("<<"),
 
     AND("and"),
     OR("or"),

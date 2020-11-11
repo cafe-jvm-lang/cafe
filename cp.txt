@@ -1,4 +1,7 @@
 func a(){}
-if(a is not 10){
+func b(){}
+a.z = b;
+a.z();
 
-}
+
+

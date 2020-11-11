@@ -1,5 +1,6 @@
 package cafelang.runtime;
 
+import cafe.BasePrototype;
 import cafe.DynamicObject;
 import cafe.Function;
 
@@ -16,7 +17,7 @@ public final class FunctionReferenceID {
     public static CallSite bootstrap(MethodHandles.Lookup caller, String name, MethodType type, String moduleClass, int arity, int varargs) throws Throwable {
         Class<?> module = caller.lookupClass().getClassLoader().loadClass(moduleClass);
         Method function = module.getDeclaredMethod(name, genericMethodType(arity, varargs == 1)
-                                                        .changeParameterType(0, DynamicObject.class)
+                                                        .changeParameterType(0, BasePrototype.class)
                                                         .parameterArray());
         function.setAccessible(true);
         return new ConstantCallSite(constant(

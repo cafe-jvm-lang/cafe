@@ -1,5 +1,6 @@
 package compiler.gen;
 
+import cafe.BasePrototype;
 import cafe.DynamicObject;
 import cafe.Function;
 import cafelang.ir.*;
@@ -78,12 +79,12 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         } else {
             signature = MethodType.genericMethodType(function.getArity()+1);
         }
-        signature = signature.changeParameterType(0,DynamicObject.class);
+        signature = signature.changeParameterType(0,BasePrototype.class);
         return signature.toMethodDescriptorString();
     }
 
     private String methodSignature(int arity){
-        return genericMethodType(arity+1).changeParameterType(0, DynamicObject.class)
+        return genericMethodType(arity+1).changeParameterType(0, BasePrototype.class)
                                          .toMethodDescriptorString();
     }
 
@@ -204,7 +205,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitPropertyAccess(PropertyAccess propertyAccess) {
         mv.visitInvokeDynamicInsn(propertyAccess.getName(),
-                methodSignature(1),
+                genericMethodType(1).toMethodDescriptorString(),
                 OBJECT_ACCESS_HANDLE
                 );
     }
@@ -214,7 +215,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         ExpressionStatement<?> expr = methodInvocation.getInvokedUpon();
 
         if(expr instanceof PropertyAccess){
-            mv.visitTypeInsn(CHECKCAST, "cafe/DynamicObject");
+            mv.visitTypeInsn(CHECKCAST, "cafe/BasePrototype");
             visitInvocationArguments(methodInvocation.getArguments());
             mv.visitInvokeDynamicInsn(((PropertyAccess) expr).getName(),
                     methodSignature(methodInvocation.getArity()),
@@ -227,7 +228,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         GlobalThis.loadThis(mv,className);
 
         MethodType type = genericMethodType(methodInvocation.getArity()+2).changeParameterType(0, Function.class)
-                .changeParameterType(1, DynamicObject.class);
+                .changeParameterType(1, BasePrototype.class);
         String typedef = type.toMethodDescriptorString();
         Handle handle = FUNC_INVOCATION_HANDLE;
 
@@ -258,7 +259,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         }
 
         MethodType type = genericMethodType(functionInvocation.getArity()+2).changeParameterType(0, Function.class)
-                                                                            .changeParameterType(1, DynamicObject.class);
+                                                                            .changeParameterType(1, BasePrototype.class);
         String name = reference.getName();
         String typedef = type.toMethodDescriptorString();
         Handle handle = FUNC_INVOCATION_HANDLE;
@@ -405,7 +406,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     private void visitLHSObjectProperty(ExpressionStatement<?> expressionStatement){
         if(expressionStatement instanceof PropertyAccess){
             mv.visitInvokeDynamicInsn(((PropertyAccess) expressionStatement).getName(),
-                    methodSignature(2),
+                    genericMethodType(2).toMethodDescriptorString(),
                     OBJECT_ACCESS_HANDLE
                     );
         }
@@ -486,7 +487,10 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitUnaryExpression(UnaryExpression unaryExpression) {
-
+        String name = unaryExpression.getType().name().toLowerCase();
+        unaryExpression.walk(this);
+        mv.visitInvokeDynamicInsn(name, MethodType.genericMethodType(1).toMethodDescriptorString()
+                , OPERATOR_HANDLE, (Integer) 1);
     }
 
     @Override

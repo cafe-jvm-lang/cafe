@@ -1,5 +1,6 @@
 package cafelang.runtime;
 
+import cafe.BasePrototype;
 import cafe.DynamicObject;
 import cafe.Function;
 
@@ -64,8 +65,8 @@ public final class MethodInvocationID {
     }
 
     private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args) throws Throwable{
-        if(args[0] instanceof DynamicObject){
-            DynamicObject object = (DynamicObject) args[0];
+        if(args[0] instanceof BasePrototype){
+            BasePrototype object = (BasePrototype) args[0];
             return object.dispatchCallHandle(callSite.name, callSite.type());
         }
         throw new InvalidClassException(args[0].getClass().getName(),"Expected DynamicObject");

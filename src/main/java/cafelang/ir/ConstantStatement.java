@@ -36,6 +36,13 @@ public class ConstantStatement extends ExpressionStatement<ConstantStatement>{
     }
 
     @Override
+    public String toString() {
+        return "Const{" +
+                 value +
+                '}';
+    }
+
+    @Override
     public void accept(CafeIrVisitor visitor) {
         visitor.visitConstantStatement(this);
     }

@@ -3,7 +3,6 @@ package compiler.gen;
 import compiler.ast.Node;
 import cafelang.ir.*;
 
-import javax.naming.Reference;
 import java.util.*;
 
 public class ASTToCafeIrVisitor implements Node.Visitor {
@@ -252,20 +251,24 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitBinaryExpr(Node.BinaryExprNode n) {
+        Context context = Context.context;
         n.e1.accept(this);
         n.e2.accept(this);
         BinaryExpression expr = BinaryExpression.of(n.op)
-                .left(Context.context.pop())
-                .right(Context.context.pop());
+                .right(context.pop())
+                .left(context.pop());
+        context.push(expr);
     }
 
     @Override
     public void visitUnaryExpr(Node.UnaryExprNode n) {
+        Context context = Context.context;
         n.e.accept(this);
         UnaryExpression expr = UnaryExpression.create(
                 n.op,
-                Context.context.pop()
+                context.pop()
         );
+        context.push(expr);
     }
 
     @Override

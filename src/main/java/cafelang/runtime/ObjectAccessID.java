@@ -1,5 +1,6 @@
 package cafelang.runtime;
 
+import cafe.BasePrototype;
 import cafe.DynamicObject;
 import cafe.Function;
 
@@ -45,22 +46,24 @@ public final class ObjectAccessID {
     }
 
     public static Object fallback(MethodCallSite callSite, Object[] args) throws Throwable {
+        System.out.println("OBJECT ACCESS ID");
+        System.out.println(callSite.name);
         for (int i = 0; i < args.length; i++) {
-            System.out.println("Arguments==>"+args[i]);
+            System.out.println("Argument "+i+"==>"+args[i]);
         }
         Class<?> clazz = args[0].getClass();
         MethodHandle target = lookupTarget(clazz,callSite,args);
 
         if(target == null)
             throw new NoSuchMethodError(clazz + "::" + callSite.name);
+
+        System.out.println("====================================");
         return target.invokeWithArguments(args);
     }
 
     private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args){
-        for(Object arg : args)
-            System.out.println(arg);
-        if(args[0] instanceof DynamicObject){
-            DynamicObject object = (DynamicObject) args[0];
+        if(args[0] instanceof BasePrototype){
+            BasePrototype object = (BasePrototype) args[0];
             return object.invoker(callSite.name, callSite.type());
         }
         return null;

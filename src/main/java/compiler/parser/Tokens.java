@@ -266,7 +266,7 @@ public class Tokens {
 		}
 		
 		public String value() {
-			return kind.toString();
+			return kind.val;
 		}
 
 	}

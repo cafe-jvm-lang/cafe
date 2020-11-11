@@ -1,5 +1,8 @@
 package cafelang.ir;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class BinaryExpression extends ExpressionStatement<BinaryExpression>{
     private final OperatorType type;
     private ExpressionStatement<?> leftExpression;
@@ -38,6 +41,20 @@ public class BinaryExpression extends ExpressionStatement<BinaryExpression>{
 
     public OperatorType getType() {
         return type;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return Arrays.asList(leftExpression, rightExpression);
+    }
+
+    @Override
+    public String toString() {
+        return "BinaryExpression{" +
+                "type=" + type +
+                ", leftExpression=" + leftExpression +
+                ", rightExpression=" + rightExpression +
+                '}';
     }
 
     @Override

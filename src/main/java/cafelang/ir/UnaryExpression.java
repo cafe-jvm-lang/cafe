@@ -1,5 +1,8 @@
 package cafelang.ir;
 
+import java.util.Collections;
+import java.util.List;
+
 public class UnaryExpression extends ExpressionStatement<UnaryExpression>{
     private final OperatorType type;
     private ExpressionStatement<?> expressionStatement;
@@ -16,9 +19,26 @@ public class UnaryExpression extends ExpressionStatement<UnaryExpression>{
         );
     }
 
+    public OperatorType getType() {
+        return type;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return Collections.singletonList(expressionStatement);
+    }
+
     @Override
     protected UnaryExpression self() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "UnaryExpression{" +
+                type +
+                expressionStatement +
+                '}';
     }
 
     @Override
