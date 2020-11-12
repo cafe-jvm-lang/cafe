@@ -733,20 +733,20 @@ public abstract class Node {
 	public static class IfStmtNode extends StmtNode {
 		public ExprNode ifCond;
 		public BlockNode ifBlock;
-		public BlockNode elsePart;
+		public StmtNode elsePart;
 
 		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock) {
 			this(ifCond, ifBlock, null);
 		}
 
-		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock, BlockNode elsePart) {
+		public IfStmtNode(ExprNode ifCond, BlockNode ifBlock, StmtNode elsePart) {
 			this.ifCond = ifCond;
 			this.ifBlock = ifBlock;
 			this.elsePart = elsePart;
 		}
 
 		// can be another if block or else block;
-		public void setElsePart(BlockNode n) {
+		public void setElsePart(StmtNode n) {
 			elsePart = n;
 		}
 

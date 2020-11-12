@@ -32,18 +32,26 @@ public class SymbolTable {
 	public final SymbolTable parent;
 	
 	private final Set<Symbol> symbols;
+
+	private boolean canDeclare = true;
 	
 	public SymbolTable(SymbolTable parent) {
 		this.parent = parent;
 		symbols = new HashSet<>();
 	}
-	
-	public boolean insert(Symbol n) {
-		return symbols.add(n);
+
+	public SymbolTable notDeclarable(){
+		canDeclare = false;
+		return this;
 	}
-	
-	public void insertAll(Collection<Symbol> n) {
-		symbols.addAll(n);
+
+	public boolean insert(Symbol n) {
+		if(!canDeclare){
+			if(parent.isPresent(n.name)){
+				return false;
+			}
+		}
+		return symbols.add(n);
 	}
 	
 	public boolean isPresent(String n) {

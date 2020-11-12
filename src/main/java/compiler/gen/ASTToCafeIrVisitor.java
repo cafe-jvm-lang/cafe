@@ -370,12 +370,32 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitIfStmt(Node.IfStmtNode n) {
+        Context context = Context.context;
+        n.ifBlock.accept(this);
+        n.ifCond.accept(this);
 
+        ConditionalBranching conditionalBranching = ConditionalBranching
+                                                    .branch()
+                                                    .condition(context.pop())
+                                                    .whenTrue(context.pop());
+
+        if(n.elsePart != null){
+//            List<Node.StmtNode> branches = n.elsePart.block;
+//            branches.get(0).accept(this);
+//            ConditionalBranching branch = (ConditionalBranching) context.pop();
+//            for(int i=1; i < branches.size() ;i++) {
+//                branches.get(i).accept(this);
+//                branch.otherwise( context.pop() );
+
+            n.elsePart.accept(this);
+            conditionalBranching.otherwise(context.pop());
+        }
+        context.push(conditionalBranching);
     }
 
     @Override
     public void visitElseStmt(Node.ElseStmtNode n) {
-
+        n.elsePart.accept(this);
     }
 
     @Override

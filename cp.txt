@@ -1,7 +1,13 @@
-func a(){}
-func b(){}
-a.z = b;
-a.z();
-
+var a = 1;
+if(a > 10){
+    a = a - 1 - 2 * (3)+2;
+}
+else if(a > 11){
+    a = 10;
+    var b = 11;
+}
+else{
+    a = 10;
+}
 
 

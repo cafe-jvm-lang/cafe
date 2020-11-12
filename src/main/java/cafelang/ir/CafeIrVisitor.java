@@ -39,4 +39,6 @@ public interface CafeIrVisitor {
     void visitThis(ThisStatement thisStatement);
 
     void visitObjectCreation(ObjectCreationStatement creationStatement);
+
+    void visitConditionalBranching(ConditionalBranching conditionalBranching);
 }

@@ -316,11 +316,11 @@ public class SemanticsChecker implements Node.Visitor {
 	public void visitIfStmt(IfStmtNode n) {
 		n.ifCond.accept(this);
 
-		CST = new SymbolTable(CST);
+		CST = new SymbolTable(CST).notDeclarable();
 		n.ifBlock.accept(this);
 		CST = CST.parent;
 		if (n.elsePart != null){
-			CST = new SymbolTable(CST);
+			CST = new SymbolTable(CST).notDeclarable();
 			n.elsePart.accept(this);
 			CST = CST.parent;
 		}

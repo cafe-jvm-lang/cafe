@@ -94,6 +94,11 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitConditionalBranching(ConditionalBranching conditionalBranching) {
+        conditionalBranching.walk(this);
+    }
+
+    @Override
     public void visitConstantStatement(ConstantStatement constantStatement) {
         constantStatement.walk(this);
     }

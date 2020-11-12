@@ -836,7 +836,42 @@ public class MainParser extends Parser {
 			elseIfList.add(elseBlock);
 		BlockNode blockNode = new BlockNode();
 		blockNode.setStmt(elseIfList);
-		ifNode.setElsePart(blockNode);
+		//ifNode.setElsePart(blockNode);
+		if (error)  return null;
+		return ifNode;
+	}
+
+	StmtNode parseIfStatement1() {
+		/*
+		 * Parse If Statement and check if there any 'else' is there, if 'yes' then
+		 * parseIt and Break otherwise parse Else if statement and append to a list
+		 */
+
+		if (error)  return null;
+		System.out.println("If Stmt Node Token: "+token.kind);
+		IfStmtNode ifNode = parseIf();
+		List<StmtNode> elseIfList = new ArrayList<>();
+		StmtNode elseBlock = null;
+		System.out.println("Before If Stmt Node Token: "+token.kind);
+		if (token.kind == TokenKind.ELSE) {
+			if (error)
+				return null;
+			accept(TokenKind.ELSE);
+			if (token.kind == TokenKind.IF) {
+				elseBlock = parseIfStatement1();
+			} else if (token.kind == TokenKind.LCURLY) {
+				accept(TokenKind.LCURLY);
+				BlockNode blockNode = new BlockNode();
+				List<StmtNode> stmt = new ArrayList<>();
+				if (token.kind != TokenKind.RCURLY)
+					stmt = parseBlock();
+				if (stmt == null ) return null;
+				blockNode.setStmt(stmt);
+				elseBlock = new ElseStmtNode(ifNode, blockNode);
+				accept(TokenKind.RCURLY);
+			}
+		}
+		ifNode.setElsePart(elseBlock);
 		if (error)  return null;
 		return ifNode;
 	}
@@ -1734,7 +1769,7 @@ public class MainParser extends Parser {
 				blockStmt.add(decl);
 				break;
 			case IF:
-				StmtNode stm2 = parseIfStatement();
+				StmtNode stm2 = parseIfStatement1();
 				if (stm2 == null) return null;
 				blockStmt.add(stm2);
 				break;

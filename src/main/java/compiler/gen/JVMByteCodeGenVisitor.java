@@ -381,12 +381,16 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     public void visitAssignment(AssignmentStatement assignmentStatement) {
         ExpressionStatement<?> lhs = assignmentStatement.getLhsExpression();
         if(lhs instanceof ReferenceLookup){
-            assignmentStatement.walk(this);
-            SymbolReference ref = (SymbolReference) context.objectStack.pop();
-            if(ref.isGlobal())
-                GlobalThis.add(mv,className);
-            else
-                mv.visitVarInsn(ASTORE,ref.getIndex());
+            SymbolReference ref = ((ReferenceLookup) lhs).resolveIn(context.referenceTableStack.peek());
+            if(ref.isGlobal()) {
+                mv.visitLdcInsn(ref.getName());
+                assignmentStatement.walk(this);
+                GlobalThis.add(mv, className);
+            }
+            else {
+                assignmentStatement.walk(this);
+                mv.visitVarInsn(ASTORE, ref.getIndex());
+            }
             return;
         }
 
@@ -472,6 +476,33 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitLabel(exitLabel);
     }
 
+    @Override
+    public void visitConditionalBranching(ConditionalBranching conditionalBranching) {
+        Label branchingElseLabel = new Label();
+        Label branchingExitLabel = new Label();
+        conditionalBranching.getCondition().accept(this);
+        asmBooleanValue();
+        mv.visitJumpInsn(IFEQ, branchingElseLabel);
+        conditionalBranching.getTrueBlock().accept(this);
+        if (conditionalBranching.hasFalseBlock()) {
+            if (!conditionalBranching.getTrueBlock().hasReturn()) {
+                mv.visitJumpInsn(GOTO, branchingExitLabel);
+            }
+            mv.visitLabel(branchingElseLabel);
+            conditionalBranching.getFalseBlock().accept(this);
+            mv.visitLabel(branchingExitLabel);
+        } else if (conditionalBranching.hasElseConditionalBranching()) {
+            if (!conditionalBranching.getTrueBlock().hasReturn()) {
+                mv.visitJumpInsn(GOTO, branchingExitLabel);
+            }
+            mv.visitLabel(branchingElseLabel);
+            conditionalBranching.getElseConditionalBranching().accept(this);
+            mv.visitLabel(branchingExitLabel);
+        } else {
+            mv.visitLabel(branchingElseLabel);
+        }
+    }
+
     private void asmFalseObject() {
         mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
     }
@@ -536,7 +567,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitReferenceLookup(ReferenceLookup referenceLookup) {
         SymbolReference reference = referenceLookup.resolveIn(context.referenceTableStack.peek());
-        context.objectStack.push(reference);
+        //context.objectStack.push(reference);
         if(reference.isGlobal()){
             mv.visitLdcInsn(reference.getName());
             GlobalThis.retrieve(mv,className);
