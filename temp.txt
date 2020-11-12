@@ -76,6 +76,8 @@ else {
     a = 12;
 }
 
+init func
+
 -----------------------------------------------
 SEMANTICS
 1. Local scope variable checking

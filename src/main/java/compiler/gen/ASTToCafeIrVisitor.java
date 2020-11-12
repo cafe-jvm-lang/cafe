@@ -410,7 +410,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitReturnStmt(Node.ReturnStmtNode n) {
-
+        Context context = Context.context;
+        n.expr.accept(this);
+        ReturnStatement returnStatement = ReturnStatement.of(context.pop());
+        context.push(returnStatement);
     }
 
     @Override

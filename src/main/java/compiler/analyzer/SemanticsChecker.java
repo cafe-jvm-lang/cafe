@@ -60,6 +60,8 @@ public class SemanticsChecker implements Node.Visitor {
 	// Current Symbol Table
 	private SymbolTable CST;
 
+	boolean isGlobal = true;
+
 	private enum Expr {
 		LHS, RHS
 	}
@@ -149,8 +151,10 @@ public class SemanticsChecker implements Node.Visitor {
 		if(!CST.insert(sym))
 			logErrors(Errors.DUPLICATE_SYMBOL,n.name.name);
 		CST = new SymbolTable(CST);
+		isGlobal = false;
 		n.params.accept(this);
 		n.block.accept(this);
+		isGlobal = true;
 		CST = CST.parent;
 	}
 
@@ -350,6 +354,10 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitReturnStmt(ReturnStmtNode n) {
+		if(isGlobal) {
+			logErrors(Errors.RETURN_OUTSIDE_BLOCK, "");
+			return;
+		}
 		n.expr.accept(this);
 	}
 

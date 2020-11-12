@@ -10,4 +10,7 @@ else{
     a = 10;
 }
 
+func bb(){
+    return {a : 10, b:20};
+}
 

@@ -5,13 +5,14 @@ import java.util.List;
 
 public class ReturnStatement extends CafeStatement<ReturnStatement>{
     private CafeStatement<?> expressionStatement;
+    private boolean isReturningVoid = false;
 
     private ReturnStatement(ExpressionStatement<?> expression) {
         setExpressionStatement(expression);
     }
 
-    public static ReturnStatement of(ExpressionStatement<?> value){
-        return new ReturnStatement(value);
+    public static ReturnStatement of(Object value){
+        return new ReturnStatement( ExpressionStatement.of(value));
     }
 
     private void setExpressionStatement(CafeStatement<?> stat) {
@@ -25,6 +26,8 @@ public class ReturnStatement extends CafeStatement<ReturnStatement>{
     public CafeStatement<?> getExpressionStatement(){
         return expressionStatement;
     }
+
+
 
     @Override
     public List<CafeElement<?>> children() {
