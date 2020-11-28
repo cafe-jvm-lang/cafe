@@ -987,9 +987,9 @@ public class MainParser extends Parser {
 			if (error)
 				return null;
 			iden = parseIdentifier();
-			accept(TokenKind.DOT);
-			ExprNode expn = parseIdentifier();
-			iden = new ObjectAccessNode(iden, expn);
+			// accept(TokenKind.DOT);
+			// ExprNode expn = parseIdentifier();
+			// iden = new ObjectAccessNode(iden, expn);
 			while (token.kind == TokenKind.DOT) {
 				if (error)
 					return null;
