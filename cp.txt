@@ -1,16 +1,6 @@
-var a = 1;
-if(a > 10){
-    a = a - 1 - 2 * (3)+2;
-}
-else if(a > 11){
-    a = 10;
-    var b = 11;
-}
-else{
-    a = 10;
+var a = 10;
+loop i in a{
+
 }
 
-func bb(){
-    return {a : 10, b:20};
-}
 

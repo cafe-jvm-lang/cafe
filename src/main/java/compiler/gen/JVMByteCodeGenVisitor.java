@@ -607,6 +607,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitForLoop(ForLoopStatement forLoopStatement) {
+
+    }
+
+    @Override
     public void visitNull(NullStatement aNull) {
         mv.visitInsn(ACONST_NULL);
     }

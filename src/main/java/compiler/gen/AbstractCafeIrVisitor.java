@@ -104,6 +104,11 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitForLoop(ForLoopStatement forLoopStatement) {
+
+    }
+
+    @Override
     public void visitReferenceLookup(ReferenceLookup referenceLookup) {
         referenceLookup.walk(this);
     }

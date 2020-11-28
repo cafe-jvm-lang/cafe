@@ -3,6 +3,7 @@ package cafelang;
 import cafe.DynamicObject;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Temp {
@@ -13,15 +14,20 @@ public class Temp {
 
     public static void main(String[] args) {
         int a= 1;
-        if(a > 2){
-            System.out.println("2");
+//        List n  = new LinkedList();
+//        n.add(1);
+//        n.add(1);
+//        n.add(1);
+        for(int i= 0;i < 10 ;i++){
+            System.out.println("he;;p");
+            if(i == 5)
+                break;
         }
-        else if(a > 3){
-            System.out.println();
-        }
-        else {
-            System.out.println("here");
-        }
+
+//        for(Object aa : n){
+//            System.out.println(aa);
+//        }
     }
 
 }
+

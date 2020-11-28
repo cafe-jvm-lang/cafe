@@ -400,7 +400,16 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitForStmt(Node.ForStmtNode n) {
+        Context context = Context.context;
 
+        List<AssignmentStatement> initStatement=null;
+        if(n.init != null){
+            initStatement = new LinkedList<>();
+            for(Node.StmtNode stmt: n.init){
+                stmt.accept(this);
+                initStatement.add( (AssignmentStatement) context.pop());
+            }
+        }
     }
 
     @Override
