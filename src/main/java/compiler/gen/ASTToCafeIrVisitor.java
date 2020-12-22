@@ -402,14 +402,31 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitForStmt(Node.ForStmtNode n) {
         Context context = Context.context;
 
-        List<AssignmentStatement> initStatement=null;
+        List<DeclarativeAssignmentStatement> initStatements=null;
         if(n.init != null){
-            initStatement = new LinkedList<>();
+            initStatements = new LinkedList<>();
             for(Node.StmtNode stmt: n.init){
                 stmt.accept(this);
-                initStatement.add( (AssignmentStatement) context.pop());
+                initStatements.add( (DeclarativeAssignmentStatement) context.pop());
             }
         }
+
+        n.cond.accept(this);
+        ExpressionStatement<?> condition = (ExpressionStatement) context.pop();
+
+        LinkedList<CafeStatement<?>> postStatements = null;
+        if(n.counters != null){
+            postStatements = new LinkedList<>();
+            for(Node.StmtNode stmt : n.counters){
+                stmt.accept(this);
+                postStatements.add((CafeStatement<?>) context.pop());
+            }
+        }
+
+        ForLoopStatement forLoop = ForLoopStatement.loop()
+                                                   .condition(condition)
+                                                   .init(initStatements).postStatement(postStatements);
+        context.push(forLoop);
     }
 
     @Override

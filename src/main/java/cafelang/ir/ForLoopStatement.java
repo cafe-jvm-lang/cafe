@@ -3,7 +3,7 @@ package cafelang.ir;
 import java.util.List;
 
 public class ForLoopStatement extends CafeStatement<ForLoopStatement>{
-    private List<AssignmentStatement> initStatement=null;
+    private List<DeclarativeAssignmentStatement> initStatement=null;
     private ExpressionStatement<?> condition;
     private List<CafeStatement<?>> postStatement = null;
 
@@ -13,7 +13,7 @@ public class ForLoopStatement extends CafeStatement<ForLoopStatement>{
         return new ForLoopStatement();
     }
 
-    public ForLoopStatement init(List<AssignmentStatement> list){
+    public ForLoopStatement init(List<DeclarativeAssignmentStatement> list){
         initStatement = list;
         return this;
     }
