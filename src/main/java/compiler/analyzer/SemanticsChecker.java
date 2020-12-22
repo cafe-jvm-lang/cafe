@@ -337,11 +337,14 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitForStmt(ForStmtNode n) {
+		CST = new SymbolTable(CST).notDeclarable();
 		for (StmtNode stmt : n.init)
 			stmt.accept(this);
 		n.cond.accept(this);
 		for (AsgnStmtNode stmt : n.counters)
 			stmt.accept(this);
+		n.block.accept(this);
+		CST = CST.parent;
 	}
 
 	@Override

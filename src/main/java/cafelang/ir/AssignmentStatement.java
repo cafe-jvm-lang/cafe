@@ -3,7 +3,7 @@ package cafelang.ir;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AssignmentStatement extends CafeStatement<AssignmentStatement> {
+public class AssignmentStatement extends AssignedStatement {
 
     private ExpressionStatement<?> lhsExpression;
     private ExpressionStatement<?> rhsExpression;

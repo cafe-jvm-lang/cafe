@@ -1,7 +1,6 @@
 package compiler.gen;
 
 import cafe.BasePrototype;
-import cafe.DynamicObject;
 import cafe.Function;
 import cafelang.ir.*;
 
@@ -11,10 +10,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import java.lang.invoke.MethodType;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static compiler.gen.JVMBytecodeUtils.loadInteger;
 import static compiler.gen.JVMBytecodeUtils.loadLong;
@@ -96,8 +92,8 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     private static final class Context {
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
-        private final Deque<Object> objectStack = new LinkedList<>();
-        private final Deque<SymbolReference> thisStack = new LinkedList<>();
+        private final Map<ForLoopStatement, Label> loopStartMap = new HashMap<>();
+        private final Map<ForLoopStatement, Label> loopEndMap = new HashMap<>();
     }
 
     private static class GlobalThis {
@@ -608,7 +604,27 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitForLoop(ForLoopStatement forLoopStatement) {
+        Label loopStart = new Label();
+        Label loopEnd = new Label();
+        context.loopStartMap.put(forLoopStatement, loopStart);
+        context.loopEndMap.put(forLoopStatement, loopEnd);
 
+        if(forLoopStatement.hasInitStatement())
+            for(AssignedStatement init: forLoopStatement.getInitStatements())
+                init.accept(this);
+
+        mv.visitLabel(loopStart);
+        forLoopStatement.getCondition().accept(this);
+        asmBooleanValue();
+        mv.visitJumpInsn(IFEQ, loopEnd);
+        forLoopStatement.getBlock().accept(this);
+
+        if(forLoopStatement.hasPostStatement())
+            for(CafeStatement<?> post: forLoopStatement.getPostStatements())
+                post.accept(this);
+
+        mv.visitJumpInsn(GOTO, loopStart);
+        mv.visitLabel(loopEnd);
     }
 
     @Override

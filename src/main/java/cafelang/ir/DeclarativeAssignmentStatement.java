@@ -3,7 +3,7 @@ package cafelang.ir;
 import java.util.Collections;
 import java.util.List;
 
-public class DeclarativeAssignmentStatement extends ExpressionStatement<DeclarativeAssignmentStatement>{
+public class DeclarativeAssignmentStatement extends AssignedStatement{
 
     private SymbolReference symbolReference;
     private ExpressionStatement<?> expressionStatement;

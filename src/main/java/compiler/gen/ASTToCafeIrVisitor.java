@@ -402,12 +402,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitForStmt(Node.ForStmtNode n) {
         Context context = Context.context;
 
-        List<DeclarativeAssignmentStatement> initStatements=null;
+        List<AssignedStatement> initStatements=null;
         if(n.init != null){
             initStatements = new LinkedList<>();
             for(Node.StmtNode stmt: n.init){
                 stmt.accept(this);
-                initStatements.add( (DeclarativeAssignmentStatement) context.pop());
+                initStatements.add( (AssignedStatement) context.pop());
             }
         }
 
@@ -423,9 +423,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             }
         }
 
+        n.block.accept(this);
+        Block block = (Block)context.pop();
         ForLoopStatement forLoop = ForLoopStatement.loop()
                                                    .condition(condition)
-                                                   .init(initStatements).postStatement(postStatements);
+                                                   .init(initStatements).postStatement(postStatements)
+                                                   .block(block);
         context.push(forLoop);
     }
 

@@ -352,7 +352,7 @@ public class PrettyPrinter implements Node.Visitor{
 
 		if(n.counters != null)
 			for(StmtNode node: n.counters)
-				addBeautify("#init", node);
+				addBeautify("#post", node);
 		addBeautify("for-block", n.block);
 		
 		tabs--;

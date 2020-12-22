@@ -84,4 +84,11 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
             statement.accept(this);
         tableStack.pop();
     }
+
+    @Override
+    public void visitForLoop(ForLoopStatement forLoopStatement) {
+        for(AssignedStatement init: forLoopStatement.getInitStatements())
+            init.accept(this);
+        forLoopStatement.getBlock().accept(this);
+    }
 }
