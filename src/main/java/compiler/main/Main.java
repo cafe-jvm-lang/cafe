@@ -33,6 +33,7 @@ public class Main {
 	}
 
 	public Result compile(String[] args) {
+		long startTime = System.nanoTime();
 		Context context = new Context();
 		log = Log.instance(context);
 
@@ -52,6 +53,10 @@ public class Main {
 			log.printWarningLog();
 			return Result.ERROR;
 		}
+
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		System.out.println("Time elapsed: "+duration/1000000 +"ms");
 
 		return Result.OK;
 	}
