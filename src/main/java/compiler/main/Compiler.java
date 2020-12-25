@@ -59,7 +59,7 @@ public class Compiler {
 	}
 	
 	boolean checkErrors() {
-		if(log.nerrors > 0) {
+		if(log.entries() > 0) {
 			return true;
 		}
 		return false;

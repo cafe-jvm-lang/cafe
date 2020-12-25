@@ -3,7 +3,6 @@ package compiler.parser;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +57,6 @@ import compiler.ast.Node.VarDeclNode;
 import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
-import compiler.util.LogType.Errors;
-// import jdk.nashorn.internal.ir.Assignment;
 
 public class MainParser extends Parser {
 	static {
@@ -112,15 +109,15 @@ public class MainParser extends Parser {
 			// return true;
 		} else if (token.kind == TokenKind.ERROR) {
 			error = true;
-			System.out.println("Expected "+ kind+ " Found "+token.kind+" "+ token.pos.line);
-			log.error(token.pos, Errors.INVALID_IDENTIFIER);
+			//System.out.println("Expected "+ kind+ " Found "+token.kind+" "+ token.pos.line);
+			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
 			// System.exit(0);
 			// return false;
 		} else {
 			// TODO: throw Error
 			error = true;
 			System.out.println("Expected "+ kind+ " Found "+token.kind);
-			log.error(token.pos, Errors.INVALID_IDENTIFIER);
+			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
 			// System.exit(0);
 			// return false;
 		}

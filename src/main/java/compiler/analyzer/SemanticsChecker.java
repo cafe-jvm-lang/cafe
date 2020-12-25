@@ -49,7 +49,10 @@ import compiler.ast.Node.UnaryExprNode;
 import compiler.ast.Node.VarDeclNode;
 import compiler.util.Context;
 import compiler.util.Log;
-import compiler.util.LogType.Errors;
+import compiler.util.Position;
+
+import static compiler.util.Log.Type.*;
+import static compiler.util.Messages.message;
 
 public class SemanticsChecker implements Node.Visitor {
 	protected static final Context.Key<SemanticsChecker> semanticsKey = new Context.Key<>();
@@ -108,7 +111,8 @@ public class SemanticsChecker implements Node.Visitor {
 	public void visitVarDecl(VarDeclNode n) {
 		Symbol sym = symbol(n.var.name);
 		if(!CST.insert(sym))
-			logErrors(Errors.DUPLICATE_SYMBOL,n.var.name);
+			logError(DUPLICATE_SYMBOL, n,
+					message(DUPLICATE_SYMBOL, n.var.name));
 		if(n.value != null)
 			n.value.accept(this);
 	}
@@ -116,40 +120,46 @@ public class SemanticsChecker implements Node.Visitor {
 	@Override
 	public void visitIden(IdenNode n) {
 		if (!CST.isPresent(n.name))
-			logErrors(Errors.SYMBOL_NOT_DECLARED,n.name);
+			logError(SYMBOL_NOT_DECLARED, n,
+					message(SYMBOL_NOT_DECLARED, n.name));
 	}
 
 	@Override
 	public void visitConstDecl(ConstDeclNode n) {
 		Symbol sym = symbol(n.var.name);
 		if(!CST.insert(sym))
-			logErrors(Errors.DUPLICATE_SYMBOL,n.var.name);
+			logError(DUPLICATE_SYMBOL, n,
+					message(DUPLICATE_SYMBOL, n.var.name));
 		n.val.accept(this);
 	}
 
 	@Override
 	public void visitNumLit(NumLitNode n) {
 		if (exprType == Expr.LHS )
-			logErrors(Errors.LHS_EXPR_ERROR,n.lit.toString());
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR, n.lit.toString()));
 	}
 
 	@Override
 	public void visitStrLit(StrLitNode n) {
 		if (exprType == Expr.LHS)
-			logErrors(Errors.LHS_EXPR_ERROR,n.lit);
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR,n.lit));
 	}
 
 	@Override
 	public void visitBoolLit(BoolLitNode n) {
 		if (exprType == Expr.LHS)
-			logErrors(Errors.LHS_EXPR_ERROR,String.valueOf(n.lit));
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR,String.valueOf(n.lit)));
 	}
 
 	@Override
 	public void visitFuncDecl(FuncDeclNode n) {
 		Symbol sym = symbol(n.name.name);
 		if(!CST.insert(sym))
-			logErrors(Errors.DUPLICATE_SYMBOL,n.name.name);
+			logError(DUPLICATE_SYMBOL, n,
+					message(DUPLICATE_SYMBOL,n.name.name));
 		CST = new SymbolTable(CST);
 		isGlobal = false;
 		n.params.accept(this);
@@ -212,7 +222,8 @@ public class SemanticsChecker implements Node.Visitor {
 			n.e1.accept(this);
 			n.e2.accept(this);
 		} else {
-			logErrors(Errors.LHS_EXPR_ERROR,"");
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR,""));
 		}
 	}
 
@@ -221,20 +232,23 @@ public class SemanticsChecker implements Node.Visitor {
 		if (exprType != Expr.LHS) {
 			n.e.accept(this);
 		} else {
-			logErrors(Errors.LHS_EXPR_ERROR,"");
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR,""));
 		}
 	}
 
 	@Override
 	public void visitThis(ThisNode n) {
 		if (exprType == Expr.LHS)
-			logErrors(Errors.LHS_EXPR_ERROR,"this");
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR,""));
 	}
 
 	@Override
 	public void visitNull(NullNode n) {
 		if (exprType == Expr.LHS )
-			logErrors(Errors.LHS_EXPR_ERROR,"null");
+			logError(LHS_EXPR_ERROR, n,
+					message(LHS_EXPR_ERROR,"null"));
 	}
 
 	@Override
@@ -264,7 +278,8 @@ public class SemanticsChecker implements Node.Visitor {
 		if(exprType == Expr.LHS){
 			tag = node.prop.getTag();
 			if(tag != Node.Tag.IDEN && tag != Node.Tag.SUBSCRIPT){
-				logErrors(Errors.LHS_EXPR_ERROR,"");
+				logError(LHS_EXPR_ERROR, n,
+						message(LHS_EXPR_ERROR,""));
 				return;
 			}
 			exprType = null;
@@ -299,7 +314,8 @@ public class SemanticsChecker implements Node.Visitor {
 		for(IdenNode iden : n.params) {
 			Symbol sym = symbol(iden.name);
 			if (!CST.insert(sym))
-				logErrors(Errors.DUPLICATE_SYMBOL, iden.name);
+				logError(DUPLICATE_SYMBOL,n,
+						message(DUPLICATE_SYMBOL, iden.name));
 		}
 	}
 
@@ -358,7 +374,8 @@ public class SemanticsChecker implements Node.Visitor {
 	@Override
 	public void visitReturnStmt(ReturnStmtNode n) {
 		if(isGlobal) {
-			logErrors(Errors.RETURN_OUTSIDE_BLOCK, "");
+			logError(RETURN_OUTSIDE_BLOCK,n,
+					message(RETURN_OUTSIDE_BLOCK));
 			return;
 		}
 		n.expr.accept(this);
@@ -414,8 +431,12 @@ public class SemanticsChecker implements Node.Visitor {
 
 	}
 
-	private void logErrors(Errors err,String val){
-		log.error(err,val);
+	private String errorDescription(Position position, String message) {
+		return message + ' ' + message(SOURCE_POSITION, position.getStartLine(), position.getStartColumn());
+	}
+
+	private void logError(Log.Type issue, Node n, String message){
+		//log.report(err,val);
 	}
 
 }

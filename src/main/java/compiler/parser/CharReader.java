@@ -11,6 +11,9 @@ public class CharReader {
 	 */
 	protected List<Character> buff;
 
+	protected int lineNumber = 1;
+	protected int column = 0;
+
 	/**
 	 * Input Buffer pointer
 	 */
@@ -54,8 +57,18 @@ public class CharReader {
 	}
 
 	protected void scanChar() {
-		if (bp < buffLen-1)
+		if (bp < buffLen-1) {
 			ch = buff.get(++bp);
+			if(ch == '\n') {
+				lineNumber++;
+				column = 0;
+			}
+			else
+				if(ch == '\t')
+					column+=4;
+				else
+					column++;
+		}
 		else
 			ch = Character.MIN_VALUE;
 	}

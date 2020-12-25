@@ -1,12 +1,46 @@
 package compiler.ast;
 
+import static compiler.parser.Tokens.Token;
+import compiler.util.Position;
+
 import static compiler.ast.Node.Tag.*;
 
 import java.util.*;
 
-// import org.graalvm.compiler.word.ObjectAccess;
-
 public abstract class Node {
+
+	private Token firstToken;
+	private Token lastToken;
+	private Position position=null;
+
+	public void setFirstToken(Token firstToken){
+		this.firstToken = firstToken;
+	}
+
+	public void setLastToken(Token lastToken){
+		this.lastToken = lastToken;
+	}
+
+	public Position getPosition() {
+		return position;
+	}
+
+	public Position getSourcePosition(){
+		if(position == null) {
+			int startLine = firstToken.pos.getStartLine();
+			int startColumn = firstToken.pos.getStartColumn();
+			int endLine = firstToken.pos.getEndLine();
+			int endColumn = firstToken.pos.getEndColumn();
+
+			if (lastToken != null) {
+				endLine = lastToken.pos.getEndLine();
+				endColumn = lastToken.pos.getEndColumn();
+			}
+			position = Position.of(startColumn, startLine, endColumn, endLine);
+		}
+
+		return position;
+	}
 
 	public abstract Tag getTag();
 

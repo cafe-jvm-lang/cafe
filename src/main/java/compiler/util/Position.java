@@ -1,34 +1,39 @@
 package compiler.util;
 
 public class Position {
-	public final int line;
-	public final int start;
-	public final int end;
+	private final int startLine;
+	private final int startColumn;
+	private final int endLine;
+	private final int endColumn;
 
-	public Position(int line, int start, int end) {
-		this.line = line;
-		this.start = start;
-		this.end = end;
+	private Position(int startColumn, int startLine, int endColumn, int endLine) {
+		this.startColumn = startColumn;
+		this.startLine = startLine;
+		this.endColumn = endColumn;
+		this.endLine = endLine;
 	}
 
-	public Position(int line, int start) {
-		this.start = start;
-		this.line = line;
-		this.end = -1;
+	public static Position of(int column, int line){
+		return new Position(column, line, column, line);
 	}
 
-	public Position(int start) {
-		this.start = start;
-		this.line = -1;
-		this.end = -1;
+	public static Position of(int startColumn, int startLine, int endColumn, int endLine){
+		return new Position(startColumn, startLine, endColumn, endLine);
 	}
 
-	@Override
-	public String toString() {
-		String pos = "line #" + line + " <col:" + start + ">";
-		if (line == -1 && end == -1) {
-			pos = "Position: " + start + " ";
-		}
-		return pos;
+	public int getStartColumn() {
+		return startColumn;
+	}
+
+	public int getStartLine() {
+		return startLine;
+	}
+
+	public int getEndColumn() {
+		return endColumn;
+	}
+
+	public int getEndLine() {
+		return endLine;
 	}
 }

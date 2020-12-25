@@ -42,15 +42,14 @@ public class Main {
 		arguments = CLIArguments.instance(context);
 		arguments.checkArgs(args);
 		
-		if(log.nerrors > 0)
+		if(log.entries() > 0)
 			return Result.CMDERR;
 		
 		Compiler c = Compiler.instance(context);
 		c.compile();
 
-		if (log.nerrors > 0 || log.nwarnings > 0) {
-			log.printErrorLog();
-			log.printWarningLog();
+		if (log.entries() > 0 ) {
+			log.printIssues();
 			return Result.ERROR;
 		}
 

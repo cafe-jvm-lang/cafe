@@ -10,8 +10,9 @@ import java.util.List;
 
 import compiler.util.Context;
 import compiler.util.Log;
-import compiler.util.LogType.Errors;
-import compiler.util.Position;
+
+import static compiler.util.Log.Type.INVALID_CLI_FILE_PATH;
+import static compiler.util.Messages.message;
 
 /**
  * A temporary class to register source file
@@ -45,7 +46,8 @@ public class SourceFileManager {
 			this.file = f;
 			this.fileName = f.getName();
 		} else {
-			log.error(Errors.INVALID_CLI_FILE_PATH);
+			log.report(INVALID_CLI_FILE_PATH, null,
+					message(INVALID_CLI_FILE_PATH, path));
 		}
 	}
 

@@ -4,8 +4,9 @@ import java.io.File;
 
 import compiler.util.Context;
 import compiler.util.Log;
-import compiler.util.LogType.Errors;
-import compiler.util.Position;
+
+import static compiler.util.Log.Type.NO_FILE_PATH_GIVEN_IN_CLI;
+import static compiler.util.Messages.message;
 
 /**
  * 
@@ -38,16 +39,15 @@ public class CLIArguments {
 	public void checkArgs(String... args) {
 
 		if(args.length <1) {
-			log.error(Errors.NO_FILE_PATH_GIVEN_IN_CLI);
-			log.printErrorLog();
+			log.report(NO_FILE_PATH_GIVEN_IN_CLI, null,
+					message(NO_FILE_PATH_GIVEN_IN_CLI));
+			log.printIssues();
 			return;
 		}
 
 		fileManager.addSourceFile(args[0]);
 
-
-
-		if(log.nerrors > 0)
-			log.printErrorLog();
+		if(log.entries() > 0)
+			log.printIssues();
 	}
 }

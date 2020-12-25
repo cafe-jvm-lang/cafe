@@ -1,27 +1,17 @@
 package compiler.util;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
-import compiler.util.LogType.Error;
-import compiler.util.LogType.Errors;
-import compiler.util.LogType.Warning;
-import compiler.util.LogType.Warnings;
 
 public class Log {
 	public static final Context.Key<Log> logKey = new Context.Key<>();
 
-	private final List<Error> errorList;
-	private final List<Warning> warningList;
-
-	public int nerrors = 0;
-	public int nwarnings = 0;
+	private final List<Issue> issues;
 
 	protected Log(Context context) {
 		context.put(logKey, this);
 
-		errorList = new ArrayList<>();
-		warningList = new ArrayList<>();
+		issues = new LinkedList<>();
 	}
 
 	public static Log instance(Context context) {
@@ -31,47 +21,67 @@ public class Log {
 		return instance;
 	}
 
-	public void error(Errors err) {
-		nerrors++;
-		errorList.add(new Error(null, err,""));
-	}
-	
-	public void error(int strtPos, Errors err) {
-		nerrors++;
-		errorList.add(new Error(new Position(strtPos), err,""));
-	}
-	
-	public void error(int strtPos,int lineNum, Errors err) {
-		nerrors++;
-		errorList.add(new Error(new Position(lineNum, strtPos), err,""));
-	}
-	
-	public void error(Position pos, Errors err) {
-		nerrors++;
-		errorList.add(new Error(pos, err,""));
+	public int entries(){
+		return issues.size();
 	}
 
-	public void error(Errors err, String val){
-		nerrors++;
-		errorList.add(new Error( null,err,val));
-	}
+	public static final class Issue{
+		private final Position position;
+		private final Type type;
+		private final String description;
 
-	public void warning(Position pos, Warnings warn) {
-		nwarnings++;
-		warningList.add(new Warning(pos, warn,""));
-	}
-	
-	public void printErrorLog() {
-		if (nerrors > 0) {
-			System.out.println("Total Errors: " + nerrors);
-			errorList.stream().forEach(e -> System.err.println(e.toString()));
+		private Issue(Type type, Position position, String description){
+			this.type = type;
+			this.description = description;
+			this.position = position;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public Position getPosition() {
+			return position;
+		}
+
+		public Type getType() {
+			return type;
 		}
 	}
 
-	public void printWarningLog() {
-		if (nwarnings > 0) {
-			System.err.println("Total Errors: " + nwarnings);
-			warningList.stream().forEach(e -> System.err.println(e.toString()));
+	public enum Type {
+		ERROR,
+		SOURCE_POSITION,
+
+		// CLI errors
+		NO_FILE_PATH_GIVEN_IN_CLI,
+		INVALID_CLI_FILE_PATH,
+
+		SEMICOLON_MISSING,
+
+		// Lex error
+		ILLEGAL_CHARACTER,
+		INVALID_IDENTIFIER,
+		INVALID_FRACTIONAL_VAL,
+		EOF,
+		EOF_PARSING_COMMENT,
+
+		// Semantic errors
+		SYMBOL_NOT_DECLARED,
+		LHS_EXPR_ERROR,
+		DUPLICATE_SYMBOL,
+		RETURN_OUTSIDE_BLOCK;
+	}
+
+	public void report(Type err, Position pos, String description) {
+		issues.add(
+				new Issue(err, pos, description)
+		);
+	}
+
+	public void printIssues() {
+		for(Issue issue: issues){
+			Messages.error(issue.getDescription());
 		}
 	}
 }

@@ -9,8 +9,10 @@ import compiler.parser.Tokens.StringToken;
 import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
-import compiler.util.LogType.Errors;
 import compiler.util.Position;
+
+import static compiler.util.Log.Type.*;
+import static compiler.util.Messages.message;
 
 public class Tokenizer {
 
@@ -22,9 +24,6 @@ public class Tokenizer {
 	
 	// Temporary variable to hold value for literals and identifiers. To be changed.
 	private String litValue;
-	
-	private int lineNum = 1;
-	private int linePos = 1;
 	
 	private List<String> comment=null;
 	
@@ -90,12 +89,14 @@ public class Tokenizer {
 			}
 			
 			if(!isNum) {
+				litValue = reader.getSavedBufferAsString(true);
+
 				// eg: 5a , 555abcd
 				if(Character.isLetter(reader.ch)) {
-					lexicalError(linePos,lineNum, Errors.INVALID_IDENTIFIER);
+					logError(INVALID_IDENTIFIER,
+							message(INVALID_IDENTIFIER, litValue+reader.ch));
 					return;
 				}
-				litValue = reader.getSavedBufferAsString(true);
 				tokenKind = TokenKind.NUMLIT;
 				return;
 			}
@@ -120,7 +121,8 @@ public class Tokenizer {
 				comment.add(word);
 			}
 			else if(reader.ch == '\0') {
-				lexicalError(linePos, lineNum, Errors.EOF_PARSING_COMMENT);
+				logError(EOF_PARSING_COMMENT,
+						message(EOF_PARSING_COMMENT));
 				return;
 			}
 			reader.scanChar();
@@ -140,7 +142,8 @@ public class Tokenizer {
 				reader.scanChar();
 			}
 			if(reader.ch == Character.MIN_VALUE){
-				lexicalError(linePos, lineNum, Errors.EOF);
+				logError(EOF,
+						message(EOF));
 				return;
 			}
 			// scan ending DQUOTE ('"')
@@ -152,24 +155,20 @@ public class Tokenizer {
 	}
 
 	Token readToken() {
-		int posBp = reader.bp;
-		int pos=linePos;
+		int startPos = reader.column;
+		int lineNumber = reader.lineNumber;
 	LOOP: while(true) {	
 			switch(reader.ch) {
 			// Ignore white spaces
 			case ' ':
 			case '\t':
 				do {
-					pos++;
-					linePos++;
 					reader.scanChar();
 				}while(reader.ch == ' ' || reader.ch == '\t');
 				break;
 			case '\r':
 			case '\n':
 				do {
-					lineNum++;
-					linePos = 1;
 					reader.scanChar();
 				}while(reader.ch == '\r' || reader.ch == '\n');
 				break;
@@ -186,12 +185,10 @@ public class Tokenizer {
 	        case 'u': case 'v': case 'w': case 'x': case 'y':
 	        case 'z':
 	        case '$': case '_':
-	        	pos = linePos;
 	        	scanIden();
 				break LOOP;
 	        case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
-            	pos = linePos;
             	scanNum();
             	break LOOP;
             case '.':
@@ -350,13 +347,14 @@ public class Tokenizer {
             	tokenKind = TokenKind.END;break LOOP;
 			default:
 				// TODO: pos calculation is wrong
-				lexicalError(pos, pos, Errors.ILLEGAL_CHARACTER);
+				logError(ILLEGAL_CHARACTER,
+						message(ILLEGAL_CHARACTER, reader.ch));
 				break LOOP;
 			}	
 		}
-		int endPosBp = reader.bp+1;
-		linePos = pos + (endPosBp - posBp);
-		Position p = new Position(lineNum, pos, linePos);
+		int endPos = reader.column;
+		int endLine = reader.lineNumber;
+		Position p = Position.of(startPos, lineNumber, endPos, endLine);
 		
 		switch(tokenKind.tag) {
 			case DEFAULT:
@@ -373,9 +371,15 @@ public class Tokenizer {
 				throw new AssertionError();
 		}
 	}
-	
-	private void lexicalError(int strtPos,int lineNum,Errors error) {
-		log.error(strtPos,lineNum,error);
+
+	private String errorDescription(Position position, String message) {
+		return message + ' ' + message(SOURCE_POSITION, position.getStartLine(), position.getStartColumn());
+	}
+
+	private void logError(Log.Type issue, String message) {
+		Position pos = Position.of(reader.column, reader.lineNumber);
+		log.report(issue, pos,
+				errorDescription(pos,message));
 		tokenKind = TokenKind.ERROR;
 	}
 }
