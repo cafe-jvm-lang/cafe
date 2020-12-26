@@ -46,18 +46,18 @@ public final class ObjectAccessID {
     }
 
     public static Object fallback(MethodCallSite callSite, Object[] args) throws Throwable {
-        System.out.println("OBJECT ACCESS ID");
-        System.out.println(callSite.name);
-        for (int i = 0; i < args.length; i++) {
-            System.out.println("Argument "+i+"==>"+args[i]);
-        }
+//        System.out.println("OBJECT ACCESS ID");
+//        System.out.println(callSite.name);
+//        for (int i = 0; i < args.length; i++) {
+//            System.out.println("Argument "+i+"==>"+args[i]);
+//        }
         Class<?> clazz = args[0].getClass();
         MethodHandle target = lookupTarget(clazz,callSite,args);
 
         if(target == null)
             throw new NoSuchMethodError(clazz + "::" + callSite.name);
 
-        System.out.println("====================================");
+       // System.out.println("====================================");
         return target.invokeWithArguments(args);
     }
 

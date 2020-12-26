@@ -253,13 +253,10 @@ public class SemanticsChecker implements Node.Visitor {
 
 	@Override
 	public void visitFuncCall(FuncCallNode n) {
-//		if (exprType == Expr.LHS && objType == ObjAcc.accesedOn){
-//			logErrors(Errors.LHS_EXPR_ERROR,"");
-//			return;
+		// method call name resolution will be done at runtime.
+//		if(objType != ObjAcc.prop) {
+//			n.invokedOn.accept(this);
 //		}
-		if(objType != ObjAcc.prop) {
-			n.invokedOn.accept(this);
-		}
 		n.args.accept(this);
 
 	}
@@ -436,7 +433,8 @@ public class SemanticsChecker implements Node.Visitor {
 	}
 
 	private void logError(Log.Type issue, Node n, String message){
-		//log.report(err,val);
+	//	log.report(issue, n.getSourcePosition(),
+	//			errorDescription(n.getSourcePosition(), message));
 	}
 
 }

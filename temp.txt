@@ -65,6 +65,15 @@ a.b.c()[d] = 100;
 
 a.b.c()	()
 
+println.a = 5;
+
+algo: if var isnt resolved
+		1. search import
+			1. Var found
+				1. return var
+				2. add var to GlobalThis
+				
+
 someFunc({1:2, 2:3});
 
 

@@ -9,6 +9,11 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitCafeImport(CafeImport cafeImport) {
+
+    }
+
+    @Override
     public void visitPropertyAccess(PropertyAccess propertyAccess) {
 
     }

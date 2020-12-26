@@ -31,10 +31,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         private Context(){}
 
-        public CafeModule createModule(String name){
+        public CafeModule createModule(String moduleName){
             ReferenceTable global = new ReferenceTable();
             referenceTableStack.push(global);
-            module = CafeModule.create(name,global);
+            module = CafeModule.create(moduleName,global);
             return module;
         }
 
@@ -113,8 +113,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             child.accept(this);
     }
 
-    public CafeModule transform(Node.ProgramNode n,String name){
-        Context.context.createModule(name);
+    public CafeModule transform(Node.ProgramNode n,String moduleName){
+        Context.context.createModule(moduleName);
         Context.context.newObjectStack();
         visitProgram(n);
         return Context.context.module;

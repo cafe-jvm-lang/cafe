@@ -24,7 +24,7 @@ public class Compiler {
 	private ParserFactory parserFactory;
 	private Log log;
 	private SourceFileManager fileManager;
-	private final String classFileName;
+	private final String moduleName;
 
 	private Parser parser;
 	private SemanticsChecker analyzer;
@@ -43,7 +43,7 @@ public class Compiler {
 		fileManager = SourceFileManager.instance(context);
 
 		String fileName = fileManager.getSourceFileName();
-		classFileName = fileName.substring(0,fileName.lastIndexOf('.'));
+		moduleName = fileName.substring(0,fileName.lastIndexOf('.'));
 
 		parserFactory = ParserFactory.instance(context);
 		parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.getSourceFileCharList());
@@ -80,12 +80,12 @@ public class Compiler {
 					analyzer.visitProgram((ProgramNode)programNode);
 					break;
 				case IR:
-					module = new ASTToCafeIrVisitor().transform((ProgramNode)programNode,classFileName);
+					module = new ASTToCafeIrVisitor().transform((ProgramNode)programNode, moduleName);
 					module.accept(new SymbolReferenceAssignmentVisitor());
 					break;
 				case GEN:
-					byteCode = new JVMByteCodeGenVisitor().generateByteCode(module,classFileName);
-					File op = new File(classFileName+".class");
+					byteCode = new JVMByteCodeGenVisitor().generateByteCode(module, moduleName);
+					File op = new File(moduleName +".class");
 					try (FileOutputStream out = new FileOutputStream(op)) {
 						out.write(byteCode);
 					}

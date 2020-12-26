@@ -21,10 +21,6 @@ public abstract class Node {
 		this.lastToken = lastToken;
 	}
 
-	public Position getPosition() {
-		return position;
-	}
-
 	public Position getSourcePosition(){
 		if(position == null) {
 			int startLine = firstToken.pos.getStartLine();

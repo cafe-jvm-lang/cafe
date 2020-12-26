@@ -1,3 +1,14 @@
-func hello(){}
+# program to generate fibonacci series up to n terms
 
-hello(1);
+# take input from the user
+var number = input("Enter the number of terms: ");
+var n1 = 0, n2 = 1, nextTerm;
+
+println("Fibonacci Series:");
+
+for (var i = 1; i <= number; i=i+1) {
+    input("");
+    nextTerm = n1 + n2;
+    n1 = n2;
+    n2 = nextTerm;
+}

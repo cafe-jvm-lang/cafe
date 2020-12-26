@@ -57,6 +57,10 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
             "OperatorID", "I"
     );
 
+    private static final Handle IMPORT_HANDLE = makeHandle(
+            "ImportID", ""
+    );
+
     private static Handle makeHandle(String methodName, String description) {
         return new Handle(H_INVOKESTATIC,
                 "cafelang/runtime/" + methodName,
@@ -94,6 +98,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
         private final Map<ForLoopStatement, Label> loopStartMap = new HashMap<>();
         private final Map<ForLoopStatement, Label> loopEndMap = new HashMap<>();
+        private final Set<String> importedVariables = new HashSet<>();
     }
 
     private static class GlobalThis {
@@ -177,6 +182,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         cw = new ClassWriter(COMPUTE_FRAMES | COMPUTE_MAXS);
         this.context = new Context();
         this.className = className;
+        writeImportMetaData(module.getImports());
         module.accept(this);
         cw.visitEnd();
         return cw.toByteArray();
@@ -191,6 +197,33 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
             accessFlags |= ACC_VARARGS;
         }
         return accessFlags;
+    }
+
+    private void writeMetaData(String name, String[] data) {
+        MethodVisitor mv = cw.visitMethod(
+                ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC,
+                "$" + name,
+                "()[Ljava/lang/String;",
+                null, null);
+        mv.visitCode();
+        loadInteger(mv, data.length);
+        mv.visitTypeInsn(ANEWARRAY, "java/lang/String");
+        for (int i = 0; i < data.length; i++) {
+            mv.visitInsn(DUP);
+            loadInteger(mv, i);
+            mv.visitLdcInsn(data[i]);
+            mv.visitInsn(AASTORE);
+        }
+        mv.visitInsn(ARETURN);
+        mv.visitMaxs(0, 0);
+        mv.visitEnd();
+    }
+
+    private void writeImportMetaData(Set<CafeImport> imports){
+        writeMetaData("imports",
+                imports.stream()
+                       .map(CafeImport::getModuleName)
+                       .toArray(String[]::new));
     }
 
     @Override
@@ -243,20 +276,23 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
         ReferenceTable table = context.referenceTableStack.peek();
         SymbolReference reference = functionInvocation.getReference().resolveIn(table);
+        MethodType type;
 
-        if(reference.isGlobal()){
+        // Method from import
+        if(reference == null){
+            mv.visitInsn(ACONST_NULL);
+        }
+        else if(reference.isGlobal()){
             mv.visitLdcInsn(reference.getName());
             GlobalThis.retrieve(mv,className);
             mv.visitTypeInsn(CHECKCAST, "cafe/Function");
-            GlobalThis.loadThis(mv,className);
         }
-        else{
-            // TODO: error
-        }
+        // load global THIS pointer
+        GlobalThis.loadThis(mv,className);
 
-        MethodType type = genericMethodType(functionInvocation.getArity()+2).changeParameterType(0, Function.class)
+        type = genericMethodType(functionInvocation.getArity()+2).changeParameterType(0, Function.class)
                                                                             .changeParameterType(1, BasePrototype.class);
-        String name = reference.getName();
+        String name = functionInvocation.getReference().getName();
         String typedef = type.toMethodDescriptorString();
         Handle handle = FUNC_INVOCATION_HANDLE;
 
@@ -301,6 +337,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitSymbolReference(SymbolReference symbolReference) {
+
+    }
+
+    @Override
+    public void visitCafeImport(CafeImport cafeImport) {
 
     }
 
@@ -563,9 +604,31 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitReferenceLookup(ReferenceLookup referenceLookup) {
         SymbolReference reference = referenceLookup.resolveIn(context.referenceTableStack.peek());
-        //context.objectStack.push(reference);
+        String name = referenceLookup.getName();
+        // search in imports
+        if(reference == null){
+            // if variable was previously imported
+            if(context.importedVariables.contains(name)){
+                mv.visitLdcInsn(name);
+                GlobalThis.retrieve(mv,className);
+            }
+            else {
+                // create an entry for new imported variable
+                context.importedVariables.add(name);
+                mv.visitLdcInsn(name);
+                mv.visitInvokeDynamicInsn(
+                        name,
+                        genericMethodType(0).toMethodDescriptorString(),
+                        IMPORT_HANDLE
+                );
+                mv.visitInsn(DUP_X1);
+                GlobalThis.add(mv, className);
+            }
+            return;
+        }
+
         if(reference.isGlobal()){
-            mv.visitLdcInsn(reference.getName());
+            mv.visitLdcInsn(name);
             GlobalThis.retrieve(mv,className);
         }else{
             mv.visitVarInsn(ALOAD, reference.getIndex());

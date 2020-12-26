@@ -43,4 +43,6 @@ public interface CafeIrVisitor {
     void visitConditionalBranching(ConditionalBranching conditionalBranching);
 
     void visitForLoop(ForLoopStatement forLoopStatement);
+
+    void visitCafeImport(CafeImport cafeImport);
 }

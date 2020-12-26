@@ -1,23 +1,24 @@
 package cafelang.ir;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CafeModule extends CafeElement<CafeModule> {
 
-    private String sourceFile;
-    private final String clazz;
+    private final String moduleName;
     private final ReferenceTable globalReferenceTable;
     private CafeFunction initFunc;
 
     private Set<CafeFunction> functions = new LinkedHashSet<>();
+    private List<CafeImport> imports = new LinkedList<>();
 
     public static final String INIT_FUNCTION = "#init";
 
-    private CafeModule(String clazz, ReferenceTable referenceTable) {
-        this.clazz = clazz;
+    private static final CafeImport[] DEFAULT_IMPORTS = {
+        CafeImport.of("*","cafe.io.BasicIO")
+    };
+
+    private CafeModule(String moduleName, ReferenceTable referenceTable) {
+        this.moduleName = moduleName;
         this.globalReferenceTable = referenceTable;
 
         initFunc = CafeFunction.function(INIT_FUNCTION)
@@ -27,8 +28,8 @@ public class CafeModule extends CafeElement<CafeModule> {
         functions.add(initFunc);
     }
 
-    public static CafeModule create(String clazz, ReferenceTable referenceTable){
-        return new CafeModule(clazz,referenceTable);
+    public static CafeModule create(String moduleName, ReferenceTable referenceTable){
+        return new CafeModule(moduleName,referenceTable);
     }
 
     public CafeModule add(CafeStatement<?> statement){
@@ -40,9 +41,21 @@ public class CafeModule extends CafeElement<CafeModule> {
         this.functions.add(function);
     }
 
+    public void addImport(CafeImport cafeImport){
+        imports.add(cafeImport);
+    }
+
+    public Set<CafeImport> getImports() {
+        Set<CafeImport> imp = new LinkedHashSet<>();
+        imp.addAll(imports);
+        Collections.addAll(imp, DEFAULT_IMPORTS);
+        return imp;
+    }
+
     @Override
     public List<CafeElement<?>> children(){
         LinkedList<CafeElement<?>> children  = new LinkedList<>();
+        children.addAll(getImports());
         children.addAll(functions);
         return children;
     }
