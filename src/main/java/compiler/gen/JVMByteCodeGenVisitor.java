@@ -297,7 +297,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         Handle handle = FUNC_INVOCATION_HANDLE;
 
         visitInvocationArguments(functionInvocation.getArguments());
-        mv.visitInvokeDynamicInsn(name,typedef, handle,new Object[]{});
+        mv.visitInvokeDynamicInsn(name,typedef, handle);
     }
 
     private void visitInvocationArguments(List<CafeElement<?>> arguments){
@@ -351,8 +351,16 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         context.referenceTableStack.push(table);
         for(CafeStatement<?> statement : block.getStatements()){
             statement.accept(this);
+            insertMissingPop(statement);
         }
         context.referenceTableStack.pop();
+    }
+
+    private void insertMissingPop(CafeStatement<?> statement) {
+        Class<?> statementClass = statement.getClass();
+        if (statementClass == FunctionInvocation.class) {
+            mv.visitInsn(POP);
+        }
     }
 
     @Override

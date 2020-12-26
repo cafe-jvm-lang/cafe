@@ -14,7 +14,8 @@ public class CafeModule extends CafeElement<CafeModule> {
     public static final String INIT_FUNCTION = "#init";
 
     private static final CafeImport[] DEFAULT_IMPORTS = {
-        CafeImport.of("*","cafe.io.BasicIO")
+            CafeImport.of("*","cafe.io.BasicIO"),
+            CafeImport.of("*","cafe.util.Conversions"),
     };
 
     private CafeModule(String moduleName, ReferenceTable referenceTable) {
