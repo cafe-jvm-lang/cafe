@@ -1,12 +1,3 @@
-var i,x,y;
-if ( i =="Romil")
-{
-	x="dhyey";
-}
-else if(true){
+func hello(){}
 
-}
-else
-{
-	y="saurabh";
-}
+hello(1);

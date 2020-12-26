@@ -111,6 +111,7 @@ public class MainParser extends Parser {
 	}
 
 	boolean accept(TokenKind kind, Log.Type issue, String errorMessage){
+		if(error) return false;
 		if(token.kind == TokenKind.ERROR){
 			error = true;
 			return false;

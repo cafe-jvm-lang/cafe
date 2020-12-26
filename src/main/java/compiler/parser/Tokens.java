@@ -163,7 +163,7 @@ public class Tokens {
 		VAR("var",Tag.NAMED),
 		CONST("const", Tag.NAMED),
 		FUNC("func", Tag.NAMED),
-		IDENTIFIER(Tag.NAMED),
+		IDENTIFIER("identifier",Tag.NAMED),
 		IF("if",Tag.NAMED),
 		ELSE("else",Tag.NAMED),
 		LPAREN("("),
