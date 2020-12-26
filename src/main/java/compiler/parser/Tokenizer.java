@@ -346,7 +346,6 @@ public class Tokenizer {
             case '\0':
             	tokenKind = TokenKind.END;break LOOP;
 			default:
-				// TODO: pos calculation is wrong
 				logError(ILLEGAL_CHARACTER,
 						message(ILLEGAL_CHARACTER, reader.ch));
 				break LOOP;

@@ -2,14 +2,10 @@ package compiler.parser;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import compiler.ast.Node;
 
-// import com.google.errorprone.annotations.Var;
 import compiler.ast.Node.AnnFuncNode;
 import compiler.ast.Node.ArgsListNode;
 import compiler.ast.Node.AsgnStmtNode;
@@ -57,6 +53,11 @@ import compiler.ast.Node.VarDeclNode;
 import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
+import compiler.util.Position;
+
+import static compiler.util.Log.Type.SOURCE_POSITION;
+import static compiler.util.Log.Type.SYMBOL_EXPECTED;
+import static compiler.util.Messages.message;
 
 public class MainParser extends Parser {
 	static {
@@ -99,29 +100,55 @@ public class MainParser extends Parser {
 	}
 
 	void nextToken() {
-		lexer.nextToken();
-		token = lexer.token();
-	}
-
-	void accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
-		if (kind == token.kind) {
-			nextToken();
-			// return true;
-		} else if (token.kind == TokenKind.ERROR) {
-			error = true;
-			//System.out.println("Expected "+ kind+ " Found "+token.kind+" "+ token.pos.line);
-			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
-			// System.exit(0);
-			// return false;
-		} else {
-			// TODO: throw Error
-			error = true;
-			System.out.println("Expected "+ kind+ " Found "+token.kind);
-			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
-			// System.exit(0);
-			// return false;
+		if(!error) {
+			lexer.nextToken();
+			token = lexer.token();
 		}
 	}
+
+	private String errorDescription(Position position, String message) {
+		return message + ' ' + message(SOURCE_POSITION, position.getStartLine(), position.getStartColumn());
+	}
+
+	boolean accept(TokenKind kind, Log.Type issue, String errorMessage){
+		if(token.kind == TokenKind.ERROR){
+			error = true;
+			return false;
+		}
+		if(kind == token.kind){
+			nextToken();
+			return true;
+		}
+		else{
+			error = true;
+			log.report(issue, token.pos, errorDescription(token.pos,errorMessage));
+			return false;
+		}
+	}
+
+	boolean accept(TokenKind kind){
+		return accept(kind, SYMBOL_EXPECTED, message(SYMBOL_EXPECTED, kind, token.kind));
+	}
+
+//	void accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
+//		if (kind == token.kind) {
+//			nextToken();
+//			// return true;
+//		} else if (token.kind == TokenKind.ERROR) {
+//			error = true;
+//			//System.out.println("Expected "+ kind+ " Found "+token.kind+" "+ token.pos.line);
+//			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
+//			// System.exit(0);
+//			// return false;
+//		} else {
+//			// TODO: throw Error
+//			error = true;
+//			System.out.println("Expected "+ kind+ " Found "+token.kind);
+//			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
+//			// System.exit(0);
+//			// return false;
+//		}
+//	}
 
 	ExprNode parseLogicalOrExpression() {
 		/*
@@ -778,24 +805,26 @@ public class MainParser extends Parser {
 	/* parseStatements */
 	IfStmtNode parseIf() {
 		if (error)  return null;
-		ExprNode ifCond, elseBlock;
+		ExprNode ifCond;
 		BlockNode ifBlock = new BlockNode();
 
-		accept(TokenKind.IF);
+		Token firstToken = token;
+
+		nextToken();
 		accept(TokenKind.LPAREN);
-		System.out.println("If Node Token: "+token.kind);
 		ifCond = parseLogicalOrExpression();
-		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.RPAREN);
-		System.out.println("If Node Token: "+token.kind);
 		accept(TokenKind.LCURLY);
-		System.out.println("If Node Token: "+token.kind);
 		if (token.kind != TokenKind.RCURLY)
 			ifBlock = parseLoopBlock();
-		System.out.println("If Node Token: "+token.kind);
+
 		accept(TokenKind.RCURLY);
+
 		if (error)  return null;
-		return new IfStmtNode(ifCond, ifBlock);
+
+		IfStmtNode ifNode = new IfStmtNode(ifCond, ifBlock);
+		ifNode.setFirstToken(firstToken);
+		return ifNode;
 	}
 
 	StmtNode parseIfStatement() {
@@ -805,72 +834,31 @@ public class MainParser extends Parser {
 		 */
 
 		if (error)  return null;
-		System.out.println("If Stmt Node Token: "+token.kind);
-		IfStmtNode ifNode = parseIf();
-		List<StmtNode> elseIfList = new ArrayList<>();
-		StmtNode elseBlock = null;
-		System.out.println("Before If Stmt Node Token: "+token.kind);
-		while (token.kind == TokenKind.ELSE) {
-			if (error)
-				return null;
-			accept(TokenKind.ELSE);
-			if (token.kind == TokenKind.IF) {
-				elseIfList.add(parseIf());
-			} else if (token.kind == TokenKind.LCURLY) {
-				accept(TokenKind.LCURLY);
-				BlockNode blockNode = new BlockNode();
-				List<StmtNode> stmt = new ArrayList<>();
-				if (token.kind != TokenKind.RCURLY)
-					stmt = parseBlock();
-				if (stmt == null ) return null;
-				blockNode.setStmt(stmt);
-				elseBlock = new ElseStmtNode(ifNode, blockNode);
-				accept(TokenKind.RCURLY);
-				break;
-			}
-		}
-		if (elseBlock != null) 
-			elseIfList.add(elseBlock);
-		BlockNode blockNode = new BlockNode();
-		blockNode.setStmt(elseIfList);
-		//ifNode.setElsePart(blockNode);
-		if (error)  return null;
-		return ifNode;
-	}
 
-	StmtNode parseIfStatement1() {
-		/*
-		 * Parse If Statement and check if there any 'else' is there, if 'yes' then
-		 * parseIt and Break otherwise parse Else if statement and append to a list
-		 */
-
-		if (error)  return null;
-		System.out.println("If Stmt Node Token: "+token.kind);
-		IfStmtNode ifNode = parseIf();
-		List<StmtNode> elseIfList = new ArrayList<>();
-		StmtNode elseBlock = null;
-		System.out.println("Before If Stmt Node Token: "+token.kind);
-		if (token.kind == TokenKind.ELSE) {
-			if (error)
-				return null;
-			accept(TokenKind.ELSE);
-			if (token.kind == TokenKind.IF) {
-				elseBlock = parseIfStatement1();
-			} else if (token.kind == TokenKind.LCURLY) {
-				accept(TokenKind.LCURLY);
-				BlockNode blockNode = new BlockNode();
-				List<StmtNode> stmt = new ArrayList<>();
-				if (token.kind != TokenKind.RCURLY)
-					stmt = parseBlock();
-				if (stmt == null ) return null;
-				blockNode.setStmt(stmt);
-				elseBlock = new ElseStmtNode(ifNode, blockNode);
-				accept(TokenKind.RCURLY);
+		IfStmtNode ifNode;
+		if((ifNode = parseIf()) != null) {
+			StmtNode elseBlock = null;
+			if (token.kind == TokenKind.ELSE) {
+				Token elseFT = token;
+				nextToken();
+				if (token.kind == TokenKind.IF) {
+					elseBlock = parseIfStatement();
+				} else if (accept(TokenKind.LCURLY)) {
+					BlockNode blockNode = new BlockNode();
+					List<StmtNode> stmt = new LinkedList<>();
+					if (token.kind != TokenKind.RCURLY)
+						stmt = parseBlock();
+					blockNode.setStmt(stmt);
+					accept(TokenKind.RCURLY);
+					elseBlock = new ElseStmtNode(ifNode, blockNode);
+					elseBlock.setFirstToken(elseFT);
+				}
+				if(error) return null;
+				ifNode.setElsePart(elseBlock);
 			}
+			return ifNode;
 		}
-		ifNode.setElsePart(elseBlock);
-		if (error)  return null;
-		return ifNode;
+		return null;
 	}
 
 	void parseElseStatement() {
@@ -1766,7 +1754,7 @@ public class MainParser extends Parser {
 				blockStmt.add(decl);
 				break;
 			case IF:
-				StmtNode stm2 = parseIfStatement1();
+				StmtNode stm2 = parseIfStatement();
 				if (stm2 == null) return null;
 				blockStmt.add(stm2);
 				break;

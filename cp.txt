@@ -1,8 +1,12 @@
-var i=11;
+var i,x,y;
+if ( i =="Romil")
+{
+	x="dhyey";
+}
+else if(true){
 
-/*
-
-func
-
-
-
+}
+else
+{
+	y="saurabh";
+}

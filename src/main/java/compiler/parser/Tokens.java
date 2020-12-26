@@ -222,7 +222,7 @@ public class Tokens {
 		TRUE("true",Tag.NAMED),
 		FALSE("false", Tag.NAMED),
 		ERROR,
-		END;
+		END("EOF");
 		
 		
 		TokenKind(){
@@ -244,6 +244,11 @@ public class Tokens {
 		
 		final String val;
 		final Tag tag;
+
+		@Override
+		public String toString() {
+			return val;
+		}
 	}
 
 	public static class Token {

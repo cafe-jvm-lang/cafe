@@ -51,13 +51,12 @@ public class Log {
 
 	public enum Type {
 		ERROR,
+		WARNING,
 		SOURCE_POSITION,
 
 		// CLI errors
 		NO_FILE_PATH_GIVEN_IN_CLI,
 		INVALID_CLI_FILE_PATH,
-
-		SEMICOLON_MISSING,
 
 		// Lex error
 		ILLEGAL_CHARACTER,
@@ -65,6 +64,10 @@ public class Log {
 		INVALID_FRACTIONAL_VAL,
 		EOF,
 		EOF_PARSING_COMMENT,
+
+		// Parsing errors
+		SEMICOLON_MISSING,
+		SYMBOL_EXPECTED,
 
 		// Semantic errors
 		SYMBOL_NOT_DECLARED,
