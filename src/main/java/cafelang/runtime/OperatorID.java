@@ -17,18 +17,18 @@ public final class OperatorID {
             FALLBACK_1 = lookup.findStatic(
                     OperatorID.class,
                     "fallback_1",
-                    methodType(Object.class,OperatorCallSite.class, Object[].class));
+                    methodType(Object.class, OperatorCallSite.class, Object[].class));
 
             FALLBACK_2 = lookup.findStatic(
                     OperatorID.class,
                     "fallback_2",
-                    methodType(Object.class,OperatorCallSite.class, Object[].class));
+                    methodType(Object.class, OperatorCallSite.class, Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
     }
 
-    static class OperatorCallSite extends MutableCallSite{
+    static class OperatorCallSite extends MutableCallSite {
         final MethodHandles.Lookup callerLookup;
         final String name;
         MethodHandle fallback;
@@ -64,14 +64,13 @@ public final class OperatorID {
         try {
             target = callSite.callerLookup.findStatic(
                     OperatorID.class, callSite.name, methodType(Object.class, argClass));
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             return reject(args[0], callSite.name);
         }
         return target.invokeWithArguments(args);
     }
 
-    public static Object fallback_2(OperatorCallSite callSite,Object[] args) throws Throwable {
+    public static Object fallback_2(OperatorCallSite callSite, Object[] args) throws Throwable {
         Class<?> arg1Class = (args[0] == null) ? Object.class : args[0].getClass();
         Class<?> arg2Class = (args[1] == null) ? Object.class : args[1].getClass();
         MethodHandle target;
@@ -79,8 +78,7 @@ public final class OperatorID {
         try {
             target = callSite.callerLookup.findStatic(
                     OperatorID.class, callSite.name, methodType(Object.class, arg1Class, arg2Class));
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             return reject(args[0], args[1], callSite.name);
         }
         return target.invokeWithArguments(args);
@@ -175,7 +173,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Integer a, Integer b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Integer a, Integer b) {
@@ -228,7 +226,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Long a, Long b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Long a, Long b) {
@@ -281,7 +279,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Double a, Double b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Double a, Double b) {
@@ -334,7 +332,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Float a, Float b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Float a, Float b) {
@@ -563,7 +561,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Integer a, Long b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Integer a, Long b) {
@@ -616,7 +614,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Integer a, Double b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Integer a, Double b) {
@@ -669,7 +667,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Integer a, Float b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Integer a, Float b) {
@@ -722,7 +720,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Long a, Double b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Long a, Double b) {
@@ -775,7 +773,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Long a, Float b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Long a, Float b) {
@@ -828,7 +826,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Double a, Float b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Double a, Float b) {
@@ -1057,7 +1055,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Long a, Integer b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Long a, Integer b) {
@@ -1110,7 +1108,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Double a, Integer b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Double a, Integer b) {
@@ -1163,7 +1161,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Float a, Integer b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Float a, Integer b) {
@@ -1216,7 +1214,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Double a, Long b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Double a, Long b) {
@@ -1269,7 +1267,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Float a, Long b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Float a, Long b) {
@@ -1322,7 +1320,7 @@ public final class OperatorID {
     }
 
     public static Object pow(Float a, Double b) {
-        return Math.pow(((double) a) ,((double) b));
+        return Math.pow(((double) a), ((double) b));
     }
 
     public static Object floor(Float a, Double b) {
@@ -2212,29 +2210,30 @@ public final class OperatorID {
 
 // ==========================
 
-   public static Object minus(Integer a){
-        return -a;
-   }
-
-    public static Object minus(Float a){
+    public static Object minus(Integer a) {
         return -a;
     }
 
-    public static Object minus(Long a){
+    public static Object minus(Float a) {
         return -a;
     }
 
-    public static Object minus(Double a){
+    public static Object minus(Long a) {
         return -a;
     }
 
-    public static Object not(Boolean a){
+    public static Object minus(Double a) {
+        return -a;
+    }
+
+    public static Object not(Boolean a) {
         return !a;
     }
-// ==========================
-public static Object bitor(Integer a, Integer b) {
-    return ((int) a) | ((int) b);
-}
+
+    // ==========================
+    public static Object bitor(Integer a, Integer b) {
+        return ((int) a) | ((int) b);
+    }
 
     public static Object bitand(Integer a, Integer b) {
         return ((int) a) & ((int) b);
@@ -2343,23 +2342,23 @@ public static Object bitor(Integer a, Integer b) {
         return builder.toString();
     }
 
-    public static Object is(Object a, Object b){
+    public static Object is(Object a, Object b) {
         return a == b;
     }
 
-    public static Object isnot(Object a, Object b){
+    public static Object isnot(Object a, Object b) {
         return a != b;
     }
 
     private static Object reject(Object a, String symbol) throws IllegalArgumentException {
         throw new IllegalArgumentException(
-                "Invalid Unary operator argument: "+a
-                        + "\n for operator "+symbol );
+                "Invalid Unary operator argument: " + a
+                        + "\n for operator " + symbol);
     }
 
     private static Object reject(Object a, Object b, String symbol) throws IllegalArgumentException {
         throw new IllegalArgumentException(
-                "Invalid Binary operator arguments: "+a.getClass()+" & "+b.getClass()
-                + "\n for operator "+symbol );
+                "Invalid Binary operator arguments: " + a.getClass() + " & " + b.getClass()
+                        + "\n for operator " + symbol);
     }
 }

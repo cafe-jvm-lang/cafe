@@ -1,13 +1,13 @@
 package compiler.gen;
 
-import compiler.ast.Node;
 import cafelang.ir.*;
+import compiler.ast.Node;
 
 import java.util.*;
 
 public class ASTToCafeIrVisitor implements Node.Visitor {
 
-    private static final class Context{
+    private static final class Context {
         final static Context context = new Context();
 
         public CafeModule module;
@@ -17,35 +17,37 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         private boolean isProperty = false;
 
-        public void enterProperty(){
+        public void enterProperty() {
             isProperty = true;
         }
 
-        public void leaveProperty(){
+        public void leaveProperty() {
             isProperty = false;
         }
 
-        public boolean isProperty(){
+        public boolean isProperty() {
             return isProperty;
         }
 
-        private Context(){}
+        private Context() {
+        }
 
-        public CafeModule createModule(String moduleName){
+        public CafeModule createModule(String moduleName) {
             ReferenceTable global = new ReferenceTable();
             referenceTableStack.push(global);
-            module = CafeModule.create(moduleName,global);
+            module = CafeModule.create(moduleName, global);
             return module;
         }
 
-        public Block enterScope(){
-            ReferenceTable blockReferenceTable = referenceTableStack.peek().fork();
+        public Block enterScope() {
+            ReferenceTable blockReferenceTable = referenceTableStack.peek()
+                                                                    .fork();
             referenceTableStack.push(blockReferenceTable);
             isModuleScope = false;
             return Block.create(blockReferenceTable);
         }
 
-        public void leaveScope(){
+        public void leaveScope() {
             referenceTableStack.pop();
             isModuleScope = true;
         }
@@ -62,40 +64,43 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             if (objectStack.isEmpty()) {
                 newObjectStack();
             }
-            objectStack.peek().push(object);
+            objectStack.peek()
+                       .push(object);
         }
 
-        public Object pop(){
-            return objectStack.peek().pop();
+        public Object pop() {
+            return objectStack.peek()
+                              .pop();
         }
 
-        public Object peek(){
+        public Object peek() {
             return objectStack.peek();
         }
 
-        SymbolReference createSymbolReference(String name, SymbolReference.Kind kind){
+        SymbolReference createSymbolReference(String name, SymbolReference.Kind kind) {
             SymbolReference ref = SymbolReference.of(name, kind);
-            referenceTableStack.peek().add(ref);
+            referenceTableStack.peek()
+                               .add(ref);
             return ref;
         }
 
-        public SymbolReference createSymbolReference(String name, Class<?> clazz){
-            return createSymbolReference(name,getSymbolKind(clazz));
+        public SymbolReference createSymbolReference(String name, Class<?> clazz) {
+            return createSymbolReference(name, getSymbolKind(clazz));
         }
 
-        public SymbolReference getReference(String name){
-            return referenceTableStack.peek().get(name);
+        public SymbolReference getReference(String name) {
+            return referenceTableStack.peek()
+                                      .get(name);
         }
 
-        SymbolReference.Kind getSymbolKind(Class<?> clazz){
-            if(clazz == Node.VarDeclNode.class) {
+        SymbolReference.Kind getSymbolKind(Class<?> clazz) {
+            if (clazz == Node.VarDeclNode.class) {
                 if (isModuleScope)
                     return SymbolReference.Kind.GLOBAL_VAR;
                 else
                     return SymbolReference.Kind.VAR;
-            }
-            else if(clazz == Node.ConstDeclNode.class){
-                if(isModuleScope)
+            } else if (clazz == Node.ConstDeclNode.class) {
+                if (isModuleScope)
                     return SymbolReference.Kind.GLOBAL_CONST;
                 else
                     return SymbolReference.Kind.CONST;
@@ -103,17 +108,17 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             throw new AssertionError("Invalid Symbol Kind");
         }
 
-        public void addFunction(CafeFunction function){
+        public void addFunction(CafeFunction function) {
             context.module.addFunction(function);
         }
     }
 
-    private <T extends Node> void iterChildren(Collection<T> nodes){
-        for(T child: nodes)
+    private <T extends Node> void iterChildren(Collection<T> nodes) {
+        for (T child : nodes)
             child.accept(this);
     }
 
-    public CafeModule transform(Node.ProgramNode n,String moduleName){
+    public CafeModule transform(Node.ProgramNode n, String moduleName) {
         Context.context.createModule(moduleName);
         Context.context.newObjectStack();
         visitProgram(n);
@@ -123,7 +128,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitProgram(Node.ProgramNode n) {
         Context context = Context.context;
-        for(Node.StmtNode stmt: n.stmts){
+        for (Node.StmtNode stmt : n.stmts) {
             stmt.accept(this);
             context.module.add((CafeStatement) context.pop());
         }
@@ -133,18 +138,18 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitVarDecl(Node.VarDeclNode n) {
         Node.IdenNode iden = n.var;
         SymbolReference sym = Context.context.createSymbolReference(iden.name, Node.VarDeclNode.class);
-        if(n.value != null)
+        if (n.value != null)
             n.value.accept(this);
         else
             Context.context.push(null);
-        DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym,Context.context.pop());
+        DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, Context.context.pop());
         Context.context.push(stmt);
     }
 
     @Override
     public void visitIden(Node.IdenNode n) {
         Context context = Context.context;
-        if(context.isProperty())
+        if (context.isProperty())
             context.push(PropertyAccess.of(n.name));
         else
             context.push(ReferenceLookup.of(n.name));
@@ -181,15 +186,15 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         List<String> params = (List) context.pop();
         n.block.accept(this);
         Block block = (Block) context.pop();
-        if(!block.hasReturn())
+        if (!block.hasReturn())
             block.add(ReturnStatement.of(null));
         CafeFunction function = CafeFunction.function(name)
-                                .block(block)
-                                .withParameters(params);
+                                            .block(block)
+                                            .withParameters(params);
         context.addFunction(function);
         FunctionWrapper wrapper = FunctionWrapper.wrap(function);
         SymbolReference ref = context.createSymbolReference(name, Node.VarDeclNode.class);
-        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref,wrapper);
+        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, wrapper);
         context.push(statement);
     }
 
@@ -200,9 +205,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Map<Node.IdenNode, Node.ExprNode> map = n.prop;
         Map<String, ExpressionStatement<?>> mapped = new LinkedHashMap<>();
 
-        for(Map.Entry<Node.IdenNode, Node.ExprNode> entry : map.entrySet()){
+        for (Map.Entry<Node.IdenNode, Node.ExprNode> entry : map.entrySet()) {
             String key = entry.getKey().name;
-            entry.getValue().accept(this);
+            entry.getValue()
+                 .accept(this);
             mapped.put(key, ExpressionStatement.of(context.pop()));
         }
 
@@ -215,7 +221,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Context context = Context.context;
         Block block = context.enterScope();
 
-        for(Node.StmtNode stmt: n.block){
+        for (Node.StmtNode stmt : n.block) {
             stmt.accept(this);
             CafeStatement<?> statement = (CafeStatement) context.pop();
             block.add(statement);
@@ -255,8 +261,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         n.e1.accept(this);
         n.e2.accept(this);
         BinaryExpression expr = BinaryExpression.of(n.op)
-                .right(context.pop())
-                .left(context.pop());
+                                                .right(context.pop())
+                                                .left(context.pop());
         context.push(expr);
     }
 
@@ -275,7 +281,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitThis(Node.ThisNode n) {
         Context context = Context.context;
         boolean isGlobal = false;
-        if(context.isModuleScope){
+        if (context.isModuleScope) {
             isGlobal = true;
         }
         context.push(ThisStatement.create(isGlobal));
@@ -290,19 +296,22 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitFuncCall(Node.FuncCallNode n) {
         Context context = Context.context;
+
+        boolean isProperty = context.isProperty;
+        context.isProperty = false;
         n.args.accept(this);
-        if(context.isProperty()){
+        context.isProperty = isProperty;
+
+        if (context.isProperty()) {
             n.invokedOn.accept(this);
-            context.push(MethodInvocation.create(context.pop(),(List)context.pop()));
-        }
-        else{
-            if(n.invokedOn.getTag() == Node.Tag.IDEN){
+            context.push(MethodInvocation.create(context.pop(), (List) context.pop()));
+        } else {
+            if (n.invokedOn.getTag() == Node.Tag.IDEN) {
                 n.invokedOn.accept(this);
                 context.push(FunctionInvocation.create(
-                        context.pop(), (List)context.pop()
+                        context.pop(), (List) context.pop()
                 ));
-            }
-            else{
+            } else {
                 throw new AssertionError("Expected Identifier");
             }
         }
@@ -313,7 +322,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Context context = Context.context;
         n.index.accept(this);
         n.subscriptOf.accept(this);
-        context.push(SubscriptStatement.create(context.pop(),context.pop()));
+        context.push(SubscriptStatement.create(context.pop(), context.pop()));
     }
 
     @Override
@@ -337,7 +346,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitArgsList(Node.ArgsListNode n) {
         Context context = Context.context;
         List<Object> args = new LinkedList<>();
-        for(Node.ExprNode arg : n.args){
+        for (Node.ExprNode arg : n.args) {
             arg.accept(this);
             args.add(context.pop());
         }
@@ -348,7 +357,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitParamList(Node.ParameterListNode n) {
         Context context = Context.context;
         List<String> params = new LinkedList<>();
-        for(Node.IdenNode param : n.params){
+        for (Node.IdenNode param : n.params) {
             params.add(param.name);
         }
         context.push(params);
@@ -364,7 +373,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Context context = Context.context;
         n.rhs.accept(this);
         n.lhs.accept(this);
-        AssignmentStatement statement = AssignmentStatement.create(context.pop(),context.pop());
+        AssignmentStatement statement = AssignmentStatement.create(context.pop(), context.pop());
         context.push(statement);
     }
 
@@ -375,11 +384,11 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         n.ifCond.accept(this);
 
         ConditionalBranching conditionalBranching = ConditionalBranching
-                                                    .branch()
-                                                    .condition(context.pop())
-                                                    .whenTrue(context.pop());
+                .branch()
+                .condition(context.pop())
+                .whenTrue(context.pop());
 
-        if(n.elsePart != null){
+        if (n.elsePart != null) {
 //            List<Node.StmtNode> branches = n.elsePart.block;
 //            branches.get(0).accept(this);
 //            ConditionalBranching branch = (ConditionalBranching) context.pop();
@@ -402,12 +411,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitForStmt(Node.ForStmtNode n) {
         Context context = Context.context;
 
-        List<AssignedStatement> initStatements=null;
-        if(n.init != null){
+        List<AssignedStatement> initStatements = null;
+        if (n.init != null) {
             initStatements = new LinkedList<>();
-            for(Node.StmtNode stmt: n.init){
+            for (Node.StmtNode stmt : n.init) {
                 stmt.accept(this);
-                initStatements.add( (AssignedStatement) context.pop());
+                initStatements.add((AssignedStatement) context.pop());
             }
         }
 
@@ -415,19 +424,20 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         ExpressionStatement<?> condition = (ExpressionStatement) context.pop();
 
         LinkedList<CafeStatement<?>> postStatements = null;
-        if(n.counters != null){
+        if (n.counters != null) {
             postStatements = new LinkedList<>();
-            for(Node.StmtNode stmt : n.counters){
+            for (Node.StmtNode stmt : n.counters) {
                 stmt.accept(this);
                 postStatements.add((CafeStatement<?>) context.pop());
             }
         }
 
         n.block.accept(this);
-        Block block = (Block)context.pop();
+        Block block = (Block) context.pop();
         ForLoopStatement forLoop = ForLoopStatement.loop()
                                                    .condition(condition)
-                                                   .init(initStatements).postStatement(postStatements)
+                                                   .init(initStatements)
+                                                   .postStatement(postStatements)
                                                    .block(block);
         context.push(forLoop);
     }

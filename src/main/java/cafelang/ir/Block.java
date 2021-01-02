@@ -3,24 +3,24 @@ package cafelang.ir;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Block extends ExpressionStatement<Block>{
+public class Block extends ExpressionStatement<Block> {
     private final List<CafeStatement<?>> statements = new LinkedList<>();
     private ReferenceTable referenceTable;
     private boolean hasReturn = false;
 
-    private Block(ReferenceTable referenceTable){
+    private Block(ReferenceTable referenceTable) {
         this.referenceTable = referenceTable;
     }
 
-    public static Block create(ReferenceTable referenceTable){
+    public static Block create(ReferenceTable referenceTable) {
         return new Block(referenceTable);
     }
 
-    public ReferenceTable getReferenceTable(){
+    public ReferenceTable getReferenceTable() {
         return referenceTable;
     }
 
-    public List<CafeStatement<?>> getStatements(){
+    public List<CafeStatement<?>> getStatements() {
         return statements;
     }
 
@@ -33,18 +33,18 @@ public class Block extends ExpressionStatement<Block>{
         return new Block(new ReferenceTable());
     }
 
-    public Block add(Object statement){
-        if(statement != null)
+    public Block add(Object statement) {
+        if (statement != null)
             this.addStatement(CafeStatement.of(statement));
         return this;
     }
 
-    private void addStatement(CafeStatement<?> statement){
+    private void addStatement(CafeStatement<?> statement) {
         statements.add(statement);
         updateStateWith(statement);
     }
 
-    private void updateStateWith(CafeStatement<?> statement){
+    private void updateStateWith(CafeStatement<?> statement) {
         referenceTable.updateFrom(statement);
         checkForReturns(statement);
     }
@@ -67,8 +67,8 @@ public class Block extends ExpressionStatement<Block>{
         return hasReturn;
     }
 
-    private void checkForReturns(CafeStatement<?> statement){
-        if(statement instanceof ReturnStatement)
+    private void checkForReturns(CafeStatement<?> statement) {
+        if (statement instanceof ReturnStatement)
             hasReturn = true;
     }
 

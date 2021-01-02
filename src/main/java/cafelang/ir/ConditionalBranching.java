@@ -3,14 +3,15 @@ package cafelang.ir;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ConditionalBranching extends CafeStatement<ConditionalBranching>{
+public class ConditionalBranching extends CafeStatement<ConditionalBranching> {
 
     private ExpressionStatement<?> condition;
     private Block trueBlock;
     private ConditionalBranching elseConditionalBranching;
     private Block falseBlock;
 
-    private ConditionalBranching(){ }
+    private ConditionalBranching() {
+    }
 
     public static ConditionalBranching branch() {
         return new ConditionalBranching();
@@ -67,11 +68,11 @@ public class ConditionalBranching extends CafeStatement<ConditionalBranching>{
         return elseConditionalBranching;
     }
 
-    public boolean hasFalseBlock(){
+    public boolean hasFalseBlock() {
         return falseBlock != null;
     }
 
-    public boolean hasElseConditionalBranching(){
+    public boolean hasElseConditionalBranching() {
         return elseConditionalBranching != null;
     }
 
@@ -80,9 +81,9 @@ public class ConditionalBranching extends CafeStatement<ConditionalBranching>{
         LinkedList<CafeElement<?>> list = new LinkedList<>();
         list.add(condition);
         list.add(trueBlock);
-        if(hasElseConditionalBranching())
+        if (hasElseConditionalBranching())
             list.add(elseConditionalBranching);
-        if(hasFalseBlock())
+        if (hasFalseBlock())
             list.add(falseBlock);
         return list;
     }

@@ -39,6 +39,7 @@ public enum OperatorType {
     private final String symbol;
 
     private static final HashMap<String, OperatorType> SYMBOL_MAPPING = new HashMap<>();
+
     static {
         for (OperatorType op : values()) {
             SYMBOL_MAPPING.put(op.toString(), op);

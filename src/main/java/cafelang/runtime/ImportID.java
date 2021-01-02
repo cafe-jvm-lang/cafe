@@ -52,9 +52,9 @@ public final class ImportID {
         MethodHandles.Lookup caller = callSite.callerLookup;
         Class<?> callerClass = caller.lookupClass();
 
-        Object obj = Imports.searchFromImports(callerClass, callSite.name,-1);
-        if(obj != null){
-            if(obj instanceof Method){
+        Object obj = Imports.searchFromImports(callerClass, callSite.name, -1);
+        if (obj != null) {
+            if (obj instanceof Method) {
                 Method method = (Method) obj;
                 MethodHandle handle = caller.unreflect(method);
                 Function function = new Function(handle);
@@ -62,6 +62,6 @@ public final class ImportID {
             }
         }
 
-        throw new NullPointerException("On Method:"+callSite.name);
+        throw new NoSuchMethodError(callSite.name+" "+callSite.type().toMethodDescriptorString());
     }
 }

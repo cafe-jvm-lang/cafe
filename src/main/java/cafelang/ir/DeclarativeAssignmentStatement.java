@@ -3,30 +3,30 @@ package cafelang.ir;
 import java.util.Collections;
 import java.util.List;
 
-public class DeclarativeAssignmentStatement extends AssignedStatement{
+public class DeclarativeAssignmentStatement extends AssignedStatement {
 
     private SymbolReference symbolReference;
     private ExpressionStatement<?> expressionStatement;
-    private boolean isAssigned=true;
+    private boolean isAssigned = true;
 
     private DeclarativeAssignmentStatement() {
     }
 
-    public static DeclarativeAssignmentStatement create(SymbolReference ref,Object expr){
-        return new DeclarativeAssignmentStatement().to(ref).as(expr);
+    public static DeclarativeAssignmentStatement create(SymbolReference ref, Object expr) {
+        return new DeclarativeAssignmentStatement().to(ref)
+                                                   .as(expr);
     }
 
-    public DeclarativeAssignmentStatement to(SymbolReference ref){
+    public DeclarativeAssignmentStatement to(SymbolReference ref) {
         symbolReference = ref;
         return this;
     }
 
-    public DeclarativeAssignmentStatement as(Object value){
-        if(value == null){
+    public DeclarativeAssignmentStatement as(Object value) {
+        if (value == null) {
             expressionStatement = new NullStatement();
             isAssigned = false;
-        }
-        else
+        } else
             expressionStatement = ExpressionStatement.of(value);
         return this;
     }

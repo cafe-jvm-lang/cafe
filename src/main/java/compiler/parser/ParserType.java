@@ -2,30 +2,29 @@ package compiler.parser;
 
 /**
  * A registry of the concrete implementation of parsers.
- * 
- * @author Dhyey
  *
+ * @author Dhyey
  */
 public enum ParserType {
-	MAINPARSER("MainParser");
+    MAINPARSER("MainParser");
 
-	String parserClassName;
+    String parserClassName;
 
-	ParserType(String string) {
-		this.parserClassName = string;
-	}
+    ParserType(String string) {
+        this.parserClassName = string;
+    }
 
-	String getParserClassName() {
-		return parserClassName;
-	}
+    String getParserClassName() {
+        return parserClassName;
+    }
 
-	static void init() {
-		for (ParserType type : ParserType.values()) {
-			try {
-				Class.forName("compiler.parser." + type.getParserClassName());
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    static void init() {
+        for (ParserType type : ParserType.values()) {
+            try {
+                Class.forName("compiler.parser." + type.getParserClassName());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

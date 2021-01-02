@@ -1,14 +1,28 @@
-# program to generate fibonacci series up to n terms
-
-# take input from the user
-var number = Int(input("Enter the number of terms: "));
-var n1 = 0, n2 = 1, nextTerm;
-
-println("Fibonacci Series:");
-
-for (var i = 1; i <= number; i=i+1) {
-    print(n1)
-    nextTerm = n1 + n2;
-    n1 = n2;
-    n2 = nextTerm;
+func create(width, height){
+    this.height = height;
+    this.width = width;
+    return this;
 }
+
+func area(){
+    return this.width * this.height;
+}
+
+var rectangle = {
+    create: create,
+    area: area
+};
+
+var rect = rectangle.create(5,10);
+println(rect.area());
+
+var square = $_create(rectangle);
+
+func create(side){
+    return rectangle.create(side, side);
+}
+
+square.create = create;
+
+var sq = square.create(5);
+println(sq.area());

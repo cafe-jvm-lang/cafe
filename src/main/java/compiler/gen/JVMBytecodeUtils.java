@@ -3,10 +3,11 @@ package compiler.gen;
 import org.objectweb.asm.MethodVisitor;
 
 import static org.objectweb.asm.Opcodes.*;
-import static org.objectweb.asm.Opcodes.LCONST_1;
 
 public class JVMBytecodeUtils {
-    private JVMBytecodeUtils(){}
+    private JVMBytecodeUtils() {
+    }
+
     static boolean between(int value, int lower, int upper) {
         return (value >= lower) && (value <= upper);
     }

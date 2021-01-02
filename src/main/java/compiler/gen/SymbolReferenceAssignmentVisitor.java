@@ -5,7 +5,7 @@ import cafelang.ir.*;
 import java.util.Deque;
 import java.util.LinkedList;
 
-public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
+public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
 
     private CafeModule module = null;
     private final AssignmentCounter assignmentCounter = new AssignmentCounter();
@@ -19,7 +19,9 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
             return counter++;
         }
 
-        public void set(int c){ counter = c; }
+        public void set(int c) {
+            counter = c;
+        }
 
         public void reset() {
             counter = 0;
@@ -35,7 +37,7 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
     @Override
     public void visitDeclarativeAssignment(DeclarativeAssignmentStatement assignmentStatement) {
         SymbolReference reference = assignmentStatement.getSymbolReference();
-        if(!reference.isGlobal())
+        if (!reference.isGlobal())
             bindReference(reference);
         assignmentStatement.walk(this);
     }
@@ -48,14 +50,15 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
 
     @Override
     public void visitFunction(CafeFunction cafeFunction) {
-        if(cafeFunction.isInit())
+        if (cafeFunction.isInit())
             assignmentCounter.set(0);
         else
             assignmentCounter.set(1);
-        ReferenceTable table= cafeFunction.getBlock().getReferenceTable();
-        for(String parameter: cafeFunction.getParameterNames()){
+        ReferenceTable table = cafeFunction.getBlock()
+                                           .getReferenceTable();
+        for (String parameter : cafeFunction.getParameterNames()) {
             SymbolReference ref = table.get(parameter);
-            if(!ref.isGlobal())
+            if (!ref.isGlobal())
                 ref.setIndex(assignmentCounter.next());
         }
 
@@ -64,14 +67,14 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
 
     @Override
     public void visitObjectCreation(ObjectCreationStatement creationStatement) {
-        if(creationStatement.index() < 0)
+        if (creationStatement.index() < 0)
             creationStatement.setIndex(assignmentCounter.next());
         creationStatement.walk(this);
     }
 
     @Override
     public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
-        for(CafeElement<?> arg: functionInvocation.getArguments()){
+        for (CafeElement<?> arg : functionInvocation.getArguments()) {
             arg.accept(this);
         }
     }
@@ -80,15 +83,16 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor{
     public void visitBlock(Block block) {
         ReferenceTable table = block.getReferenceTable();
         tableStack.push(table);
-        for(CafeStatement<?> statement : block.getStatements())
+        for (CafeStatement<?> statement : block.getStatements())
             statement.accept(this);
         tableStack.pop();
     }
 
     @Override
     public void visitForLoop(ForLoopStatement forLoopStatement) {
-        for(AssignedStatement init: forLoopStatement.getInitStatements())
+        for (AssignedStatement init : forLoopStatement.getInitStatements())
             init.accept(this);
-        forLoopStatement.getBlock().accept(this);
+        forLoopStatement.getBlock()
+                        .accept(this);
     }
 }

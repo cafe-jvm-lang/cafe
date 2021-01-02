@@ -1,6 +1,6 @@
 package cafelang.ir;
 
-public class SubscriptStatement extends ExpressionStatement<SubscriptStatement>{
+public class SubscriptStatement extends ExpressionStatement<SubscriptStatement> {
     private ExpressionStatement<?> subscriptOf;
     private ExpressionStatement<?> index;
 
@@ -9,7 +9,7 @@ public class SubscriptStatement extends ExpressionStatement<SubscriptStatement>{
         this.index = index;
     }
 
-    public static SubscriptStatement create(Object subscriptOf,Object index){
+    public static SubscriptStatement create(Object subscriptOf, Object index) {
         return new SubscriptStatement(
                 ExpressionStatement.of(subscriptOf),
                 ExpressionStatement.of(index)

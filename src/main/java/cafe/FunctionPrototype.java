@@ -1,8 +1,8 @@
 package cafe;
 
 public class FunctionPrototype extends BasePrototype {
-    FunctionPrototype(){
-        super(new ObjectPrototype());
+    FunctionPrototype() {
+        super(new ObjectPrototype(), false);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package cafe;
 
 public class ObjectPrototype extends BasePrototype {
-    ObjectPrototype(){
-        super(null);
+    ObjectPrototype() {
+        super(null,false);
     }
 }

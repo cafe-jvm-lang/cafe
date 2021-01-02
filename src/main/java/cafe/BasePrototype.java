@@ -3,7 +3,7 @@ package cafe;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +11,7 @@ import static java.lang.invoke.MethodType.genericMethodType;
 import static java.lang.invoke.MethodType.methodType;
 
 public abstract class BasePrototype {
-    private final Map<String, Object> map;
+    protected final Map<String, Object> map;
     private static final String __PROTO__ = "__proto__";
 
     public static final MethodHandle DISPATCH_CALL;
@@ -21,51 +21,57 @@ public abstract class BasePrototype {
     static {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
-            DISPATCH_CALL = lookup.findStatic(DynamicObject.class, "dispatchCall", methodType(Object.class, String.class, Object[].class));
-            DISPATCH_GET = lookup.findStatic(BasePrototype.class, "dispatchGetterStyle", methodType(Object.class, String.class, BasePrototype.class));
-            DISPATCH_SET = lookup.findStatic(BasePrototype.class, "dispatchSetterStyle", methodType(Object.class, String.class, BasePrototype.class, Object.class));
+            DISPATCH_CALL = lookup.findStatic(DynamicObject.class, "dispatchCall",
+                    methodType(Object.class, String.class, Object[].class));
+            DISPATCH_GET = lookup.findStatic(BasePrototype.class, "dispatchGetterStyle",
+                    methodType(Object.class, String.class, BasePrototype.class));
+            DISPATCH_SET = lookup.findStatic(BasePrototype.class, "dispatchSetterStyle",
+                    methodType(Object.class, String.class, BasePrototype.class, Object.class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
             throw new Error("Could not bootstrap the required method handles");
         }
     }
 
-    BasePrototype(Object __proto__){
-        this(__proto__,new HashMap<>());
+    BasePrototype(Object __proto__, boolean isFunction) {
+        map = new HashMap<>();
+        map.put("__proto__", __proto__);
+        if(isFunction)
+            map.put("prototype", new DynamicObject());
     }
 
-    BasePrototype(Object __proto__, Map<String, Object> map){
-        this.map = map;
-        map.put("__proto__",__proto__);
+    public void define(String key, Object value) {
+        map.put(key, value);
     }
 
-    public void define(String key, Object value){
-        map.put(key,value);
-    }
-
-    public Object get(String key){
+    public Object get(String key) {
         return map.get(key);
     }
 
-    public MethodHandle invoker(String property, MethodType type){
-        switch (type.parameterCount()){
+    public MethodHandle invoker(String property, MethodType type) {
+        switch (type.parameterCount()) {
             case 0:
-                throw new IllegalArgumentException("A dynamic object invoker type needs at least 1 argument (the receiver)");
+                throw new IllegalArgumentException(
+                        "A dynamic object invoker type needs at least 1 argument");
             case 1:
-                return DISPATCH_GET.bindTo(property).asType(genericMethodType(1));
+                return DISPATCH_GET.bindTo(property)
+                                   .asType(genericMethodType(1));
             case 2:
-                return DISPATCH_SET.bindTo(property).asType(genericMethodType(2));
+                return DISPATCH_SET.bindTo(property)
+                                   .asType(genericMethodType(2));
         }
         return null;
     }
 
-    public MethodHandle dispatchCallHandle(String property, MethodType type){
-        return DISPATCH_CALL.bindTo(property).asCollector(Object[].class, type.parameterCount());
+    public MethodHandle dispatchCallHandle(String property, MethodType type) {
+        return DISPATCH_CALL.bindTo(property)
+                            .asCollector(Object[].class, type.parameterCount());
+
     }
 
-    public static Object dispatchGetterStyle(String property, BasePrototype object) throws Throwable {
-        while(object != null){
-            if(object.get(property) != null)
+    public static Object dispatchGetterStyle(String property, BasePrototype object) {
+        while (object != null) {
+            if (object.get(property) != null)
                 return object.get(property);
             object = (BasePrototype) object.get(__PROTO__);
         }
@@ -78,19 +84,22 @@ public abstract class BasePrototype {
     }
 
     public static Object dispatchCall(String property, Object... args) throws Throwable {
-        return null;
+        BasePrototype obj = (BasePrototype) args[0];
+        Object o = obj.get(property);
+        //args = Arrays.copyOfRange(args, 1,args.length);
+        if(o instanceof Function)
+            return ((Function) o).invoke(args);
+        throw new NoSuchMethodError(obj.toString()+" has no such method "+ property);
     }
 
-    public String toString(String clazz){
-        return clazz+'{' +
-                 map +
+    public String toString(String clazz) {
+        return clazz + '{' +
+                map +
                 '}';
     }
 
     @Override
     public String toString() {
-        return "BasePrototype{" +
-                "map=" + map +
-                '}';
+        return "<BasePrototype>";
     }
 }

@@ -3,14 +3,14 @@ package cafelang.ir;
 import java.util.Collections;
 import java.util.List;
 
-public class FunctionWrapper extends ExpressionStatement<FunctionWrapper>{
+public class FunctionWrapper extends ExpressionStatement<FunctionWrapper> {
     private CafeFunction target;
 
-    private FunctionWrapper(CafeFunction function){
+    private FunctionWrapper(CafeFunction function) {
         this.target = function;
     }
 
-    public static FunctionWrapper wrap(CafeFunction target){
+    public static FunctionWrapper wrap(CafeFunction target) {
         return new FunctionWrapper(target);
     }
 

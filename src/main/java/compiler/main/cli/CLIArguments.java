@@ -1,5 +1,6 @@
-package compiler.main;
+package compiler.main.cli;
 
+import compiler.main.SourceFileManager;
 import compiler.util.Context;
 import compiler.util.Log;
 
@@ -49,9 +50,23 @@ public class CLIArguments {
             return;
         }
 
-        fileManager.setSourceFile(args[0]);
+        for(String arg: args)
+            parseCommand(arg);
 
-        if (log.entries() > 0)
-            log.printIssues();
+    }
+
+    private void parseCommand(String arg){
+        if(arg.endsWith(".cafe")){
+            parseCompileCommand(arg);
+        }
+      //  else if(arg.split("\\s*(\\ |\\s)\\s*"))
+    }
+
+    private void parseCompileCommand(String fileName){
+
+    }
+
+    private void parseRunCommand(){
+
     }
 }

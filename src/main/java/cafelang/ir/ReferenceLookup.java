@@ -1,6 +1,6 @@
 package cafelang.ir;
 
-public class ReferenceLookup extends ExpressionStatement<ReferenceLookup>{
+public class ReferenceLookup extends ExpressionStatement<ReferenceLookup> {
 
     private final String name;
 
@@ -8,7 +8,7 @@ public class ReferenceLookup extends ExpressionStatement<ReferenceLookup>{
         this.name = name;
     }
 
-    public static ReferenceLookup of(Object name){
+    public static ReferenceLookup of(Object name) {
         if (name instanceof ReferenceLookup) {
             return (ReferenceLookup) name;
         }
@@ -18,7 +18,7 @@ public class ReferenceLookup extends ExpressionStatement<ReferenceLookup>{
         return new ReferenceLookup(name.toString());
     }
 
-    public SymbolReference resolveIn(ReferenceTable table){
+    public SymbolReference resolveIn(ReferenceTable table) {
         return table.get(name);
     }
 

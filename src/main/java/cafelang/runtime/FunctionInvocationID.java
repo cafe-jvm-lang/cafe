@@ -3,7 +3,6 @@ package cafelang.runtime;
 import cafe.Function;
 
 import java.lang.invoke.*;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 
 import static java.lang.invoke.MethodType.methodType;
@@ -18,7 +17,7 @@ public final class FunctionInvocationID {
             FALLBACK = lookup.findStatic(
                     FunctionInvocationID.class,
                     "fallback",
-                    methodType(Object.class,FunctionCallSite.class, Object[].class));
+                    methodType(Object.class, FunctionCallSite.class, Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
@@ -37,7 +36,7 @@ public final class FunctionInvocationID {
     }
 
     public static CallSite bootstrap(MethodHandles.Lookup caller, String name, MethodType type, Object... bsmArgs) {
-        FunctionCallSite callSite = new FunctionCallSite(caller,name,type);
+        FunctionCallSite callSite = new FunctionCallSite(caller, name, type);
         MethodHandle fallbackHandle = FALLBACK
                 .bindTo(callSite)
                 .asCollector(Object[].class, type.parameterCount())
@@ -46,31 +45,29 @@ public final class FunctionInvocationID {
         return callSite;
     }
 
-    public static Object fallback(FunctionCallSite callSite,Object[] args) throws Throwable{
+    public static Object fallback(FunctionCallSite callSite, Object[] args) throws Throwable {
 //        for(int i=0;i<args.length;i++){
 //            System.out.println(args[i]);
 //        }
 
         MethodHandle target = null;
-        MethodHandle invoker=null;
+        MethodHandle invoker = null;
 
         // check in imports
-        if(args[0] == null){
+        if (args[0] == null) {
             String name = callSite.name;
             MethodHandles.Lookup caller = callSite.callerLookup;
             Class<?> callerClass = caller.lookupClass();
 
-            Object obj = Imports.searchFromImports(callerClass, callSite.name, args.length-1);
-            if(obj != null) {
+            Object obj = Imports.searchFromImports(callerClass, name, args.length - 1);
+            if (obj != null) {
                 if (obj instanceof Method) {
                     Method method = (Method) obj;
                     target = caller.unreflect(method);
                 }
-            }
-            else
-                throw new NullPointerException("On Method:"+callSite.name);
-        }
-        else {
+            } else
+                throw new NoSuchMethodError(name+callSite.type().toMethodDescriptorString());
+        } else {
             Function targetRef = (Function) args[0];
             target = targetRef.handle();
         }

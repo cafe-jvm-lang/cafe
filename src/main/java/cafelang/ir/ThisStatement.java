@@ -1,14 +1,14 @@
 package cafelang.ir;
 
-public class ThisStatement extends ExpressionStatement<ThisStatement>{
+public class ThisStatement extends ExpressionStatement<ThisStatement> {
 
     private final boolean isGlobal;
 
-    private ThisStatement(boolean isGlobal){
+    private ThisStatement(boolean isGlobal) {
         this.isGlobal = isGlobal;
     }
 
-    public static ThisStatement create(boolean isGlobal){
+    public static ThisStatement create(boolean isGlobal) {
         return new ThisStatement(isGlobal);
     }
 

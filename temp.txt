@@ -1,3 +1,4 @@
+D:\Dhyey\compiler\compiler-project\build\classes\java\main
 
 ObjectPrototype{
 	Map<key,value>  = [];
@@ -158,28 +159,67 @@ class SemanticsChecker implements Node.Visitor{
 }
 
 ---------------------------------------------------
-can u make a change in parser:
-in ObjAccessNode :
-eg : o.a.b
-then ast aise bann raha h:
-ObjectAccessNode
-      AccessedOn
-        IdenNode: o
-      Property
-        ObjectAccessNode
-          AccessedOn
-            IdenNode: a
-          Property
-            IdenNode: b
 
-But ObjectCreation node left assciative h so,
-ObjectAccessNode
-	AccessedOn
-		ObjectAccessNode
-			AccessedOn
-				IdenNode: o
-			Property
-				IdenNode: a      
-	Property
-		IdenNode: b
-can u check this?
+DynamicObject.__proto__ = ObjectPrototype
+Function.__proto__ = FunctionPrototype
+
+FunctionPrototype.__proto__ = ObjectPrototype
+ObjectPrototype.__proto__ = null
+
+1. ObjectPrototype
+	Methods common to all Objects should be declared in ObjectPrototype
+	List of methods:
+	
+2. DynamicObject
+	An Object created by user
+
+3. Function
+	A Function created by user
+
+4. FunctionPrototype
+	A shared pool for functional inheritence
+	
+	
+	
+JAVASCRIPT prototype design:
+Object.prototype
+{constructor: ƒ, __defineGetter__: ƒ, __defineSetter__: ƒ, hasOwnProperty: ƒ, __lookupGetter__: ƒ, …}
+Object.__proto__.__proto__ == Object.prototype
+true
+Function.__proto__.__proto__ == Function.prototype
+false
+Function.__proto__ == Function.prototype
+true
+
+Object.__proto__ == Function.prototype
+true
+Function.prototype.__proto__
+{constructor: ƒ, __defineGetter__: ƒ, __defineSetter__: ƒ, hasOwnProperty: ƒ, __lookupGetter__: ƒ, …}
+Function.prototype.__proto__ == Object.__proto__.__proto__
+true
+var a = {}
+undefined
+a.__proto__ == Function.prototype
+false
+Object
+ƒ Object() { [native code] }
+Object()
+{}__proto__: Object
+var a = new Object()
+undefined
+a.__proto__ == Function.prototype
+false
+Object.prototype == Function.__proto__
+false
+
+----------------------------
+func b(){
+
+}
+func c(){
+    return "hello";
+}
+
+b.prototype.z  = c;
+var a = $_create(b.prototype);
+print(a.z);

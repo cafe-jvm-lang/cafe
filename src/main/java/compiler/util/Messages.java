@@ -2,11 +2,8 @@ package compiler.util;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Map;
-
 
 import static compiler.util.Log.Type.*;
-import static java.util.Map.entry;
 
 public final class Messages {
     private static final String ERROR = "\u001B[31m"; // red
@@ -16,7 +13,7 @@ public final class Messages {
 
     private static final HashMap<Log.Type, String> MESSAGES;
 
-    static{
+    static {
         MESSAGES = new HashMap<>() {{
 
             put(Log.Type.ERROR, "ERROR");
@@ -47,9 +44,10 @@ public final class Messages {
 
     }
 
-    private Messages(){}
+    private Messages() {
+    }
 
-    public static String message(Log.Type key, Object... values){
+    public static String message(Log.Type key, Object... values) {
         return MessageFormat.format(MESSAGES.get(key), values);
     }
 

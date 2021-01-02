@@ -1,47 +1,48 @@
 package compiler.parser;
 
-import java.util.List;
-
 import compiler.parser.Tokens.Token;
+
+import java.util.List;
 
 public class Scanner implements Lexer {
 
-	static {
-		ScannerFactory.registerScanner(new Scanner());
-	}
+    static {
+        ScannerFactory.registerScanner(new Scanner());
+    }
 
-	private Tokens tokens;
-	private Token token;
-	private Token prevToken;
-	
-	private Tokenizer tokenizer;
-	
-	private Scanner() {}
-	
-	private Scanner(ScannerFactory scannerFactory, List<Character> buff) {
-		this.tokens = scannerFactory.tokens;
-		token = prevToken = null;
-		
-		tokenizer = new Tokenizer(scannerFactory, buff);
-	}
-	
-	protected Scanner instance(ScannerFactory scannerFactory, List<Character> input) {
-		return new Scanner(scannerFactory, input);
-	}
+    private Tokens tokens;
+    private Token token;
+    private Token prevToken;
 
-	@Override
-	public void nextToken() {
-		prevToken = token;
-		token = tokenizer.readToken();
-	}
+    private Tokenizer tokenizer;
 
-	@Override
-	public Token token() {
-		return token;
-	}
+    private Scanner() {
+    }
 
-	@Override
-	public Token prevToken() {
-		return prevToken;
-	}
+    private Scanner(ScannerFactory scannerFactory, List<Character> buff) {
+        this.tokens = scannerFactory.tokens;
+        token = prevToken = null;
+
+        tokenizer = new Tokenizer(scannerFactory, buff);
+    }
+
+    protected Scanner instance(ScannerFactory scannerFactory, List<Character> input) {
+        return new Scanner(scannerFactory, input);
+    }
+
+    @Override
+    public void nextToken() {
+        prevToken = token;
+        token = tokenizer.readToken();
+    }
+
+    @Override
+    public Token token() {
+        return token;
+    }
+
+    @Override
+    public Token prevToken() {
+        return prevToken;
+    }
 }

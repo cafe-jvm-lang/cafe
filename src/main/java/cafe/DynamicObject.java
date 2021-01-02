@@ -1,22 +1,21 @@
 package cafe;
 
-import java.util.Map;
-
 public class DynamicObject extends BasePrototype {
-    public DynamicObject(){
-        super(new ObjectPrototype());
+
+    public DynamicObject() {
+        super(new ObjectPrototype(), false);
     }
 
-    public DynamicObject(Map<String, Object> map){
-        super(new ObjectPrototype(),map);
+    public DynamicObject(BasePrototype __proto__){
+        super(__proto__, false);
     }
 
-    public static final DynamicObject create(Map<String, Object> map){
-        return new DynamicObject(map);
+    public static DynamicObject $_create(BasePrototype b, BasePrototype __proto__){
+        return new DynamicObject(__proto__);
     }
 
     @Override
     public String toString() {
-        return super.toString("DynamicObject");
+        return "<Dynamic Object>: \n ";
     }
 }

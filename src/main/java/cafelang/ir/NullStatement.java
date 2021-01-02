@@ -1,6 +1,6 @@
 package cafelang.ir;
 
-public class NullStatement extends ExpressionStatement<NullStatement>{
+public class NullStatement extends ExpressionStatement<NullStatement> {
     @Override
     protected NullStatement self() {
         return this;

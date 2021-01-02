@@ -3,7 +3,7 @@ package cafelang.ir;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessStatement>{
+public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessStatement> {
     private ExpressionStatement<?> accessedOn;
     private ExpressionStatement<?> property;
 
@@ -12,7 +12,7 @@ public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessState
         this.property = property;
     }
 
-    public static ObjectAccessStatement create(Object accessedOn, Object property){
+    public static ObjectAccessStatement create(Object accessedOn, Object property) {
         return new ObjectAccessStatement(
                 ExpressionStatement.of(accessedOn),
                 ExpressionStatement.of(property)

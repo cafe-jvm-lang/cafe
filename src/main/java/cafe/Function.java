@@ -5,12 +5,12 @@ import java.lang.invoke.MethodHandle;
 public class Function extends BasePrototype {
     private final MethodHandle handle;
 
-    public Function(MethodHandle handle){
-        super(new FunctionPrototype());
+    public Function(MethodHandle handle) {
+        super(new FunctionPrototype(), true);
         this.handle = handle;
     }
 
-    public MethodHandle handle(){
+    public MethodHandle handle() {
         return handle;
     }
 
@@ -20,6 +20,6 @@ public class Function extends BasePrototype {
 
     @Override
     public String toString() {
-        return super.toString("Function");
+        return ("<Function>");
     }
 }

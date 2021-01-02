@@ -3,12 +3,12 @@ package cafelang.ir;
 import java.util.Arrays;
 import java.util.List;
 
-public class BinaryExpression extends ExpressionStatement<BinaryExpression>{
+public class BinaryExpression extends ExpressionStatement<BinaryExpression> {
     private final OperatorType type;
     private ExpressionStatement<?> leftExpression;
-    private  ExpressionStatement<?> rightExpression;
+    private ExpressionStatement<?> rightExpression;
 
-    private BinaryExpression(OperatorType type){
+    private BinaryExpression(OperatorType type) {
         this.type = type;
     }
 
@@ -17,16 +17,16 @@ public class BinaryExpression extends ExpressionStatement<BinaryExpression>{
         return this;
     }
 
-    public static BinaryExpression of(Object type){
+    public static BinaryExpression of(Object type) {
         return new BinaryExpression(OperatorType.of(type));
     }
 
-    public BinaryExpression left(Object expr){
+    public BinaryExpression left(Object expr) {
         this.leftExpression = ExpressionStatement.of(expr);
         return this;
     }
 
-    public BinaryExpression right(Object expr){
+    public BinaryExpression right(Object expr) {
         this.rightExpression = ExpressionStatement.of(expr);
         return this;
     }

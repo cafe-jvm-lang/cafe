@@ -3,7 +3,7 @@ package cafelang.ir;
 import java.util.Collections;
 import java.util.List;
 
-public class ReturnStatement extends CafeStatement<ReturnStatement>{
+public class ReturnStatement extends CafeStatement<ReturnStatement> {
     private CafeStatement<?> expressionStatement;
     private boolean isReturningVoid = false;
 
@@ -11,8 +11,8 @@ public class ReturnStatement extends CafeStatement<ReturnStatement>{
         setExpressionStatement(expression);
     }
 
-    public static ReturnStatement of(Object value){
-        return new ReturnStatement( ExpressionStatement.of(value));
+    public static ReturnStatement of(Object value) {
+        return new ReturnStatement(ExpressionStatement.of(value));
     }
 
     private void setExpressionStatement(CafeStatement<?> stat) {
@@ -23,15 +23,14 @@ public class ReturnStatement extends CafeStatement<ReturnStatement>{
         }
     }
 
-    public CafeStatement<?> getExpressionStatement(){
+    public CafeStatement<?> getExpressionStatement() {
         return expressionStatement;
     }
 
 
-
     @Override
     public List<CafeElement<?>> children() {
-        if(expressionStatement != null)
+        if (expressionStatement != null)
             return Collections.singletonList(expressionStatement);
         return Collections.emptyList();
     }

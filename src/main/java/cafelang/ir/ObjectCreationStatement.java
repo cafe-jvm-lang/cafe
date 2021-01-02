@@ -1,19 +1,18 @@
 package cafelang.ir;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ObjectCreationStatement extends ExpressionStatement<ObjectCreationStatement>{
+public class ObjectCreationStatement extends ExpressionStatement<ObjectCreationStatement> {
     private int index = -1;
     private Map<String, ExpressionStatement<?>> map;
 
-    private ObjectCreationStatement(Map<String, ExpressionStatement<?>> map){
+    private ObjectCreationStatement(Map<String, ExpressionStatement<?>> map) {
         this.map = map;
     }
 
-    public static ObjectCreationStatement of(Map<String, ExpressionStatement<?>> map){
+    public static ObjectCreationStatement of(Map<String, ExpressionStatement<?>> map) {
         return new ObjectCreationStatement(map);
     }
 

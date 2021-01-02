@@ -5,6 +5,7 @@ import java.util.List;
 
 public abstract class CafeElement<T extends CafeElement<T>> {
     private CafeElement<?> parent;
+
     protected abstract T self();
 
     private void setParent(CafeElement<?> parent) {
@@ -17,7 +18,7 @@ public abstract class CafeElement<T extends CafeElement<T>> {
 
     public abstract void accept(CafeIrVisitor visitor);
 
-    public List<CafeElement<?>> children(){
+    public List<CafeElement<?>> children() {
         return Collections.emptyList();
     }
 
@@ -25,11 +26,12 @@ public abstract class CafeElement<T extends CafeElement<T>> {
         return new ClassCastException(String.format(
                 "expecting a %s but got a %s",
                 expected,
-                value == null ? "null value" : value.getClass().getName()));
+                value == null ? "null value" : value.getClass()
+                                                    .getName()));
     }
 
-    public void walk(CafeIrVisitor visitor){
-        for(CafeElement<?> e: children())
+    public void walk(CafeIrVisitor visitor) {
+        for (CafeElement<?> e : children())
             e.accept(visitor);
     }
 }

@@ -2,17 +2,17 @@ package cafelang.ir;
 
 import java.util.Objects;
 
-public class CafeImport extends CafeElement<CafeImport>{
+public class CafeImport extends CafeElement<CafeImport> {
     private final String functions;
     private final String moduleName;
 
-    private CafeImport(String functions, String moduleName){
+    private CafeImport(String functions, String moduleName) {
         this.functions = functions;
         this.moduleName = moduleName;
     }
 
-    public static CafeImport of(String functions, String moduleName){
-        return new CafeImport(functions,moduleName);
+    public static CafeImport of(String functions, String moduleName) {
+        return new CafeImport(functions, moduleName);
     }
 
     public String getModuleName() {

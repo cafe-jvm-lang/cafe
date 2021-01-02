@@ -8,12 +8,13 @@ public class AssignmentStatement extends AssignedStatement {
     private ExpressionStatement<?> lhsExpression;
     private ExpressionStatement<?> rhsExpression;
 
-    public static AssignmentStatement create(Object ref, Object value){
-        return new AssignmentStatement().to(ref).as(value);
+    public static AssignmentStatement create(Object ref, Object value) {
+        return new AssignmentStatement().to(ref)
+                                        .as(value);
     }
 
-    public AssignmentStatement to(Object ref){
-        if(ref == null){
+    public AssignmentStatement to(Object ref) {
+        if (ref == null) {
             throw new IllegalArgumentException("Must assign to a reference");
         }
         this.lhsExpression = ExpressionStatement.of(ref);
@@ -31,9 +32,10 @@ public class AssignmentStatement extends AssignedStatement {
         return lhsExpression;
     }
 
-    public ExpressionStatement<?> getRhsExpression(){
+    public ExpressionStatement<?> getRhsExpression() {
         return rhsExpression;
     }
+
     @Override
     public List<CafeElement<?>> children() {
         LinkedList<CafeElement<?>> children = new LinkedList<>();

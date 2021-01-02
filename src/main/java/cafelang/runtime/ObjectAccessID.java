@@ -1,8 +1,6 @@
 package cafelang.runtime;
 
 import cafe.BasePrototype;
-import cafe.DynamicObject;
-import cafe.Function;
 
 import java.lang.invoke.*;
 
@@ -24,11 +22,11 @@ public final class ObjectAccessID {
         }
     }
 
-    static final class MethodCallSite extends MutableCallSite{
+    static final class MethodCallSite extends MutableCallSite {
         final MethodHandles.Lookup callerLookup;
         String name;
 
-        MethodCallSite(MethodHandles.Lookup caller, String name, MethodType type){
+        MethodCallSite(MethodHandles.Lookup caller, String name, MethodType type) {
             super(type);
             this.callerLookup = caller;
             this.name = name;
@@ -52,17 +50,16 @@ public final class ObjectAccessID {
 //            System.out.println("Argument "+i+"==>"+args[i]);
 //        }
         Class<?> clazz = args[0].getClass();
-        MethodHandle target = lookupTarget(clazz,callSite,args);
-
-        if(target == null)
+        MethodHandle target = lookupTarget(clazz, callSite, args);
+        if (target == null)
             throw new NoSuchMethodError(clazz + "::" + callSite.name);
 
-       // System.out.println("====================================");
+        // System.out.println("====================================");
         return target.invokeWithArguments(args);
     }
 
-    private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args){
-        if(args[0] instanceof BasePrototype){
+    private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args) {
+        if (args[0] instanceof BasePrototype) {
             BasePrototype object = (BasePrototype) args[0];
             return object.invoker(callSite.name, callSite.type());
         }

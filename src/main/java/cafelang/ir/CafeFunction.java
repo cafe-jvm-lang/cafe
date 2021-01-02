@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class CafeFunction extends ExpressionStatement<CafeFunction>{
+public class CafeFunction extends ExpressionStatement<CafeFunction> {
 
     private String name;
     private Scope scope;
@@ -15,37 +15,37 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
     private boolean isVarargs = false;
     private boolean isInit = false;
 
-    public enum Scope{
+    public enum Scope {
         MODULE, CLOSURE
     }
 
-    private CafeFunction(String name){
+    private CafeFunction(String name) {
         this.name = name;
     }
 
-    public static CafeFunction function(String name){
+    public static CafeFunction function(String name) {
         return new CafeFunction(name);
     }
 
-    public CafeFunction name(String n){
+    public CafeFunction name(String n) {
         name = n;
         return this;
     }
 
-    public CafeFunction asInit(){
+    public CafeFunction asInit() {
         isInit = true;
         return this;
     }
 
-    public boolean isInit(){
+    public boolean isInit() {
         return isInit;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public CafeFunction block(Block block){
+    public CafeFunction block(Block block) {
         this.block = block;
         return this;
     }
@@ -54,36 +54,38 @@ public class CafeFunction extends ExpressionStatement<CafeFunction>{
         return block;
     }
 
-    public boolean isSynthetic(){
+    public boolean isSynthetic() {
         return isSynthetic;
     }
 
-    public boolean isVarargs(){
+    public boolean isVarargs() {
         return isVarargs;
     }
 
-    public CafeFunction withVarargs(){
+    public CafeFunction withVarargs() {
         isVarargs = true;
         return this;
     }
 
-    public CafeFunction withParameters(Collection<?> names){
-        for(Object name: names){
+    public CafeFunction withParameters(Collection<?> names) {
+        for (Object name : names) {
             addParamterToBlockReferences(name.toString());
             parameterNames.add(name.toString());
         }
         return this;
     }
 
-    private void addParamterToBlockReferences(String name){
-        this.getBlock().getReferenceTable().add(SymbolReference.of(name, SymbolReference.Kind.VAR));
+    private void addParamterToBlockReferences(String name) {
+        this.getBlock()
+            .getReferenceTable()
+            .add(SymbolReference.of(name, SymbolReference.Kind.VAR));
     }
 
-    public int getArity(){
+    public int getArity() {
         return parameterNames.size();
     }
 
-    public List<String> getParameterNames(){
+    public List<String> getParameterNames() {
         return parameterNames;
     }
 

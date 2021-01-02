@@ -1,2 +1,5 @@
-package compiler.main.cli;public class Command {
+package compiler.main.cli;
+
+public interface Command {
+    void execute();
 }

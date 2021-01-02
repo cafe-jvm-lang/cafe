@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     // This dependency is used by the application.
-    implementation 'com.google.guava:guava:28.2-jre'
+ //   implementation 'com.google.guava:guava:28.2-jre'
 
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
     compile group: 'org.ow2.asm', name: 'asm', version: '7.3.1'
@@ -31,14 +31,32 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'compiler.Main'
+distributions{
+    main{
+        baseName = 'cafe'
+        contents{
+            from(projectDir){
+                include('README*')
+            }
+            into('samples'){
+                from('samples'){
+                    include '**/*.cafe'
+                }
+            }
+        }
     }
+}
+
+startScripts{
+    applicationName = 'cafe'
 }
 
 run {
     args = [".\\cp.txt"]
+}
+
+jar{
+    baseName = 'cafe'
 }
 
 application {
