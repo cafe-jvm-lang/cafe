@@ -185,12 +185,23 @@ public class Tokenizer {
         if (reader.ch == '"') {
             reader.scanChar();
             while (reader.ch != '"' && reader.ch != Character.MIN_VALUE) {
-                reader.putChar(reader.ch);
                 // Escape char after '\'
                 if (reader.ch == '\\') {
                     reader.scanChar();
-                    reader.putChar(reader.ch);
+                    switch (reader.ch){
+                        case 't':
+                            reader.putChar('\t');
+                            break;
+                        case 'n':
+                            reader.putChar('\n');
+                            break;
+                        case 'r':
+                            reader.putChar('\r');
+                            break;
+                    }
                 }
+                else
+                    reader.putChar(reader.ch);
                 reader.scanChar();
             }
             if (reader.ch == Character.MIN_VALUE) {

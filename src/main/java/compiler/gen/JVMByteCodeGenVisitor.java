@@ -98,6 +98,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
         private final Map<ForLoopStatement, Label> loopStartMap = new HashMap<>();
         private final Map<ForLoopStatement, Label> loopEndMap = new HashMap<>();
+        private final Map<ForLoopStatement, Label> loopIncrMap = new HashMap<>();
         private final Set<String> importedVariables = new HashSet<>();
     }
 
@@ -575,6 +576,21 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         }
     }
 
+    @Override
+    public void visitBreakContinue(BreakContinueStatement breakContinueStatement) {
+        Label jumpTarget;
+        if (BreakContinueStatement.Type.BREAK.equals(breakContinueStatement.getType())) {
+            jumpTarget = context.loopEndMap.get(breakContinueStatement.getEnclosingLoop());
+        } else {
+            ForLoopStatement loop = breakContinueStatement.getEnclosingLoop();
+            jumpTarget = context.loopIncrMap.get(loop);
+            if(jumpTarget == null)
+                jumpTarget = context.loopStartMap.get(loop);
+        }
+        mv.visitLdcInsn(0);
+        mv.visitJumpInsn(IFEQ, jumpTarget);
+    }
+
     private void asmFalseObject() {
         mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
     }
@@ -709,8 +725,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     public void visitForLoop(ForLoopStatement forLoopStatement) {
         Label loopStart = new Label();
         Label loopEnd = new Label();
+        Label loopIncr = new Label();
+
         context.loopStartMap.put(forLoopStatement, loopStart);
         context.loopEndMap.put(forLoopStatement, loopEnd);
+        context.loopIncrMap.put(forLoopStatement, loopIncr);
 
         if (forLoopStatement.hasInitStatement())
             for (AssignedStatement init : forLoopStatement.getInitStatements())
@@ -724,10 +743,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         forLoopStatement.getBlock()
                         .accept(this);
 
-        if (forLoopStatement.hasPostStatement())
+        mv.visitLabel(loopIncr);
+        if (forLoopStatement.hasPostStatement()) {
             for (CafeStatement<?> post : forLoopStatement.getPostStatements())
                 post.accept(this);
-
+        }
         mv.visitJumpInsn(GOTO, loopStart);
         mv.visitLabel(loopEnd);
     }

@@ -52,7 +52,7 @@ startScripts{
 }
 
 run {
-    args = [".\\cp.txt"]
+    args = [".\\cp.cafe"]
 }
 
 jar{

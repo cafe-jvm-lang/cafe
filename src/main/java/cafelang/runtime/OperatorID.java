@@ -2334,6 +2334,32 @@ public final class OperatorID {
         return a + b;
     }
 
+    public static Object plus(Integer a, String b) {
+        return a +  b;
+    }
+    public static Object plus(Float a, String b) {
+        return a + b;
+    }
+    public static Object plus(Double a, String b) {
+        return a + b;
+    }
+    public static Object plus(Long a, String b) {
+        return a + b;
+    }
+    public static Object plus(String a, Integer b) {
+        return a + b;
+    }
+    public static Object plus(String a, Float b) {
+        return a + b;
+    }
+    public static Object plus(String a, Double b) {
+        return a + b;
+    }
+    public static Object plus(String a, Long b) {
+        return a + b;
+    }
+
+
     public static Object times(String string, Integer n) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < n; i++) {

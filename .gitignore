@@ -12,4 +12,4 @@ build
 # JDT-specific (Eclipse Java Development Tools)     
 .classpath
 
-cp.txt
+cp.cafe

@@ -46,4 +46,6 @@ public interface CafeIrVisitor {
     void visitForLoop(ForLoopStatement forLoopStatement);
 
     void visitCafeImport(CafeImport cafeImport);
+
+    void visitBreakContinue(BreakContinueStatement breakContinueStatement);
 }

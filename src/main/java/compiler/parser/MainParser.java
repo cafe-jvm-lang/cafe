@@ -24,7 +24,7 @@ public class MainParser extends Parser {
     private Token token;
     private Log log;
     private boolean breakAllowed = false, innerLoop = false, error = false;
-    private List debug = new ArrayList();
+    private List<String> debug = new ArrayList<>();
     private MainParser() {
     }
 
@@ -1741,6 +1741,11 @@ public class MainParser extends Parser {
                 blockStmt.add(stm6);
                 debug.add("Block Stmt: " + token.kind);
                 accept(TokenKind.SEMICOLON);
+                break;
+            case BREAK: case CONTINUE:
+                StmtNode stm7 = parseFlowStatement();
+                blockStmt.add(stm7);
+                debug.add("Block Stmt: " + token.kind);
                 break;
             default:
                 error = true;

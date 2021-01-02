@@ -13,6 +13,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
         private final Deque<Deque<Object>> objectStack = new LinkedList<>();
+        private final Deque<ForLoopStatement> forLoopStack = new LinkedList<>();
+
         private boolean isModuleScope = true;
 
         private boolean isProperty = false;
@@ -410,6 +412,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitForStmt(Node.ForStmtNode n) {
         Context context = Context.context;
+        ForLoopStatement forLoop = ForLoopStatement.loop();
+        context.forLoopStack.push(forLoop);
 
         List<AssignedStatement> initStatements = null;
         if (n.init != null) {
@@ -434,11 +438,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         n.block.accept(this);
         Block block = (Block) context.pop();
-        ForLoopStatement forLoop = ForLoopStatement.loop()
-                                                   .condition(condition)
-                                                   .init(initStatements)
-                                                   .postStatement(postStatements)
-                                                   .block(block);
+        forLoop.condition(condition)
+               .init(initStatements)
+               .postStatement(postStatements)
+               .block(block);
+
+        context.forLoopStack.pop();
         context.push(forLoop);
     }
 
@@ -457,12 +462,18 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitContinueStmt(Node.ContinueStmtNode n) {
-
+        Context context = Context.context;
+        BreakContinueStatement continueStatement = BreakContinueStatement.newContinue()
+                                                                         .setEnclosingLoop(context.forLoopStack.peek());;
+        context.push(continueStatement);
     }
 
     @Override
     public void visitBreakStmt(Node.BreakStmtNode n) {
-
+        Context context = Context.context;
+        BreakContinueStatement breakStatement = BreakContinueStatement.newBreak()
+                                                                      .setEnclosingLoop(context.forLoopStack.peek());
+        context.push(breakStatement);
     }
 
     @Override

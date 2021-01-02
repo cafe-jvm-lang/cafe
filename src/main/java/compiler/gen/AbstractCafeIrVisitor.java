@@ -117,4 +117,9 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     public void visitReferenceLookup(ReferenceLookup referenceLookup) {
         referenceLookup.walk(this);
     }
+
+    @Override
+    public void visitBreakContinue(BreakContinueStatement breakContinueStatement) {
+
+    }
 }

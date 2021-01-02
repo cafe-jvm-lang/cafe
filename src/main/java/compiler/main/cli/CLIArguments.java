@@ -21,6 +21,7 @@ public class CLIArguments {
     private Log log;
     private File file;
     private SourceFileManager fileManager;
+    private Context context;
 
     public static CLIArguments instance(Context context) {
         CLIArguments instance = context.get(argsKey);
@@ -32,38 +33,37 @@ public class CLIArguments {
 
     private CLIArguments(Context context) {
         context.put(argsKey, this);
+        this.context = context;
         log = Log.instance(context);
         fileManager = SourceFileManager.instance(context);
     }
 
-    private enum Command{
-        COMPILE,
-        RUN
-    }
-
-    public void parse(String... args) {
+    public Command parse(String... args) {
 
         if (args.length < 1) {
             log.report(NO_FILE_PATH_GIVEN_IN_CLI, null,
                     message(NO_FILE_PATH_GIVEN_IN_CLI));
             log.printIssues();
-            return;
+            return null;
         }
 
-        for(String arg: args)
-            parseCommand(arg);
-
+        return parseCommand(args[0]);
     }
 
-    private void parseCommand(String arg){
-        if(arg.endsWith(".cafe")){
-            parseCompileCommand(arg);
+    private Command parseCommand(String arg){
+        int i = arg.lastIndexOf('.');
+        if(i >= 0) {
+            String type = arg.substring(i);
+            if (type.equals(".cafe")) {
+                return parseCompileCommand(arg);
+            }
         }
-      //  else if(arg.split("\\s*(\\ |\\s)\\s*"))
+        return null;
     }
 
-    private void parseCompileCommand(String fileName){
-
+    private CompileCommand parseCompileCommand(String fileName){
+        fileManager.setSourceFile(fileName);
+        return new CompileCommand(context);
     }
 
     private void parseRunCommand(){

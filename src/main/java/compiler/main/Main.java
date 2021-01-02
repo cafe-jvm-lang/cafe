@@ -1,6 +1,7 @@
 package compiler.main;
 
 import compiler.main.cli.CLIArguments;
+import compiler.main.cli.Command;
 import compiler.util.Context;
 import compiler.util.Log;
 
@@ -11,7 +12,6 @@ import compiler.util.Log;
 public class Main {
 
     private Log log;
-    private SourceFileManager fileManager;
     private CLIArguments arguments;
 
     public enum Result {
@@ -38,16 +38,16 @@ public class Main {
         Context context = new Context();
         log = Log.instance(context);
 
-        fileManager = SourceFileManager.instance(context);
-
         arguments = CLIArguments.instance(context);
-        arguments.parse(args);
+        Command command = arguments.parse(args);
 
         if (log.entries() > 0)
             return Result.CMDERR;
 
-        Compiler c = Compiler.instance(context);
-        c.compile();
+        command.execute();
+
+//        Compiler c = Compiler.instance(context);
+//        c.compile();
 
         if (log.entries() > 0) {
             log.printIssues();
