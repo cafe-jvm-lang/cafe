@@ -39,6 +39,7 @@ public final class Messages {
             put(DUPLICATE_SYMBOL, "Symbol {0} is already declared");
             put(SYMBOL_NOT_DECLARED, "Undeclared symbol {0}");
             put(LHS_EXPR_ERROR, "Illegal LHS expression `{0}`");
+            put(REASSIGN_CONSTANT, "Cannot reassign constant `{0}`");
             put(RETURN_OUTSIDE_BLOCK, "Return statement outside function");
         }};
 

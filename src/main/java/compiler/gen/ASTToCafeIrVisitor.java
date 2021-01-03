@@ -159,7 +159,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitConstDecl(Node.ConstDeclNode n) {
-
+        Context context = Context.context;
+        Node.IdenNode iden = n.var;
+        SymbolReference sym = context.createSymbolReference(iden.name, Node.ConstDeclNode.class);
+        n.val.accept(this);
+        DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, context.pop());
+        context.push(stmt);
     }
 
     @Override

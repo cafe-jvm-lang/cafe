@@ -73,6 +73,7 @@ public class Log {
         SYMBOL_NOT_DECLARED,
         LHS_EXPR_ERROR,
         DUPLICATE_SYMBOL,
+        REASSIGN_CONSTANT,
         RETURN_OUTSIDE_BLOCK;
     }
 

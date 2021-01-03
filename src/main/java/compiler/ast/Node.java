@@ -628,7 +628,6 @@ public abstract class Node {
     public static class VarDeclNode extends DeclNode {
         public IdenNode var;
         public ExprNode value;
-
         public VarDeclNode(IdenNode var) {
             this(var, null);
         }

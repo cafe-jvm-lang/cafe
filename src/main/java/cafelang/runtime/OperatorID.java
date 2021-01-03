@@ -79,7 +79,13 @@ public final class OperatorID {
             target = callSite.callerLookup.findStatic(
                     OperatorID.class, callSite.name, methodType(Object.class, arg1Class, arg2Class));
         } catch (Throwable t) {
-            return reject(args[0], args[1], callSite.name);
+            try{
+                target = callSite.callerLookup.findStatic(
+                        OperatorID.class, callSite.name, methodType(Object.class, Object.class, Object.class));
+            }
+            catch (Throwable t2) {
+                return reject(args[0], args[1], callSite.name);
+            }
         }
         return target.invokeWithArguments(args);
     }

@@ -53,8 +53,8 @@ public class SemanticsChecker implements Node.Visitor {
         log = Log.instance(context);
     }
 
-    private Symbol symbol(String name) {
-        return new Symbol(name);
+    private Symbol symbol(String name, boolean isConst) {
+        return new Symbol(name,isConst);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitVarDecl(VarDeclNode n) {
-        Symbol sym = symbol(n.var.name);
+        Symbol sym = symbol(n.var.name, false);
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
                     message(DUPLICATE_SYMBOL, n.var.name));
@@ -76,14 +76,22 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitIden(IdenNode n) {
-        if (!CST.isPresent(n.name))
-            logError(SYMBOL_NOT_DECLARED, n,
-                    message(SYMBOL_NOT_DECLARED, n.name));
+        if(exprType == Expr.LHS){
+            if(CST.isSymbolConstant(n.name)){
+               logError(REASSIGN_CONSTANT, n,
+                       message(REASSIGN_CONSTANT, n.name));
+            }
+        }
+        else {
+            if (!CST.isSymbolPresent(n.name))
+                logError(SYMBOL_NOT_DECLARED, n,
+                        message(SYMBOL_NOT_DECLARED, n.name));
+        }
     }
 
     @Override
     public void visitConstDecl(ConstDeclNode n) {
-        Symbol sym = symbol(n.var.name);
+        Symbol sym = symbol(n.var.name, true);
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
                     message(DUPLICATE_SYMBOL, n.var.name));
@@ -113,7 +121,7 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitFuncDecl(FuncDeclNode n) {
-        Symbol sym = symbol(n.name.name);
+        Symbol sym = symbol(n.name.name, false);
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
                     message(DUPLICATE_SYMBOL, n.name.name));
@@ -201,7 +209,7 @@ public class SemanticsChecker implements Node.Visitor {
     public void visitThis(ThisNode n) {
         if (exprType == Expr.LHS)
             logError(LHS_EXPR_ERROR, n,
-                    message(LHS_EXPR_ERROR, ""));
+                    message(LHS_EXPR_ERROR, "this"));
     }
 
     @Override
@@ -269,7 +277,7 @@ public class SemanticsChecker implements Node.Visitor {
     @Override
     public void visitParamList(ParameterListNode n) {
         for (IdenNode iden : n.params) {
-            Symbol sym = symbol(iden.name);
+            Symbol sym = symbol(iden.name, false);
             if (!CST.insert(sym))
                 logError(DUPLICATE_SYMBOL, n,
                         message(DUPLICATE_SYMBOL, iden.name));
@@ -397,8 +405,8 @@ public class SemanticsChecker implements Node.Visitor {
     }
 
     private void logError(Log.Type issue, Node n, String message) {
-        //	log.report(issue, n.getSourcePosition(),
-        //			errorDescription(n.getSourcePosition(), message));
+        	log.report(issue, Position.of(-1,-1),
+        			errorDescription(Position.of(-1,-1), message));
     }
 
 }

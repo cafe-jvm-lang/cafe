@@ -1,14 +1,18 @@
 package compiler.analyzer;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 final class Symbol {
     String name;
+    boolean isConst;
 
     public Symbol(String name) {
+        this(name, false);
+    }
+
+    public Symbol(String name,boolean isConst) {
         this.name = name;
+        this.isConst = isConst;
     }
 
     @Override
@@ -28,13 +32,13 @@ final class Symbol {
 public class SymbolTable {
     public final SymbolTable parent;
 
-    private final Set<Symbol> symbols;
+    private final Map<String,Symbol> symbols;
 
     private boolean canDeclare = true;
 
     public SymbolTable(SymbolTable parent) {
         this.parent = parent;
-        symbols = new HashSet<>();
+        symbols = new HashMap<>();
     }
 
     public SymbolTable notDeclarable() {
@@ -44,21 +48,48 @@ public class SymbolTable {
 
     public boolean insert(Symbol n) {
         if (!canDeclare) {
-            if (parent.isPresent(n.name)) {
+            if (parent.isSymbolPresent(n.name)) {
                 return false;
             }
         }
-        return symbols.add(n);
+        if(symbols.containsKey(n.name))
+            return false;
+        else {
+            symbols.put(n.name, n);
+            return true;
+        }
     }
 
-    public boolean isPresent(String n) {
+    public boolean isSymbolPresent(String n) {
         SymbolTable table = this;
-        Symbol s = new Symbol(n);
         while (table != null) {
-            if (table.symbols.contains(s))
+            if (table.symbols.containsKey(n))
                 return true;
             table = table.parent;
         }
         return false;
     }
+
+    public boolean isSymbolConstant(String n) {
+        SymbolTable table = this;
+        while (table != null) {
+            if (table.symbols.containsKey(n)){
+                if(table.symbols.get(n).isConst)
+                    return true;
+            }
+            table = table.parent;
+        }
+        return false;
+    }
+
+//    public Symbol get(String n){
+//        SymbolTable table = this;
+//        Symbol s = new Symbol(n);
+//        while (table != null) {
+//            if (table.symbols.contains(s))
+//                ;
+//            table = table.parent;
+//        }
+//        return false;
+//    }
 }

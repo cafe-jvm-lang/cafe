@@ -66,24 +66,29 @@ public class MainParser extends Parser {
         return message + ' ' + message(SOURCE_POSITION, position.getStartLine(), position.getStartColumn());
     }
 
-    boolean accept(TokenKind kind, Log.Type issue, String errorMessage) {
+    private boolean accept(TokenKind tokenKindExpected) {
         if (error) return false;
         if (token.kind == TokenKind.ERROR) {
             error = true;
             return false;
         }
-        if (kind == token.kind) {
+        if (tokenKindExpected == token.kind) {
             nextToken();
             return true;
         } else {
-            error = true;
-            log.report(issue, token.pos, errorDescription(token.pos, errorMessage));
+            logError(tokenKindExpected);
             return false;
         }
     }
 
-    boolean accept(TokenKind kind) {
-        return accept(kind, SYMBOL_EXPECTED, message(SYMBOL_EXPECTED, kind, token.kind));
+//    private boolean accept(TokenKind tokenKindExpected) {
+//        return accept(tokenKindExpected);
+//    }
+
+    private void logError(TokenKind tokenKindExpected){
+        error = true;
+        log.report(SYMBOL_EXPECTED, token.pos,
+                errorDescription(token.pos, message(SYMBOL_EXPECTED, tokenKindExpected, token.kind)));
     }
 
 //	void accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
@@ -1735,7 +1740,7 @@ public class MainParser extends Parser {
                 blockStmt.add(stm5);
                 break;
             case IDENTIFIER:
-            case THIS:
+            case THIS: case NULL:
                 StmtNode stm6 = parseExprStmt();
                 if (stm6 == null) return null;
                 blockStmt.add(stm6);
@@ -1748,8 +1753,7 @@ public class MainParser extends Parser {
                 debug.add("Block Stmt: " + token.kind);
                 break;
             default:
-                error = true;
-                accept(TokenKind.IDENTIFIER);
+                logError(TokenKind.IDENTIFIER);
         }
         if (error) return null;
         debug.add("Block Stmt: " + blockStmt);
