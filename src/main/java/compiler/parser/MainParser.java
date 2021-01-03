@@ -6,6 +6,7 @@ import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
 import compiler.util.Position;
+import compiler.util.Log.Type;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -208,6 +209,7 @@ public class MainParser extends Parser {
          * parseBitOrExpression() }
          */
         if (error) return null;
+        Token tk = token;
         ExprNode exp1 = parseBitOrExpression();
         while (token.kind == TokenKind.LT || token.kind == TokenKind.GT || token.kind == TokenKind.LTE
                 || token.kind == TokenKind.GTE || token.kind == TokenKind.IN || token.kind == TokenKind.IS
@@ -236,6 +238,8 @@ public class MainParser extends Parser {
             exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
+
+        exp1.setFirstToken(tk);
         return exp1;
     }
 
@@ -614,14 +618,20 @@ public class MainParser extends Parser {
 
     ExprNode parseNull() {
         if (error) return null;
+        Token tk = token;
         accept(TokenKind.NULL);
-        return new NullNode();
+        NullNode nullNode = new NullNode();
+        nullNode.setFirstToken(tk);
+        return nullNode;
     }
 
     ExprNode parseThis() {
         if (error) return null;
+        Token tk = token;
         accept(TokenKind.THIS);
-        return new ThisNode();
+        ThisNode thisNode = new ThisNode();
+        thisNode.setFirstToken(tk);
+        return thisNode;
     }
 
     ExprNode parseIdentifier() {
@@ -691,14 +701,21 @@ public class MainParser extends Parser {
          *
          */
         if (error) return null;
+        Token tk = token;
         if (token.kind == TokenKind.TRUE) {
             accept(TokenKind.TRUE);
             if (error) return null;
-            return new BoolLitNode(true);
+
+            BoolLitNode boolLit = new BoolLitNode(true);
+            boolLit.setFirstToken(tk);
+            return boolLit;
         } else if (token.kind == TokenKind.FALSE) {
             accept(TokenKind.FALSE);
             if (error) return null;
-            return new BoolLitNode(false);
+            
+            BoolLitNode boolLit = new BoolLitNode(false);
+            boolLit.setFirstToken(tk);
+            return boolLit;
         }
         return null;
     }
@@ -770,6 +787,11 @@ public class MainParser extends Parser {
         nextToken();
         accept(TokenKind.LPAREN);
         ifCond = parseLogicalOrExpression();
+        if(ifCond == null){
+            log.report(Type.ERROR, token.pos, errorDescription(token.pos,  "If without condition!"));            
+            error = true;
+            return null;
+        }
         accept(TokenKind.RPAREN);
         accept(TokenKind.LCURLY);
         if (token.kind != TokenKind.RCURLY)
@@ -1017,17 +1039,22 @@ public class MainParser extends Parser {
          * if(CONTINUE) return ContinueNode if(BREAK) return BreakNode
          */
         if (error) return null;
+        Token tk=token;
         if (breakAllowed)
             if (token.kind == TokenKind.CONTINUE) {
                 if (error) return null;
                 accept(TokenKind.CONTINUE);
                 accept(TokenKind.SEMICOLON);
-                return new ContinueStmtNode();
+                ContinueStmtNode continueStmtNode = new ContinueStmtNode();
+                continueStmtNode.setFirstToken(tk);
+                return continueStmtNode;
             } else {
                 if (error) return null;
                 accept(TokenKind.BREAK);
                 accept(TokenKind.SEMICOLON);
-                return new BreakStmtNode();
+                BreakStmtNode breakStmtNode = new BreakStmtNode();
+                breakStmtNode.setFirstToken(tk);
+                return breakStmtNode;
             }
         else {
             error = true;
@@ -1498,6 +1525,7 @@ public class MainParser extends Parser {
         while (token.kind != TokenKind.SEMICOLON) {
             if (error)
                 return null;
+            Token tk = token;
             IdenNode idenNode = (IdenNode) parseIdentifier();
             ExprNode exp = null;
             if (error)
@@ -1510,7 +1538,9 @@ public class MainParser extends Parser {
                 accept(TokenKind.COMMA);
             }
             debug.add("Var Decl: " + exp);
-            varDeclNodes.add(new VarDeclNode(idenNode, exp));
+            VarDeclNode varDecl = new VarDeclNode(idenNode, exp);
+            varDecl.setFirstToken(tk);
+            varDeclNodes.add(varDecl);
         }
         accept(TokenKind.SEMICOLON);
         if (error) return null;
@@ -1533,12 +1563,15 @@ public class MainParser extends Parser {
         while (token.kind != TokenKind.SEMICOLON) {
             if (error)
                 return null;
+            Token tk = token;
             IdenNode idenNode = (IdenNode) parseIdentifier();
             accept(TokenKind.EQU);
             ExprNode exp = parseValue();
             if (token.kind != TokenKind.SEMICOLON)
                 accept(TokenKind.COMMA);
-            constDeclNodes.add(new ConstDeclNode(idenNode, exp));
+            ConstDeclNode constDecl = new ConstDeclNode(idenNode, exp);
+            constDecl.setFirstToken(tk);
+            constDeclNodes.add(constDecl);
         }
         accept(TokenKind.SEMICOLON);
         if (error) return null;
@@ -1600,6 +1633,7 @@ public class MainParser extends Parser {
          */
         if (error) return null;
         accept(TokenKind.FUNC);
+        Token tk = token;
         ExprNode funcName = parseIdentifier();
         accept(TokenKind.LPAREN);
         ParameterListNode arg = parseParameter();
@@ -1617,7 +1651,10 @@ public class MainParser extends Parser {
         BlockNode block = new BlockNode();
         block.setStmt(stmt);
         if (error) return null;
-        return new FuncDeclNode((IdenNode) funcName, arg, block);
+
+        FuncDeclNode funcDecl = new FuncDeclNode((IdenNode) funcName, arg, block);
+        funcDecl.setFirstToken(tk);
+        return funcDecl;
     }
 
     void parseDeclarativeStatement() {
@@ -1653,11 +1690,15 @@ public class MainParser extends Parser {
     StmtNode parseReturnStatement() {
         if (error) return null;
         accept(TokenKind.RET);
+        Token tk = token;
         ExprNode exp = parseValue();
         debug.add("Return : " + exp);
         accept(TokenKind.SEMICOLON);
         if (error) return null;
-        return new ReturnStmtNode(exp);
+
+        ReturnStmtNode rtrnNode = new ReturnStmtNode(exp);
+        rtrnNode.setFirstToken(tk);
+        return rtrnNode;
     }
 
     BlockNode parseLoopBlock() {
