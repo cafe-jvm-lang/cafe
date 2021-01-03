@@ -1,1 +1,5 @@
-if(){}
+func m1(a,b) {
+    var i=1;
+    return 59+2;
+}
+print("Hello"+5);

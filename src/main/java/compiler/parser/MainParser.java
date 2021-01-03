@@ -222,6 +222,10 @@ public class MainParser extends Parser {
         if (error) return null;
         Token tk = token;
         ExprNode exp1 = parseBitOrExpression();
+        if(exp1 == null){
+            error= true;
+            return null;
+        }
         while (token.kind == TokenKind.LT || token.kind == TokenKind.GT || token.kind == TokenKind.LTE
                 || token.kind == TokenKind.GTE || token.kind == TokenKind.IN || token.kind == TokenKind.IS
                 || token.kind == TokenKind.NOT) {
@@ -546,6 +550,10 @@ public class MainParser extends Parser {
         if (error) return null;
         debug.add("Atom Expr Node Token: " + token.kind);
         ExprNode oExp = parseAtom();
+        if(oExp == null){
+            error = true;
+            return null;
+        }
         debug.add("Atom Expr Node Token: " + token.kind);
         if (oExp instanceof IdenNode || oExp instanceof ThisNode) {
             ExprNode trailer;
@@ -553,8 +561,12 @@ public class MainParser extends Parser {
                 oExp = trailer;
             }
         }
-
+        
         if (error) return null;
+        if(oExp == null){
+            error = true;
+            return null;
+        }
         return oExp;
     }
 
@@ -621,8 +633,14 @@ public class MainParser extends Parser {
             case THIS:
                 exp1 = parseThis();
                 break;
+            default:
+                error=true;
         }
         if (error) return null;
+        if (exp1 == null){
+            error = true;
+            return null;
+        }
         return (ExprNode) exp1;
 
     }
@@ -929,6 +947,7 @@ public class MainParser extends Parser {
             }
         }
         if (error) return null;
+        if(init.isEmpty()) return null;
         return init;
     }
 
