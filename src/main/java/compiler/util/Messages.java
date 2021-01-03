@@ -34,6 +34,7 @@ public final class Messages {
 
             // Parsing Errors
             put(SYMBOL_EXPECTED, "`{0}` expected, found `{1}`");
+            put(CONDITION_EXPECTED, "`Condition expected`");
 
             // Semantic Errors
             put(DUPLICATE_SYMBOL, "Symbol {0} is already declared");

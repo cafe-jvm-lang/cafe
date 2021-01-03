@@ -12,8 +12,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 
-import static compiler.util.Log.Type.SOURCE_POSITION;
-import static compiler.util.Log.Type.SYMBOL_EXPECTED;
+import static compiler.util.Log.Type.*;
 import static compiler.util.Messages.message;
 
 public class MainParser extends Parser {
@@ -90,6 +89,13 @@ public class MainParser extends Parser {
         error = true;
         log.report(SYMBOL_EXPECTED, token.pos,
                 errorDescription(token.pos, message(SYMBOL_EXPECTED, tokenKindExpected, token.kind)));
+    }
+
+    private void logError(Log.Type issue){
+        error = true;
+        log.report(issue, token.pos,
+                errorDescription(token.pos, message(issue)));
+
     }
 
 //	void accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
@@ -195,20 +201,20 @@ public class MainParser extends Parser {
          * parseRealtionalExpression() }
          */
         if (error) return null;
-        ExprNode exp1 = parseRealtionalExpression();
+        ExprNode exp1 = parseRelationalExpression();
         while (token.kind == TokenKind.EQUEQU) {
             if (error)
                 return null;
             String op = token.value();
             accept(token.kind);
-            ExprNode exp2 = parseRealtionalExpression();
+            ExprNode exp2 = parseRelationalExpression();
             exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
     }
 
-    ExprNode parseRealtionalExpression() {
+    ExprNode parseRelationalExpression() {
         /*
          * parseBitOrExpression() while(TokenType == <,>,<=,>=,in ,not in, is, is not ){
          * parseBitOrExpression() }
@@ -793,7 +799,8 @@ public class MainParser extends Parser {
         accept(TokenKind.LPAREN);
         ifCond = parseLogicalOrExpression();
         if(ifCond == null){
-            log.report(Type.ERROR, token.pos, errorDescription(token.pos,  "If without condition!"));
+        //    log.report(Type.ERROR, token.pos, errorDescription(token.pos,  "If without condition!"));
+            logError(CONDITION_EXPECTED);
             error = true;
             return null;
         }

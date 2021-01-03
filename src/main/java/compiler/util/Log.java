@@ -66,8 +66,8 @@ public class Log {
         EOF_PARSING_COMMENT,
 
         // Parsing errors
-        SEMICOLON_MISSING,
         SYMBOL_EXPECTED,
+        CONDITION_EXPECTED,
 
         // Semantic errors
         SYMBOL_NOT_DECLARED,
