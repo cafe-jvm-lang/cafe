@@ -249,8 +249,8 @@ public class MainParser extends Parser {
             exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
-
-        exp1.setFirstToken(tk);
+        if(exp1 != null)
+            exp1.setFirstToken(tk);
         return exp1;
     }
 
@@ -790,7 +790,7 @@ public class MainParser extends Parser {
     /* parseStatements */
     IfStmtNode parseIf() {
         if (error) return null;
-        ExprNode ifCond;
+        ExprNode ifCond=null;
         BlockNode ifBlock = new BlockNode();
 
         Token firstToken = token;
