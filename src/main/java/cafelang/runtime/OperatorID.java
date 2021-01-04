@@ -2335,36 +2335,6 @@ public final class OperatorID {
 
 
 // ==========================
-
-    public static Object plus(String a, String b) {
-        return a + b;
-    }
-
-    public static Object plus(Integer a, String b) {
-        return a +  b;
-    }
-    public static Object plus(Float a, String b) {
-        return a + b;
-    }
-    public static Object plus(Double a, String b) {
-        return a + b;
-    }
-    public static Object plus(Long a, String b) {
-        return a + b;
-    }
-    public static Object plus(String a, Integer b) {
-        return a + b;
-    }
-    public static Object plus(String a, Float b) {
-        return a + b;
-    }
-    public static Object plus(String a, Double b) {
-        return a + b;
-    }
-    public static Object plus(String a, Long b) {
-        return a + b;
-    }
-
     public static Object plus(Object a, Object b){
         return a.toString()+b.toString();
     }
