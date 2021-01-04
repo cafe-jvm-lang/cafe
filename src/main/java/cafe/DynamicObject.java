@@ -16,6 +16,6 @@ public class DynamicObject extends BasePrototype {
 
     @Override
     public String toString() {
-        return "<Dynamic Object>: \n ";
+        return "<Dynamic Object>: \n "+super.map;
     }
 }

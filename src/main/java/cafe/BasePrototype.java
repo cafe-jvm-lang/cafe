@@ -3,7 +3,6 @@ package cafe;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,9 +22,9 @@ public abstract class BasePrototype {
         try {
             DISPATCH_CALL = lookup.findStatic(DynamicObject.class, "dispatchCall",
                     methodType(Object.class, String.class, Object[].class));
-            DISPATCH_GET = lookup.findStatic(BasePrototype.class, "dispatchGetterStyle",
+            DISPATCH_GET = lookup.findStatic(BasePrototype.class, "getObject",
                     methodType(Object.class, String.class, BasePrototype.class));
-            DISPATCH_SET = lookup.findStatic(BasePrototype.class, "dispatchSetterStyle",
+            DISPATCH_SET = lookup.findStatic(BasePrototype.class, "setObject",
                     methodType(Object.class, String.class, BasePrototype.class, Object.class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
@@ -69,7 +68,7 @@ public abstract class BasePrototype {
 
     }
 
-    public static Object dispatchGetterStyle(String property, BasePrototype object) {
+    public static Object getObject(String property, BasePrototype object) {
         while (object != null) {
             if (object.get(property) != null)
                 return object.get(property);
@@ -78,14 +77,14 @@ public abstract class BasePrototype {
         return null;
     }
 
-    public static Object dispatchSetterStyle(String property, BasePrototype object, Object arg) throws Throwable {
+    public static Object setObject(String property, BasePrototype object, Object arg) throws Throwable {
         object.define(property, arg);
         return null;
     }
 
     public static Object dispatchCall(String property, Object... args) throws Throwable {
         BasePrototype obj = (BasePrototype) args[0];
-        Object o = obj.get(property);
+        Object o = getObject(property, obj);
         //args = Arrays.copyOfRange(args, 1,args.length);
         if(o instanceof Function)
             return ((Function) o).invoke(args);

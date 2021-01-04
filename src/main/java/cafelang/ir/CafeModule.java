@@ -28,7 +28,6 @@ public class CafeModule extends CafeElement<CafeModule> {
                                        Block.create(globalReferenceTable)
                                )
                                .asInit();
-        functions.add(initFunc);
     }
 
     public static CafeModule create(String moduleName, ReferenceTable referenceTable) {
@@ -61,6 +60,7 @@ public class CafeModule extends CafeElement<CafeModule> {
         LinkedList<CafeElement<?>> children = new LinkedList<>();
         children.addAll(getImports());
         children.addAll(functions);
+        children.add(initFunc);
         return children;
     }
 

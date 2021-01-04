@@ -1,8 +1,29 @@
-func B(a,b){
-    println(a+b);
-}
-func A(){
-    return B;
+
+func createRect(height, width){
+    var self = $_create(this);
+    self.height = height;
+    self.width = width;
+    return self;
 }
 
-A()(5,10);
+func area(){
+    return this.width * this.height;
+}
+var rectangle = {
+    create: createRect,
+    getArea: area
+};
+
+var rect1 = rectangle.create(5,10);
+println(rect1.getArea());
+
+var square = $_create(rectangle);
+
+func createSq(side){
+    return rectangle.create(side,side);
+}
+
+square.create = createSq;
+
+var sq1 = square.create(5);
+println(sq1.getArea());

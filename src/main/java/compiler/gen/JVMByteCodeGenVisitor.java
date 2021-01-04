@@ -276,9 +276,10 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
-        functionInvocation.getReference().accept(this);
         MethodType type;
 
+        // This will load Function object (if present) or throw error during runtime.
+        functionInvocation.getReference().accept(this);
         mv.visitTypeInsn(CHECKCAST, "cafe/Function");
 
         // load global THIS pointer

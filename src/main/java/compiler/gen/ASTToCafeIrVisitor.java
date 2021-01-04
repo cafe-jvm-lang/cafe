@@ -205,6 +205,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         context.push(statement);
     }
 
+    @Override
+    public void visitAnnFunc(Node.AnnFuncNode n) {
+
+    }
 
     @Override
     public void visitObjCreation(Node.ObjCreationNode n) {
@@ -235,11 +239,6 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         }
         context.push(block);
         context.leaveScope();
-    }
-
-    @Override
-    public void visitAnnFunc(Node.AnnFuncNode n) {
-
     }
 
     @Override
@@ -309,18 +308,14 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         n.args.accept(this);
         context.isProperty = isProperty;
 
+        // eg: a.b()
+        // b is a property of a, thus method invocation node is created.
         if (context.isProperty()) {
             n.invokedOn.accept(this);
             context.push(MethodInvocation.create(context.pop(), (List) context.pop()));
         } else {
-//            if (n.invokedOn.getTag() == Node.Tag.IDEN) {
-//                n.invokedOn.accept(this);
-//                context.push(FunctionInvocation.create(
-//                        context.pop(), (List) context.pop()
-//                ));
-//            } else {
-//                throw new AssertionError("Expected Identifier");
-//            }
+        // eg: a()
+        // a() is normal function call, thus function invocation node is created.
             n.invokedOn.accept(this);
             context.push(FunctionInvocation.create(
                     context.pop(), (List) context.pop()

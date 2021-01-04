@@ -46,9 +46,11 @@ public final class FunctionInvocationID {
     }
 
     public static Object fallback(FunctionCallSite callSite, Object[] args) throws Throwable {
+//        System.out.println("Name=>"+ callSite.name);
 //        for(int i=0;i<args.length;i++){
 //            System.out.println(args[i]);
 //        }
+//        System.out.println("====================");
 
         MethodHandle target = null;
         MethodHandle invoker = null;

@@ -2365,6 +2365,10 @@ public final class OperatorID {
         return a + b;
     }
 
+    public static Object plus(Object a, Object b){
+        return a.toString()+b.toString();
+    }
+
 
     public static Object times(String string, Integer n) {
         StringBuilder builder = new StringBuilder();
