@@ -34,10 +34,10 @@ public final class Messages {
 
             // Parsing Errors
             put(SYMBOL_EXPECTED, "`{0}` expected, found `{1}`");
-            put(CONDITION_EXPECTED, "`Condition expected`");
+            put(INVALID_EXPRESSION, "Invalid expression");
 
             // Semantic Errors
-            put(DUPLICATE_SYMBOL, "Symbol {0} is already declared");
+            put(DUPLICATE_SYMBOL, "Duplicate symbol `{0}`");
             put(SYMBOL_NOT_DECLARED, "Undeclared symbol {0}");
             put(LHS_EXPR_ERROR, "Illegal LHS expression `{0}`");
             put(REASSIGN_CONSTANT, "Cannot reassign constant `{0}`");

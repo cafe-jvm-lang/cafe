@@ -67,7 +67,7 @@ public class Log {
 
         // Parsing errors
         SYMBOL_EXPECTED,
-        CONDITION_EXPECTED,
+        INVALID_EXPRESSION,
 
         // Semantic errors
         SYMBOL_NOT_DECLARED,

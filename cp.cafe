@@ -1,5 +1,8 @@
-func m1(a,b) {
-    var i=1;
-    return 59+2;
+func B(a,b){
+    println(a+b);
 }
-print("Hello"+5);
+func A(){
+    return B;
+}
+
+A()(5,10);

@@ -6,7 +6,6 @@ import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
 import compiler.util.Position;
-import compiler.util.Log.Type;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -818,7 +817,7 @@ public class MainParser extends Parser {
         ifCond = parseLogicalOrExpression();
         if(ifCond == null){
         //    log.report(Type.ERROR, token.pos, errorDescription(token.pos,  "If without condition!"));
-            logError(CONDITION_EXPECTED);
+            logError(INVALID_EXPRESSION);
             error = true;
             return null;
         }
