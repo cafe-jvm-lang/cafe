@@ -53,24 +53,8 @@ public final class FunctionInvocationID {
         MethodHandle target = null;
         MethodHandle invoker = null;
 
-        // check in imports
-        if (args[0] == null) {
-            String name = callSite.name;
-            MethodHandles.Lookup caller = callSite.callerLookup;
-            Class<?> callerClass = caller.lookupClass();
-
-            Object obj = Imports.searchFromImports(callerClass, name, args.length - 1);
-            if (obj != null) {
-                if (obj instanceof Method) {
-                    Method method = (Method) obj;
-                    target = caller.unreflect(method);
-                }
-            } else
-                throw new NoSuchMethodError(name+callSite.type().toMethodDescriptorString());
-        } else {
-            Function targetRef = (Function) args[0];
-            target = targetRef.handle();
-        }
+        Function targetRef = (Function) args[0];
+        target = targetRef.handle();
 
         invoker = MethodHandles.dropArguments(target, 0, Function.class);
         //System.out.println(invoker);

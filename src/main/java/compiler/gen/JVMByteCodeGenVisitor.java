@@ -276,26 +276,17 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
-        ReferenceTable table = context.referenceTableStack.peek();
-        SymbolReference reference = functionInvocation.getReference()
-                                                      .resolveIn(table);
+        functionInvocation.getReference().accept(this);
         MethodType type;
 
-        // Method from import
-        if (reference == null) {
-            mv.visitInsn(ACONST_NULL);
-        } else if (reference.isGlobal()) {
-            mv.visitLdcInsn(reference.getName());
-            GlobalThis.retrieve(mv, className);
-            mv.visitTypeInsn(CHECKCAST, "cafe/Function");
-        }
+        mv.visitTypeInsn(CHECKCAST, "cafe/Function");
+
         // load global THIS pointer
         GlobalThis.loadThis(mv, className);
 
         type = genericMethodType(functionInvocation.getArity() + 2).changeParameterType(0, Function.class)
                                                                    .changeParameterType(1, BasePrototype.class);
-        String name = functionInvocation.getReference()
-                                        .getName();
+        String name = functionInvocation.getName();
         String typedef = type.toMethodDescriptorString();
         Handle handle = FUNC_INVOCATION_HANDLE;
 

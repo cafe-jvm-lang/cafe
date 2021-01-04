@@ -313,14 +313,18 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             n.invokedOn.accept(this);
             context.push(MethodInvocation.create(context.pop(), (List) context.pop()));
         } else {
-            if (n.invokedOn.getTag() == Node.Tag.IDEN) {
-                n.invokedOn.accept(this);
-                context.push(FunctionInvocation.create(
-                        context.pop(), (List) context.pop()
-                ));
-            } else {
-                throw new AssertionError("Expected Identifier");
-            }
+//            if (n.invokedOn.getTag() == Node.Tag.IDEN) {
+//                n.invokedOn.accept(this);
+//                context.push(FunctionInvocation.create(
+//                        context.pop(), (List) context.pop()
+//                ));
+//            } else {
+//                throw new AssertionError("Expected Identifier");
+//            }
+            n.invokedOn.accept(this);
+            context.push(FunctionInvocation.create(
+                    context.pop(), (List) context.pop()
+            ));
         }
     }
 

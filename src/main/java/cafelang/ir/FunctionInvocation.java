@@ -4,31 +4,41 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FunctionInvocation extends ExpressionStatement<FunctionInvocation> {
-    private ReferenceLookup ref;
+    private String name;
+    private ExpressionStatement<?> ref;
     private List<CafeElement<?>> arguments;
 
-    private FunctionInvocation(ReferenceLookup ref, List<CafeElement<?>> arguments) {
+    private FunctionInvocation(String name, ExpressionStatement<?> ref, List<CafeElement<?>> arguments) {
+        this.name = name;
         this.ref = ref;
         this.arguments = arguments;
     }
 
-    public ReferenceLookup getReference() {
+    public ExpressionStatement<?> getReference() {
         return ref;
     }
 
     public static FunctionInvocation create(Object ref, List<Object> args) {
         List<CafeElement<?>> arguments = new LinkedList<>();
         for (Object arg : args) {
-            if (arg instanceof CafeElement) {
-                arguments.add((CafeElement) arg);
+            if (arg instanceof CafeElement<?>) {
+                arguments.add((CafeElement<?>) arg);
             } else {
                 arguments.add(ExpressionStatement.of(arg));
             }
         }
+        String name = "#_ANN_CALL";
+        if(ref instanceof ReferenceLookup)
+            name= ((ReferenceLookup) ref).getName();
         return new FunctionInvocation(
-                ReferenceLookup.of(ref),
+                name,
+                ExpressionStatement.of(ref),
                 arguments
         );
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getArity() {
