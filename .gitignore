@@ -13,3 +13,6 @@ build
 .classpath
 
 cp.cafe
+/.idea/
+/.vscode/
+/.settings/

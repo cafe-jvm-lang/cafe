@@ -4,7 +4,6 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import compiler.main.cli.CLIArguments;
 import compiler.main.cli.Command;
-import compiler.util.Log;
 
 import java.util.Map;
 

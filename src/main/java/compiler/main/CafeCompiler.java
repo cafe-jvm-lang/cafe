@@ -1,7 +1,6 @@
 package compiler.main;
 
 import cafelang.ir.CafeModule;
-import compiler.analyzer.PrettyPrinter;
 import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
 import compiler.ast.Node.ProgramNode;

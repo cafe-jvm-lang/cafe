@@ -3,7 +3,6 @@ package cafelang.runtime;
 import cafe.Function;
 
 import java.lang.invoke.*;
-import java.lang.reflect.Method;
 
 import static java.lang.invoke.MethodType.methodType;
 
