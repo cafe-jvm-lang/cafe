@@ -62,7 +62,7 @@ run {
     // args = ["-c",".\\examples\\HelloWorld.cafe"]
 
     // Usage
-    // args = ["--usage", "-c"]
+    args = ["--usage", "-c"]
 }
 
 jar{
