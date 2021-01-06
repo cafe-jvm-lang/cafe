@@ -73,7 +73,7 @@ public final class Messages {
     public static void printPrefixed(Log.Type prefix, String message, Ansi.Color color) {
         AnsiConsole.systemInstall();
         System.out.println(
-                ansi().fg(color).a("["+MESSAGES.get(prefix)+"]").reset().a(message)
+                ansi().fg(color).a("["+MESSAGES.get(prefix)+"] ").reset().a(message)
         );
         AnsiConsole.systemUninstall();
     }

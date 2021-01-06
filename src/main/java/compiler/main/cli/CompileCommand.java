@@ -8,7 +8,7 @@ import compiler.main.Main;
 @Parameters(commandNames = {"-c"},  commandDescription = "Compiles Cafe source files")
 public class CompileCommand implements Command {
 
-    @Parameter(description = "[source-file].cafe")
+    @Parameter(description = "[source-file].cafe", required = true)
     String source;
 
     private CompileCommand(){
@@ -20,6 +20,8 @@ public class CompileCommand implements Command {
 
     @Override
     public Main.Result execute() {
-        return new CafeCompiler(source).compile();
+        if(source!=null)
+            return new CafeCompiler(source).compile();
+        return Main.Result.OK;
     }
 }
