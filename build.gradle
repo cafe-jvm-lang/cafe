@@ -41,8 +41,8 @@ distributions{
             from(projectDir){
                 include('README*')
             }
-            into('samples'){
-                from('samples'){
+            into('examples'){
+                from('examples'){
                     include '**/*.cafe'
                 }
             }
@@ -55,8 +55,11 @@ startScripts{
 }
 
 run {
-    //args = ["-r","cp"]
-    args = ["-c",".\\cp.cafe"]
+    // RUN
+    // args = ["-r","-cp=.\\examples\\","HelloWorld"]
+
+    // Compile
+    //args = ["-c",".\\examples\\HelloWorld.cafe"]
 }
 
 jar{
