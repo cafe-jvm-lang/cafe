@@ -30,6 +30,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.beust/jcommander
     implementation group: 'com.beust', name: 'jcommander', version: '1.78'
 
+    implementation 'org.fusesource.jansi:jansi:2.1.1'
+
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
@@ -59,7 +61,7 @@ run {
     // args = ["-r","-cp=.\\examples\\","HelloWorld"]
 
     // Compile
-    //args = ["-c",".\\examples\\HelloWorld.cafe"]
+    // args = ["-c",".\\examples\\HelloWorld.cafe"]
 }
 
 jar{

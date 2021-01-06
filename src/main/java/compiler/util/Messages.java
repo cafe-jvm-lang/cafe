@@ -1,15 +1,22 @@
 package compiler.util;
 
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 
 import static compiler.util.Log.Type.*;
+import static org.fusesource.jansi.Ansi.ansi;
 
 public final class Messages {
     private static final String ERROR = "\u001B[31m"; // red
     private static final String INFO = "\u001B[34m";  // blue
     private static final String WARNING = "\u001B[33m"; // yellow
     private static final String SUCCESS = "\u001B[36m"; // cyan
+
+    private static final Ansi.Color JERROR = Ansi.Color.RED;
+    private static final Ansi.Color JSUCCESS = Ansi.Color.GREEN;
 
     private static final HashMap<Log.Type, String> MESSAGES;
 
@@ -59,14 +66,23 @@ public final class Messages {
     }
 
     public static void printPrefixed(Log.Type prefix, String message, String color) {
+        AnsiConsole.systemInstall();
         System.err.println(prefixed(prefix, message, color));
     }
 
+    public static void printPrefixed(Log.Type prefix, String message, Ansi.Color color) {
+        AnsiConsole.systemInstall();
+        System.out.println(
+                ansi().fg(color).a("["+MESSAGES.get(prefix)+"]").reset().a(message)
+        );
+        AnsiConsole.systemUninstall();
+    }
+
     public static void error(Object message) {
-        printPrefixed(Log.Type.ERROR, String.valueOf(message), ERROR);
+        printPrefixed(Log.Type.ERROR, String.valueOf(message), JERROR);
     }
 
     public static void success(Object message) {
-        printPrefixed(Log.Type.SUCCESS, String.valueOf(message), SUCCESS);
+        printPrefixed(Log.Type.SUCCESS, String.valueOf(message), JSUCCESS);
     }
 }
