@@ -18,7 +18,6 @@ import static compiler.util.Messages.message;
  */
 public class SourceFileManager {
     public static final Context.Key<SourceFileManager> fileKey = new Context.Key<>();
-    private String fileName;
     private File file;
     private Log log;
 
@@ -37,25 +36,16 @@ public class SourceFileManager {
     }
 
     public void setSourceFile(String path) {
-        File f = new File(path);
-        if (f.exists() && !f.isDirectory()) {
-            this.file = f;
-            this.fileName = f.getName();
+        File file = new File(path);
+        if (file.exists() && !file.isDirectory()) {
+            this.file = file;
         } else {
             log.report(INVALID_CLI_FILE_PATH, null,
                     message(INVALID_CLI_FILE_PATH, path));
         }
     }
 
-    File getSourceFile() {
-        return file;
-    }
-
-    String getSourceFileName() {
-        return this.fileName;
-    }
-
-    List<Character> getSourceFileCharList() {
+    List<Character> asCharList() {
         char ch;
         List<Character> list = new ArrayList<>(100);
         BufferedReader br;

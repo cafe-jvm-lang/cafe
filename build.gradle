@@ -25,7 +25,10 @@ dependencies {
  //   implementation 'com.google.guava:guava:28.2-jre'
 
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
-    compile group: 'org.ow2.asm', name: 'asm', version: '7.3.1'
+    implementation group: 'org.ow2.asm', name: 'asm', version: '7.3.1'
+
+    // https://mvnrepository.com/artifact/com.beust/jcommander
+    implementation group: 'com.beust', name: 'jcommander', version: '1.78'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
@@ -52,7 +55,8 @@ startScripts{
 }
 
 run {
-    args = [".\\cp.cafe"]
+    //args = ["-r","cp"]
+    args = ["-c",".\\cp.cafe"]
 }
 
 jar{

@@ -52,11 +52,13 @@ public class Log {
     public enum Type {
         ERROR,
         WARNING,
+        SUCCESS,
         SOURCE_POSITION,
 
         // CLI errors
         NO_FILE_PATH_GIVEN_IN_CLI,
         INVALID_CLI_FILE_PATH,
+        MODULE_NOT_FOUND,
 
         // Lex error
         ILLEGAL_CHARACTER,

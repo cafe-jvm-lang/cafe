@@ -10,8 +10,8 @@ public enum ParserType {
 
     String parserClassName;
 
-    ParserType(String string) {
-        this.parserClassName = string;
+    ParserType(String className) {
+        this.parserClassName = className;
     }
 
     String getParserClassName() {

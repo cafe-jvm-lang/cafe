@@ -63,7 +63,7 @@ public class CLIArguments {
 
     private CompileCommand parseCompileCommand(String fileName){
         fileManager.setSourceFile(fileName);
-        return new CompileCommand(context);
+        return null;
     }
 
     private void parseRunCommand(){

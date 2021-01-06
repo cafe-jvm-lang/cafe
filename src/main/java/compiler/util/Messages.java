@@ -9,13 +9,13 @@ public final class Messages {
     private static final String ERROR = "\u001B[31m"; // red
     private static final String INFO = "\u001B[34m";  // blue
     private static final String WARNING = "\u001B[33m"; // yellow
-    private static final String STACK = "\u001B[36m"; // cyan
+    private static final String SUCCESS = "\u001B[36m"; // cyan
 
     private static final HashMap<Log.Type, String> MESSAGES;
 
     static {
         MESSAGES = new HashMap<>() {{
-
+            put(Log.Type.SUCCESS, "SUCCESS");
             put(Log.Type.ERROR, "ERROR");
             put(Log.Type.WARNING, "WARNING");
 
@@ -24,6 +24,7 @@ public final class Messages {
 
             // CLI Errors
             put(INVALID_CLI_FILE_PATH, "Path `{0}` does not exists");
+            put(MODULE_NOT_FOUND, "Module `{0}` not found");
 
             // Lexical Errors
             put(NO_FILE_PATH_GIVEN_IN_CLI, "No source file provided to compile");
@@ -63,5 +64,9 @@ public final class Messages {
 
     public static void error(Object message) {
         printPrefixed(Log.Type.ERROR, String.valueOf(message), ERROR);
+    }
+
+    public static void success(Object message) {
+        printPrefixed(Log.Type.SUCCESS, String.valueOf(message), SUCCESS);
     }
 }

@@ -1,17 +1,19 @@
 package compiler.main;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import compiler.main.cli.CLIArguments;
 import compiler.main.cli.Command;
-import compiler.util.Context;
 import compiler.util.Log;
+
+import java.util.Map;
 
 /**
  * @author Dhyey
- * @version 1.0
+ * @version 0.0.1
  */
-public class Main {
+public final class Main {
 
-    private Log log;
     private CLIArguments arguments;
 
     public enum Result {
@@ -35,23 +37,31 @@ public class Main {
 
     public Result compile(String[] args) {
         long startTime = System.nanoTime();
-        Context context = new Context();
-        log = Log.instance(context);
+//        Context context = new Context();
+//        log = Log.instance(context);
 
-        arguments = CLIArguments.instance(context);
-        Command command = arguments.parse(args);
+        //arguments = CLIArguments.instance(context);
+        //Command command = arguments.parse(args);
 
-        if (log.entries() > 0)
-            return Result.CMDERR;
+        JCommander cmd = new JCommander();
+        cmd.setProgramName("cafe");
 
-        command.execute();
+        Command.initCommands();
+        for(Map.Entry<Command.CommandName, Command> command: Command.commands.entrySet()){
+            cmd.addCommand(command.getValue());
+        }
 
-//        Compiler c = Compiler.instance(context);
-//        c.compile();
-
-        if (log.entries() > 0) {
-            log.printIssues();
-            return Result.ERROR;
+        try{
+            cmd.parse(args);
+            String command = cmd.getParsedCommand();
+            JCommander parsedJCommander = cmd.getCommands().get(command);
+            Object commandObject = parsedJCommander.getObjects().get(0);
+            if(commandObject instanceof Command){
+                ((Command) commandObject).execute();
+            }
+        }
+        catch (ParameterException e){
+            System.err.println(e.getMessage());
         }
 
         long endTime = System.nanoTime();

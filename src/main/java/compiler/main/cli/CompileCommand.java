@@ -1,16 +1,25 @@
 package compiler.main.cli;
 
-import compiler.main.Compiler;
-import compiler.util.Context;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import compiler.main.CafeCompiler;
+import compiler.main.Main;
 
+@Parameters(commandNames = {"-c"}, commandDescriptionKey = "compile")
 public class CompileCommand implements Command {
-    private Context context;
-    public CompileCommand(Context context){
-        this.context = context;
+
+    @Parameter(descriptionKey = "source_file")
+    String source;
+
+    private CompileCommand(){
+    }
+
+    static {
+        Command.registerCommand(CommandName.COMPILE, new CompileCommand());
     }
 
     @Override
-    public void execute() {
-        Compiler.instance(context).compile();
+    public Main.Result execute() {
+        return new CafeCompiler(source).compile();
     }
 }
