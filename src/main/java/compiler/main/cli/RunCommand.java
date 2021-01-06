@@ -20,13 +20,15 @@ import static compiler.util.Messages.message;
 import static java.lang.invoke.MethodHandles.publicLookup;
 import static java.lang.invoke.MethodType.methodType;
 
-@Parameters(commandNames = {"-r"}, separators = "=", commandDescriptionKey = "run")
+@Parameters(commandNames = {"-r"}, separators = "=", commandDescription = "Executes compiled Cafe code")
 public class RunCommand implements Command {
 
-    @Parameter(names = {"-cp", "--classpath"})
+    @Parameter(names = {"-cp", "--classpath"},
+            description = "A , separated list of directories to search for class files.")
     List<String> classPath = new LinkedList<>();
 
-    @Parameter(descriptionKey = "arguments")
+    @Parameter(descriptionKey = "arguments",
+            description = "[runtime arguments]")
     List<String> arguments = new LinkedList<>();
 
     static {

@@ -5,10 +5,10 @@ import com.beust.jcommander.Parameters;
 import compiler.main.CafeCompiler;
 import compiler.main.Main;
 
-@Parameters(commandNames = {"-c"}, commandDescriptionKey = "compile")
+@Parameters(commandNames = {"-c"},  commandDescription = "Compiles Cafe source files")
 public class CompileCommand implements Command {
 
-    @Parameter(descriptionKey = "source_file")
+    @Parameter(description = "[source-file].cafe")
     String source;
 
     private CompileCommand(){

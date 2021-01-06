@@ -1,8 +1,6 @@
 package compiler.main;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-import compiler.main.cli.CLIArguments;
+import com.beust.jcommander.*;
 import compiler.main.cli.Command;
 
 import java.util.Map;
@@ -12,9 +10,6 @@ import java.util.Map;
  * @version 0.0.1
  */
 public final class Main {
-
-    private CLIArguments arguments;
-
     public enum Result {
         OK(0), // Compilation completed with no errors.
         ERROR(1), // Completed but reported errors.
@@ -34,15 +29,21 @@ public final class Main {
     public Main() {
     }
 
+    static class GlobalArguments {
+        @Parameter(names = {"--help"}, description = "Prints this message", help = true)
+        boolean help;
+
+        @Parameter(names = {"--usage"}, description = "Command name to print its usage")
+        String usageCommand;
+    }
+
     public Result compile(String[] args) {
         long startTime = System.nanoTime();
-//        Context context = new Context();
-//        log = Log.instance(context);
 
-        //arguments = CLIArguments.instance(context);
-        //Command command = arguments.parse(args);
+        GlobalArguments globalArguments = new GlobalArguments();
 
-        JCommander cmd = new JCommander();
+        JCommander cmd = new JCommander(globalArguments);
+        DefaultUsageFormatter usageFormatter = new DefaultUsageFormatter(cmd);
         cmd.setProgramName("cafe");
 
         Command.initCommands();
@@ -52,11 +53,22 @@ public final class Main {
 
         try{
             cmd.parse(args);
-            String command = cmd.getParsedCommand();
-            JCommander parsedJCommander = cmd.getCommands().get(command);
-            Object commandObject = parsedJCommander.getObjects().get(0);
-            if(commandObject instanceof Command){
-                ((Command) commandObject).execute();
+            if (globalArguments.usageCommand != null) {
+                usageFormatter.usage(globalArguments.usageCommand);
+            } else
+            if(cmd.getParsedCommand() == null || globalArguments.help){
+                cmd.usage();
+            }else {
+                String command = cmd.getParsedCommand();
+                JCommander parsedJCommander = cmd.getCommands()
+                                                 .get(command);
+                Object commandObject = parsedJCommander.getObjects()
+                                                       .get(0);
+                if (commandObject instanceof Command) {
+                    ((Command) commandObject).execute();
+                } else {
+                    return Result.CMDERR;
+                }
             }
         }
         catch (ParameterException e){

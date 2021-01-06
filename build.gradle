@@ -21,8 +21,6 @@ repositories {
 }
 
 dependencies {
-    // This dependency is used by the application.
- //   implementation 'com.google.guava:guava:28.2-jre'
 
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
     implementation group: 'org.ow2.asm', name: 'asm', version: '7.3.1'
@@ -62,6 +60,9 @@ run {
 
     // Compile
     // args = ["-c",".\\examples\\HelloWorld.cafe"]
+
+    // Usage
+    // args = ["--usage", "-c"]
 }
 
 jar{
