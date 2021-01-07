@@ -22,6 +22,6 @@ public class CompileCommand implements Command {
     public Main.Result execute() {
         if(source!=null)
             return new CafeCompiler(source).compile();
-        return Main.Result.OK;
+        return Main.Result.ERROR;
     }
 }

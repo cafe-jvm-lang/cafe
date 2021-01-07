@@ -405,6 +405,7 @@ public class SemanticsChecker implements Node.Visitor {
     }
 
     private void logError(Log.Type issue, Node n, String message) {
+        System.out.println(message);
         	log.report(issue, n.getSourcePosition(),
         			errorDescription(n.getSourcePosition(), message));
     }

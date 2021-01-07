@@ -24,19 +24,20 @@ public class CafeCompiler {
     private ParserFactory parserFactory;
     private Log log;
     private SourceFileManager fileManager;
-    private final String moduleName;
 
     private Parser parser;
     private SemanticsChecker analyzer;
 
+    private final String source;
     private String outputFilePath;
+    private final String moduleName;
 
     public CafeCompiler(String source) {
         Context context = new Context();
+        this.source = source;
 
         log = Log.instance(context);
         fileManager = SourceFileManager.instance(context);
-        fileManager.setSourceFile(source);
 
         String fileName = source.substring( source.lastIndexOf('\\')+1);
         moduleName = fileName.substring(0, fileName.lastIndexOf('.'));
@@ -45,12 +46,12 @@ public class CafeCompiler {
         outputFilePath += moduleName + ".class";
 
         parserFactory = ParserFactory.instance(context);
-        parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.asCharList());
 
         analyzer = SemanticsChecker.instance(context);
     }
 
     enum Phase {
+        INIT,
         PARSE,
         ANALYZE,
         IR,
@@ -59,6 +60,7 @@ public class CafeCompiler {
 
     boolean checkErrors() {
         if (log.entries() > 0) {
+            log.printIssues();
             return true;
         }
         return false;
@@ -70,7 +72,11 @@ public class CafeCompiler {
         byte[] byteCode = null;
         for (Phase phase : Phase.values()) {
             switch (phase) {
+                case INIT:
+                    fileManager.setSourceFile(source);
+                    break;
                 case PARSE:
+                    parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.asCharList());
                     programNode = parser.parse();
                     break;
                 case ANALYZE:

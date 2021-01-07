@@ -1,0 +1,19 @@
+
+func Z(){
+	return B;
+}
+
+func A(fn){
+    return fn();
+}
+
+func B(){
+	print("I'm B");
+}
+
+var obj = {
+	Foo: A,
+};
+
+var b = obj.Foo(Z);
+b(); # I’m B

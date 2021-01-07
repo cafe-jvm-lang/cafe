@@ -71,10 +71,10 @@ startScripts{
 
 run {
     // RUN
-    // args = ["-r","-cp=.\\examples\\","HelloWorld"]
+    // args = ["-r","-cp=.\\examples\\","HighOrderFunction"]
 
     // Compile
-    // args = ["-c",".\\examples\\HelloWorld.cafe"]
+    args = ["-c",".\\examples\\HighOrderFunction.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]
