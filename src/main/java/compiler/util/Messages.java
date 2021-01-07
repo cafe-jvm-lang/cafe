@@ -21,7 +21,7 @@ public final class Messages {
     private static final HashMap<Log.Type, String> MESSAGES;
 
     static {
-        MESSAGES = new HashMap<>() {{
+        MESSAGES = new HashMap<Log.Type, String>() {{
             put(Log.Type.SUCCESS, "SUCCESS");
             put(Log.Type.ERROR, "ERROR");
             put(Log.Type.WARNING, "WARNING");

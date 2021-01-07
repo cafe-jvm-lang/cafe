@@ -29,7 +29,7 @@ public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessState
 
     @Override
     public List<CafeElement<?>> children() {
-        LinkedList<CafeElement<?>> list = new LinkedList();
+        LinkedList<CafeElement<?>> list = new LinkedList<>();
         list.add(accessedOn);
         list.add(property);
         return list;

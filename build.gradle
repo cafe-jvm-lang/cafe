@@ -12,6 +12,19 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
+
+    id 'distribution'
+}
+
+group 'cafe'
+version '0.0.1-beta'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.compilerArgs += ["-Xlint:all", "-Xlint:-serial", "-parameters"]
 }
 
 repositories {
@@ -28,6 +41,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.beust/jcommander
     implementation group: 'com.beust', name: 'jcommander', version: '1.78'
 
+    // https://search.maven.org/artifact/org.fusesource.jansi/jansi/2.1.1/jar
     implementation 'org.fusesource.jansi:jansi:2.1.1'
 
     // Use JUnit test framework
@@ -36,7 +50,7 @@ dependencies {
 
 distributions{
     main{
-        baseName = 'cafe'
+        baseName("cafe")
         contents{
             from(projectDir){
                 include('README*')
@@ -48,6 +62,7 @@ distributions{
             }
         }
     }
+
 }
 
 startScripts{
@@ -63,10 +78,6 @@ run {
 
     // Usage
     // args = ["--usage", "-c"]
-}
-
-jar{
-    baseName = 'cafe'
 }
 
 application {

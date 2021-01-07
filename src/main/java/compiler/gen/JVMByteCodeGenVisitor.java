@@ -26,7 +26,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out",
                 "Ljava/io/PrintStream;");//put System.out to operand stack
         mv.visitInsn(SWAP); // swap of the top two values of the opestack: value1 value2 => value2 value1
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V");
+        // mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V");
     }
 
     private static final String JOBJECT = "java/lang/Object";
