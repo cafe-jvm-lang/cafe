@@ -669,7 +669,9 @@ public class MainParser extends Parser {
         if (error) return null;
         Token prev = token;
         accept(TokenKind.IDENTIFIER);
-        return new IdenNode(prev.value());
+        IdenNode iden = new IdenNode(prev.value());
+        iden.setFirstToken(prev);
+        return iden;
 
     }
 
