@@ -30,6 +30,7 @@ public enum OperatorType {
     AND("and"),
     OR("or"),
     NOT("not"),
+    NOTOP("!"),
 
     IS("is"),
     ISNOT("isnot"),

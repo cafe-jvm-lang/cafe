@@ -652,15 +652,17 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         SymbolReference reference = referenceLookup.resolveIn(context.referenceTableStack.peek());
         String name = referenceLookup.getName();
         // search in imports
+        // TODO: optimize searching in imports
         if (reference == null) {
             // if variable was previously imported
-            if (context.importedVariables.contains(name)) {
-                mv.visitLdcInsn(name);
-                GlobalThis.retrieve(mv, className);
-            } else {
-                // create an entry for new imported variable
-                visitVariableInImports(name);
-            }
+//            if (context.importedVariables.contains(name)) {
+//                mv.visitLdcInsn(name);
+//                GlobalThis.retrieve(mv, className);
+//            } else {
+//                // create an entry for new imported variable
+//                visitVariableInImports(name);
+//            }
+            visitVariableInImports(name);
             return;
         }
 
@@ -673,7 +675,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     private void visitVariableInImports(String varName){
-        context.importedVariables.add(varName);
+        // context.importedVariables.add(varName);
         mv.visitLdcInsn(varName);
         mv.visitInvokeDynamicInsn(
                 varName,

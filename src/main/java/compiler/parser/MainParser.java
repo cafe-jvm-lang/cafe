@@ -436,7 +436,9 @@ public class MainParser extends Parser {
          */
         if (error) return null;
         ExprNode exp1 = null;
-        if (token.kind == TokenKind.SUB || token.kind == TokenKind.TILDE) {
+        if (token.kind == TokenKind.SUB || token.kind == TokenKind.TILDE
+                || token.kind == TokenKind.NOT
+                || token.kind == TokenKind.NOTOP) {
             if (prevToken().kind == TokenKind.IDENTIFIER) {
                 // Handle Case where previous token is identifier and sould not generate
                 // UnaryOperator

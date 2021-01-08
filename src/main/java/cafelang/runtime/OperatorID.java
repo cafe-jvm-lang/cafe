@@ -2236,6 +2236,10 @@ public final class OperatorID {
         return !a;
     }
 
+    public static Object notop(Boolean a) {
+        return !a;
+    }
+
     // ==========================
     public static Object bitor(Integer a, Integer b) {
         return a | b;
@@ -2335,6 +2339,10 @@ public final class OperatorID {
 
 
 // ==========================
+    public static Object equals(Object a, Object b){
+        return a == b;
+    }
+
     public static Object plus(Object a, Object b){
         return a.toString()+b.toString();
     }
@@ -2346,6 +2354,10 @@ public final class OperatorID {
             builder.append(string);
         }
         return builder.toString();
+    }
+
+    public static Object times(Integer n, String string){
+        return times(string, n);
     }
 
     public static Object is(Object a, Object b) {

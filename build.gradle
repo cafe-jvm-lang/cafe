@@ -71,10 +71,10 @@ startScripts{
 
 run {
     // RUN
-    // args = ["-r","-cp=.\\examples\\","ThisBinding"]
+    // args = ["-r","-cp=.\\examples\\","HelloWorld"]
 
     // Compile
-    args = ["-c",".\\examples\\HelloWorld.cafe"]
+    // args = ["-c",".\\examples\\HelloWorld.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]
