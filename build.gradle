@@ -71,10 +71,10 @@ startScripts{
 
 run {
     // RUN
-    // args = ["-r","-cp=.\\examples\\","HighOrderFunction"]
+    // args = ["-r","-cp=.\\examples\\","ThisBinding"]
 
     // Compile
-    args = ["-c",".\\examples\\HighOrderFunction.cafe"]
+    args = ["-c",".\\examples\\HelloWorld.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]

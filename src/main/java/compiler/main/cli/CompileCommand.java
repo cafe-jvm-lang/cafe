@@ -20,8 +20,6 @@ public class CompileCommand implements Command {
 
     @Override
     public Main.Result execute() {
-        if(source!=null)
-            return new CafeCompiler(source).compile();
-        return Main.Result.ERROR;
+        return new CafeCompiler(source).compile();
     }
 }

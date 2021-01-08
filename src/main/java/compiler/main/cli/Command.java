@@ -28,6 +28,10 @@ public interface Command {
         commands.put(type, command);
     }
 
+    static Command getCommand(CommandName type){
+        return commands.get(type);
+    }
+
     static void initCommands() {
         for (CommandName command : CommandName.values()) {
             try {
@@ -36,5 +40,9 @@ public interface Command {
                 e.printStackTrace();
             }
         }
+    }
+
+    default void callRun(){
+
     }
 }

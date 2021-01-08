@@ -505,10 +505,10 @@ public class Tokenizer {
                     reader.scanChar();
                     tokenKind = TokenKind.MOD;
                     break LOOP;
-                case '\'':
-                    reader.scanChar();
-                    tokenKind = TokenKind.SQOUTE;
-                    break LOOP;
+//                case '\'':
+//                    reader.scanChar();
+//                    tokenKind = TokenKind.SQOUTE;
+//                    break LOOP;
                 case '"':
                     scanString();
                     break LOOP;

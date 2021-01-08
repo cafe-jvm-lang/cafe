@@ -80,7 +80,7 @@ public final class Main {
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-        System.out.println("Time elapsed: " + duration / 1000000 + "ms");
+        System.out.println("\nTime elapsed: " + duration / 1000000 + "ms");
 
         return Result.OK;
     }

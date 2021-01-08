@@ -82,11 +82,11 @@ public class SemanticsChecker implements Node.Visitor {
                        message(REASSIGN_CONSTANT, n.name));
             }
         }
-        else {
-            if (!CST.isSymbolPresent(n.name))
-                logError(SYMBOL_NOT_DECLARED, n,
-                        message(SYMBOL_NOT_DECLARED, n.name));
-        }
+//        else {
+//            if (!CST.isSymbolPresent(n.name))
+//                logError(SYMBOL_NOT_DECLARED, n,
+//                        message(SYMBOL_NOT_DECLARED, n.name));
+//        }
     }
 
     @Override

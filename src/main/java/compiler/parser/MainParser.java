@@ -633,7 +633,7 @@ public class MainParser extends Parser {
                 exp1 = parseThis();
                 break;
             default:
-                error=true;
+                logError(INVALID_EXPRESSION);
         }
         if (error) return null;
         if (exp1 == null){
