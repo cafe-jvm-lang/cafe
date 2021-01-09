@@ -20,7 +20,7 @@ the build can bootstrap itself by downloading the qualified Gradle version from 
 
 Cafe requires Java 8 to build.
 
-In practice you can run most Cafe code with Java 11 and beyond.
+In practice you can run most Cafe code with Java 8 and beyond.
 
 ### Building
 
@@ -31,7 +31,10 @@ This project is built with [IntelliJ IDEA](https://www.jetbrains.com/idea/) and 
 For running as a java project, [java-application-plugin](https://docs.gradle.org/current/userguide/java_plugin.html) is already included and can be invoked with `gradlew run`.
 The source file to compile can be set from `build.gradle` `run` method.
 
-For now, testing is not done, though [JUnit](https://junit.org/) framework is installed with a view to start testing on later phases of development.
+## License
+GNU General Public License v3.0.
+
+See LICENSE to see the full text.
 
 ## Contributing
 
