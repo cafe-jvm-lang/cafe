@@ -1,5 +1,16 @@
 /*
- * Copyright (c) 2021. Romil Nisar <rnisar7@gmail.com>
+ * Copyright (c) 2021. Dhyey Shah, Saurabh Pethani, Romil Nisar
+ *
+ * Developed by:
+ *         Dhyey Shah<dhyeyshah4@gmail.com>
+ *         https://github.com/dhyey-shah
+ *
+ * Contributors:
+ *         Saurabh Pethani<spethani28@gmail.com>
+ *         https://github.com/SaurabhPethani
+ *
+ *         Romil Nisar<rnisar7@gmail.com>
+ *
  *
  * This file is part of Cafe.
  *
