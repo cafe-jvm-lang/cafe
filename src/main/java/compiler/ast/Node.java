@@ -73,7 +73,7 @@ public abstract class Node {
 
     public enum Tag {
         VARDECL, IDEN, CONSTDECL, NUMLIT, STRLIT, BOOLLIT, FUNCDECL, OBJCREATION, BLOCK, ANNFUNC, LIST, SET, LINKEDLIST,
-        MAP, BINEXPR, UNEXPR, THIS, NULL, FUNCCALL, SUBSCRIPT, SLICE, OBJACCESS, ARGSLIST, PARAMLIST, IMPORT, ASGN, IF,
+        MAP, BINEXPR, UNEXPR, THIS, NULL, FUNCCALL, SUBSCRIPT, SLICE, OBJACCESS, ARGSLIST, PARAMLIST, IMPORT, EXPORT, ASGN, IF,
         ELSE, FOR, LOOP, RETURN, CONTINUE, BREAK, LISTCOMP, SETCOMP, LINKCOMP, MAPCOMP, COMPLOOP, COMPIF, RANGE,
         PROGRAM;
     }
@@ -751,10 +751,12 @@ public abstract class Node {
     }
 
     public static class ImportStmtNode extends StmtNode {
-        public String path;
+        public Map<IdenNode, IdenNode> importAliasMap;
+        public String directory;
 
-        public ImportStmtNode(String path) {
-            this.path = path;
+        public ImportStmtNode(Map<IdenNode, IdenNode> importAliasMap,  String directory) {
+            this.importAliasMap = importAliasMap;
+            this.directory = directory;
         }
 
         @Override
@@ -765,6 +767,24 @@ public abstract class Node {
         @Override
         public void accept(Visitor v) {
             v.visitImportStmt(this);
+        }
+    }
+    
+    public static class ExportStmtNode extends StmtNode{
+        public IdenNode node;
+
+        public ExportStmtNode(IdenNode node){
+            this.node = node;
+        }
+
+        @Override
+        public Tag getTag() {
+            return EXPORT;
+        }
+
+        @Override
+        public void accept(Visitor v) {
+            v.visitExportStmt(this);
         }
     }
 
@@ -1049,5 +1069,7 @@ public abstract class Node {
         void visitCompIf(CompIfNode n);
 
         void visitListRange(RangeNode n);
+
+        void visitExportStmt(ExportStmtNode n);
     }
 }
