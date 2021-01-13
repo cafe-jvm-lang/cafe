@@ -87,7 +87,10 @@ public abstract class Node {
     }
 
     public static abstract class DeclNode extends StmtNode {
-
+        IdenNode iden;
+        public IdenNode getIden(){
+            return iden;
+        }
     }
 
     public static class ProgramNode extends StmtNode {
@@ -655,14 +658,13 @@ public abstract class Node {
     }
 
     public static class VarDeclNode extends DeclNode {
-        public IdenNode var;
         public ExprNode value;
         public VarDeclNode(IdenNode var) {
             this(var, null);
         }
 
         public VarDeclNode(IdenNode var, ExprNode value) {
-            this.var = var;
+            iden = var;
             this.value = value;
         }
 
@@ -678,11 +680,10 @@ public abstract class Node {
     }
 
     public static class ConstDeclNode extends DeclNode {
-        public IdenNode var;
         public ExprNode val;
 
         public ConstDeclNode(IdenNode v, ExprNode e) {
-            var = v;
+            iden = v;
             val = e;
         }
 
@@ -698,12 +699,11 @@ public abstract class Node {
     }
 
     public static class FuncDeclNode extends DeclNode {
-        public IdenNode name;
         public ParameterListNode params;
         public BlockNode block;
 
         public FuncDeclNode(IdenNode name, ParameterListNode params, BlockNode block) {
-            this.name = name;
+            iden = name;
             this.params = params;
             this.block = block;
         }
