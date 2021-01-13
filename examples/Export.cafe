@@ -1,0 +1,9 @@
+
+export var a;
+export func Hello(){
+    println("Hello");
+}
+var c = 10, cc=11;
+export c;
+export var b=10,bb=11;
+export c,cc;

@@ -771,10 +771,11 @@ public abstract class Node {
     }
     
     public static class ExportStmtNode extends StmtNode{
+        public IdenNode iden;
+        public DeclNode node;
 
-        public IdenNode node;
-
-        public ExportStmtNode(IdenNode node){
+        public ExportStmtNode(IdenNode iden, DeclNode node){
+            this.iden = iden;
             this.node = node;
         }
 

@@ -307,7 +307,8 @@ public class PrettyPrinter implements Node.Visitor {
         printWithTabs("ExportStmtNode");
         tabs++;
 
-        System.out.println("export:"+n.node.name);
+        addBeautify("export:",n.iden);
+        addBeautify("Node:",n.node);
 
         tabs--;
     }

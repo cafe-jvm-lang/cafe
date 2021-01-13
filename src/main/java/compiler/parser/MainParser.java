@@ -1848,12 +1848,12 @@ public class MainParser extends Parser {
             case IDENTIFIER:
                 IdenNode id = parseIdentifier();
                 if (id == null) return null;
-                exportStmtNode.add(new ExportStmtNode(id));
+                exportStmtNode.add(new ExportStmtNode(id, null));
                 while(token.kind == TokenKind.COMMA){
                     accept(TokenKind.COMMA);
                     id = parseIdentifier();
                     if (id == null) return null;
-                    exportStmtNode.add(new ExportStmtNode(id));
+                    exportStmtNode.add(new ExportStmtNode(id, null));
                 }
                 accept(TokenKind.SEMICOLON);
                 break;
@@ -1862,20 +1862,20 @@ public class MainParser extends Parser {
                 List<VarDeclNode> stm = parseVariable();
                 if (stm == null) return null;
                 for(VarDeclNode var: stm){
-                    exportStmtNode.add(new ExportStmtNode(var.getIden()));
+                    exportStmtNode.add(new ExportStmtNode(var.getIden(),var));
                 }
                 break;
             case CONST:
                 List<ConstDeclNode> stm1 = parseConstVariable();
                 if (stm1 == null) return null;
                 for(ConstDeclNode var: stm1){
-                    exportStmtNode.add(new ExportStmtNode(var.getIden()));
+                    exportStmtNode.add(new ExportStmtNode(var.getIden(), var));
                 }
                 break;
             case FUNC:
                 DeclNode decl = parseFunctionDeclaration();
                 if (decl == null) return null;
-                exportStmtNode.add(new ExportStmtNode(decl.getIden()));
+                exportStmtNode.add(new ExportStmtNode(decl.getIden(), decl));
                 break;
             default:
                 error= true;

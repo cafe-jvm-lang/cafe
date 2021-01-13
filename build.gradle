@@ -98,7 +98,7 @@ run {
     // args = ["-r","-cp=.\\examples\\","HelloWorld"]
 
     // Compile
-    args = ["-c",".\\examples\\Import.cafe"]
+    args = ["-c",".\\examples\\Export.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]
