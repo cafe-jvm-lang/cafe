@@ -1,0 +1,3 @@
+import a from "b.cafe";
+import a as A from "b.cafe";
+import a,b as B from "b.cafe";

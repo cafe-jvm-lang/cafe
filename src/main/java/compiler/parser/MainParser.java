@@ -37,13 +37,9 @@ import compiler.util.Log;
 import compiler.util.Position;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
-
-import cafelang.ir.ReturnStatement;
 
 import static compiler.util.Log.Type.*;
 import static compiler.util.Messages.message;
@@ -1077,10 +1073,10 @@ public class MainParser extends Parser {
         BlockNode block = null;
 
         accept(TokenKind.LOOP);
-        iden1 = (IdenNode) parseIdentifier();
+        iden1 = parseIdentifier();
         if (token.kind == TokenKind.COMMA) {
             nextToken();
-            iden2 = (IdenNode) parseIdentifier();
+            iden2 = parseIdentifier();
         }
         accept(TokenKind.IN);
         try {
@@ -1263,10 +1259,10 @@ public class MainParser extends Parser {
             switch (token.kind) {
                 case LOOP:
                     accept(TokenKind.LOOP);
-                    iden1 = (IdenNode) parseIdentifier();
+                    iden1 = parseIdentifier();
                     if (token.kind == TokenKind.COMMA) {
                         nextToken();
-                        iden2 = (IdenNode) parseIdentifier();
+                        iden2 = parseIdentifier();
                     }
                     accept(TokenKind.IN);
                     exp = parseCollection();
@@ -1470,7 +1466,7 @@ public class MainParser extends Parser {
         while (token.kind != TokenKind.RCURLY) {
             if (error)
                 return null;
-            idenNode = (IdenNode) parseIdentifier();
+            idenNode = parseIdentifier();
             accept(TokenKind.COLON);
             exprNode = parseValue();
             object.put(idenNode, exprNode);
@@ -1594,7 +1590,7 @@ public class MainParser extends Parser {
             if (error)
                 return null;
             Token tk = token;
-            IdenNode idenNode = (IdenNode) parseIdentifier();
+            IdenNode idenNode = parseIdentifier();
             ExprNode exp = null;
             if (error)
                 return null;
@@ -1632,7 +1628,7 @@ public class MainParser extends Parser {
             if (error)
                 return null;
             Token tk = token;
-            IdenNode idenNode = (IdenNode) parseIdentifier();
+            IdenNode idenNode = parseIdentifier();
             accept(TokenKind.EQU);
             ExprNode exp = parseValue();
             if (token.kind != TokenKind.SEMICOLON)
@@ -1671,11 +1667,11 @@ public class MainParser extends Parser {
             if (token.kind == TokenKind.VARARGS) {
                 accept(TokenKind.VARARGS);
                 varArg = true;
-                idenNodes.add((IdenNode) parseIdentifier());
+                idenNodes.add(parseIdentifier());
                 // accept(TokenKind.RPAREN);
                 break;
             }
-            idenNodes.add((IdenNode) parseIdentifier());
+            idenNodes.add(parseIdentifier());
             if (TokenKind.RPAREN != token.kind)
                 accept(TokenKind.COMMA);
         }
@@ -1938,7 +1934,8 @@ public class MainParser extends Parser {
             blocks.put(id1, id2);
         }
         accept(TokenKind.FROM);
-        if(!Files.isDirectory(Path.of(token.value()))){
+        File file = new File(token.value()+".class");
+        if(!file.exists()){
             // throw Error
             error = true;
         } else {
