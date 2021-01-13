@@ -99,6 +99,7 @@ public class Log {
         // Parsing errors
         SYMBOL_EXPECTED,
         INVALID_EXPRESSION,
+        INVALID_IMPORT_FILE,
 
         // Semantic errors
         SYMBOL_NOT_DECLARED,

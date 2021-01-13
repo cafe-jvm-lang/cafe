@@ -72,6 +72,7 @@ public final class Messages {
             // Parsing Errors
             put(SYMBOL_EXPECTED, "`{0}` expected, found `{1}`");
             put(INVALID_EXPRESSION, "Invalid expression");
+            put(INVALID_IMPORT_FILE,"Import module `{0}` does not exist");
 
             // Semantic Errors
             put(DUPLICATE_SYMBOL, "Duplicate symbol `{0}`");

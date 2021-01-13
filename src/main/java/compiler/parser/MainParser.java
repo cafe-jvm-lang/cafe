@@ -120,32 +120,12 @@ public class MainParser extends Parser {
                 errorDescription(token.pos, message(SYMBOL_EXPECTED, tokenKindExpected, token.kind)));
     }
 
-    private void logError(Log.Type issue){
+    private void logError(Log.Type issue,Object... values){
         error = true;
         log.report(issue, token.pos,
-                errorDescription(token.pos, message(issue)));
+                errorDescription(token.pos, message(issue,values)));
 
     }
-
-//	void accept(TokenKind kind/* ,Errors error ) */ /* pass specific error type */) {
-//		if (kind == token.kind) {
-//			nextToken();
-//			// return true;
-//		} else if (token.kind == TokenKind.ERROR) {
-//			error = true;
-//			//debug.add("Expected "+ kind+ " Found "+token.kind+" "+ token.pos.line);
-//			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
-//			// System.exit(0);
-//			// return false;
-//		} else {
-//			// TODO: throw Error
-//			error = true;
-//			debug.add("Expected "+ kind+ " Found "+token.kind);
-//			//log.report(token.pos, Errors.INVALID_IDENTIFIER);
-//			// System.exit(0);
-//			// return false;
-//		}
-//	}
 
     ExprNode parseLogicalOrExpression() {
         /*
@@ -1936,7 +1916,7 @@ public class MainParser extends Parser {
         accept(TokenKind.FROM);
         File file = new File(token.value()+".class");
         if(!file.exists()){
-            // throw Error
+            logError(INVALID_IMPORT_FILE, token.value());
             error = true;
         } else {
             importStmtNode = new ImportStmtNode(blocks, token.value());

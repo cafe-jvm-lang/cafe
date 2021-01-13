@@ -292,9 +292,11 @@ public class PrettyPrinter implements Node.Visitor {
         printWithTabs("ImportStmtNode");
         tabs++;
 
-        System.out.println("Dir:"+n.directory);
-        System.out.println("Import-Alias Map");
-        System.out.println(n.importAliasMap);
+        addBeautify("Dir:"+n.directory,null);
+        for(Map.Entry<IdenNode, IdenNode> entry : n.importAliasMap.entrySet()){
+            addBeautify("Import",entry.getKey());
+            addBeautify("Alias",entry.getValue());
+        }
 
         tabs--;
 

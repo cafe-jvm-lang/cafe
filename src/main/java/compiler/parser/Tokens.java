@@ -52,20 +52,6 @@ public class Tokens {
 
     TokenKind lookupKind(String name) {
         switch (name) {
-
-
-//		case "(":
-//			return TokenKind.LPAREN;
-//		case ")":
-//			return TokenKind.RPAREN;
-//		case "{":
-//			return TokenKind.LCURLY;
-//		case "}":
-//			return TokenKind.RCURLY;
-//		case "[":
-//			return TokenKind.LSQU;
-//		case "]":
-//			return TokenKind.RSQU;
             case "list":
                 return TokenKind.LIST;
             case "map":
@@ -76,82 +62,22 @@ public class Tokens {
                 return TokenKind.SET;
             case "and":
                 return TokenKind.AND;
-//		case "&&":
-//			return TokenKind.ANDOP;
             case "or":
                 return TokenKind.OR;
-//		case "||":
-//			return TokenKind.OROP;
             case "not":
                 return TokenKind.NOT;
-//		case "!":
-//			return TokenKind.NOTOP;	
-//		case ">":
-//			return TokenKind.GT;
-//		case "<":
-//			return TokenKind.LT;
-//		case ">=":
-//			return TokenKind.GTE;
-//		case "<=":
-//			return TokenKind.LTE;
-//		case "!=":
-//			return TokenKind.NOTEQU;
-//		case "==":
-//			return TokenKind.EQUEQU;
-//		case "=":
-//			return TokenKind.EQU;
-//		case "|":
-//			return TokenKind.BITOR;
-//		case "&":
-//			return TokenKind.BITAND;
-//		case "<<":
-//			return TokenKind.LSHIFT;
-//		case ">>":
-//			return TokenKind.RSHIFT;
-//		case ">>>":
-//			return TokenKind.TRSHIFT;
-//		case "+":
-//			return TokenKind.ADD;
-//		case "-":
-//			return TokenKind.SUB;
-//		case "*":
-//			return TokenKind.MUL;
-//		case "/":
-//			return TokenKind.DIV;
-//		case "//":
-//			return TokenKind.FLOORDIV;
-//		case "%":
-//			return TokenKind.MOD;
-//		case "**":
-//			return TokenKind.POWER;
             case "is":
                 return TokenKind.IS;
             case "if":
                 return TokenKind.IF;
             case "else":
                 return TokenKind.ELSE;
-//		case "is not":
-//			return TokenKind.ISNOT;
             case "in":
                 return TokenKind.IN;
             case "loop":
                 return TokenKind.LOOP;
             case "for":
                 return TokenKind.FOR;
-//		case "'":
-//			return TokenKind.SQOUTE;
-//		case "\"":
-//			return TokenKind.DQOUTE;	
-//		case ".":
-//			return TokenKind.DOT;
-//		case "@":
-//			return TokenKind.IMPORT;
-//		case "#":
-//			return TokenKind.SINGLECOMMENT;
-//		case "/*":
-//			return TokenKind.LCOMMENT;
-//		case "*/":
-//			return TokenKind.RCOMMENT;
             case "this":
                 return TokenKind.THIS;
             case "null":
@@ -172,6 +98,14 @@ public class Tokens {
                 return TokenKind.RET;
             case "break":
                 return TokenKind.BREAK;
+            case "import":
+                return TokenKind.IMPORT;
+            case "export":
+                return TokenKind.EXPORT;
+            case "as":
+                return TokenKind.AS;
+            case "from":
+                return TokenKind.FROM;
             default:
                 return TokenKind.IDENTIFIER;
         }
