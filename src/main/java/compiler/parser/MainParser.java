@@ -36,9 +36,14 @@ import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
 import compiler.util.Position;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
+
+import cafelang.ir.ReturnStatement;
 
 import static compiler.util.Log.Type.*;
 import static compiler.util.Messages.message;
@@ -693,7 +698,7 @@ public class MainParser extends Parser {
         return thisNode;
     }
 
-    ExprNode parseIdentifier() {
+    IdenNode parseIdentifier() {
         /*
          * Create Identifier Node. return IdentNode()
          */
@@ -1859,15 +1864,89 @@ public class MainParser extends Parser {
         return blockStmt;
     }
 
+    List<ExportStmtNode> parseExportStatement() {
+        List<ExportStmtNode> exportStmtNode = new ArrayList<ExportStmtNode>();
+        
+        accept(TokenKind.EXPORT);
+        switch(token.kind){
+            case IDENTIFIER:
+                IdenNode id = parseIdentifier();
+                if (id == null) return null;
+                exportStmtNode.add(new ExportStmtNode(id));
+                while(token.kind == TokenKind.COMMA){
+                    accept(TokenKind.COMMA);
+                    id = parseIdentifier();
+                    if (id == null) return null;
+                    exportStmtNode.add(new ExportStmtNode(id));
+                }
+                accept(TokenKind.SEMICOLON);
+                break;
+
+            case VAR:
+                List<VarDeclNode> stm = parseVariable();
+                if (stm == null) return null;
+                for(VarDeclNode var: stm){
+                    exportStmtNode.add(new ExportStmtNode(var.getIden()));
+                }
+                break;
+            case CONST:
+                List<ConstDeclNode> stm1 = parseConstVariable();
+                if (stm1 == null) return null;
+                for(ConstDeclNode var: stm1){
+                    exportStmtNode.add(new ExportStmtNode(var.getIden()));
+                }
+                break;
+            case FUNC:
+                DeclNode decl = parseFunctionDeclaration();
+                if (decl == null) return null;
+                exportStmtNode.add(new ExportStmtNode(decl.getIden()));
+                break;
+            default:
+                error= true;
+        }
+        if(error) return null;
+        return exportStmtNode;
+    }
+
     // return Import Statement Node
-    void parseImportStatement() {
+    ImportStmtNode parseImportStatement() {
         /* List of Imports */
 
         // accept('@');
         // boolean valid = checkFilePathRegex(token.value());
         // if(valid) return ImportStatement(token.value())
         // else Throw Error
+        ImportStmtNode importStmtNode = null;
+        Map<IdenNode, IdenNode> blocks = new HashMap<IdenNode, IdenNode>();
+        IdenNode id1, id2 = null;
 
+        accept(TokenKind.IMPORT);
+        id1 = parseIdentifier();
+        if (token.kind == TokenKind.AS) {
+            accept(token.kind);
+            id2 = parseIdentifier();
+        }
+        blocks.put(id1, id2);
+        while (token.kind == TokenKind.COMMA) {
+            accept(TokenKind.COMMA);
+            id1 = parseIdentifier();
+            id2 = null;
+            if (token.kind == TokenKind.AS) {
+                accept(token.kind);
+                id2 = parseIdentifier();
+            }
+            blocks.put(id1, id2);
+        }
+        accept(TokenKind.FROM);
+        if(!Files.isDirectory(Path.of(token.value()))){
+            // throw Error
+            error = true;
+        } else {
+            importStmtNode = new ImportStmtNode(blocks, token.value());
+            nextToken();
+            accept(TokenKind.SEMICOLON);
+        }
+        return importStmtNode; 
     }
 
     // return Statement Node
@@ -1897,6 +1976,12 @@ public class MainParser extends Parser {
                 return null;
             switch (token.kind) {
                 case IMPORT:
+                    ImportStmtNode importStmtNode = parseImportStatement();
+                    tree.add(importStmtNode);
+                    break;
+                case EXPORT:
+                    List<ExportStmtNode> exports = parseExportStatement();
+                    tree.addAll(exports);
                     break;
                 default:
                     List<StmtNode> stmt = parseBlock();
