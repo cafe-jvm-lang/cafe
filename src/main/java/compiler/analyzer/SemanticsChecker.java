@@ -95,10 +95,10 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitVarDecl(VarDeclNode n) {
-        Symbol sym = symbol(n.var.name, false);
+        Symbol sym = symbol(n.getIden().name, false);
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
-                    message(DUPLICATE_SYMBOL, n.var.name));
+                    message(DUPLICATE_SYMBOL, n.getIden().name));
         if (n.value != null)
             n.value.accept(this);
     }
@@ -120,10 +120,10 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitConstDecl(ConstDeclNode n) {
-        Symbol sym = symbol(n.var.name, true);
+        Symbol sym = symbol(n.getIden().name, true);
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
-                    message(DUPLICATE_SYMBOL, n.var.name));
+                    message(DUPLICATE_SYMBOL, n.getIden().name));
         n.val.accept(this);
     }
 
@@ -150,10 +150,10 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitFuncDecl(FuncDeclNode n) {
-        Symbol sym = symbol(n.name.name, false);
+        Symbol sym = symbol(n.getIden().name, false);
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
-                    message(DUPLICATE_SYMBOL, n.name.name));
+                    message(DUPLICATE_SYMBOL, n.getIden().name));
         CST = new SymbolTable(CST);
         isGlobal = false;
         n.params.accept(this);
@@ -316,6 +316,11 @@ public class SemanticsChecker implements Node.Visitor {
     @Override
     public void visitImportStmt(ImportStmtNode n) {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void visitExportStmt(ExportStmtNode n) {
+
     }
 
     @Override

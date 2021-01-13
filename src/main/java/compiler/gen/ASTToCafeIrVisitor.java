@@ -167,7 +167,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitVarDecl(Node.VarDeclNode n) {
-        Node.IdenNode iden = n.var;
+        Node.IdenNode iden = n.getIden();
         SymbolReference sym = Context.context.createSymbolReference(iden.name, Node.VarDeclNode.class);
         if (n.value != null)
             n.value.accept(this);
@@ -189,7 +189,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitConstDecl(Node.ConstDeclNode n) {
         Context context = Context.context;
-        Node.IdenNode iden = n.var;
+        Node.IdenNode iden = n.getIden();
         SymbolReference sym = context.createSymbolReference(iden.name, Node.ConstDeclNode.class);
         n.val.accept(this);
         DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, context.pop());
@@ -217,7 +217,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitFuncDecl(Node.FuncDeclNode n) {
         Context context = Context.context;
-        String name = n.name.name;
+        String name = n.getIden().name;
         n.params.accept(this);
         List<String> params = (List) context.pop();
         n.block.accept(this);
@@ -400,6 +400,11 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitImportStmt(Node.ImportStmtNode n) {
+
+    }
+
+    @Override
+    public void visitExportStmt(Node.ExportStmtNode n) {
 
     }
 

@@ -75,7 +75,7 @@ public class PrettyPrinter implements Node.Visitor {
     public void visitVarDecl(VarDeclNode n) {
         printWithTabs("VarDeclNode");
         tabs++;
-        addBeautify("var", n.var);
+        addBeautify("var", n.getIden());
         addBeautify("value", n.value);
         tabs--;
     }
@@ -90,7 +90,7 @@ public class PrettyPrinter implements Node.Visitor {
         printWithTabs("ConstDeclNode");
         tabs++;
 
-        addBeautify("variable-name", n.var);
+        addBeautify("variable-name", n.getIden());
         addBeautify("value", n.val);
 
         tabs--;
@@ -116,7 +116,7 @@ public class PrettyPrinter implements Node.Visitor {
         printWithTabs("FuncDeclNode");
         tabs++;
 
-        addBeautify("func-name", n.name);
+        addBeautify("func-name", n.getIden());
         addBeautify("parameter-list", n.params);
         addBeautify("func-block", n.block);
 
@@ -289,8 +289,25 @@ public class PrettyPrinter implements Node.Visitor {
 
     @Override
     public void visitImportStmt(ImportStmtNode n) {
-        // TODO Not Supported yet
+        printWithTabs("ImportStmtNode");
+        tabs++;
 
+        System.out.println("Dir:"+n.directory);
+        System.out.println("Import-Alias Map");
+        System.out.println(n.importAliasMap);
+
+        tabs--;
+
+    }
+
+    @Override
+    public void visitExportStmt(ExportStmtNode n) {
+        printWithTabs("ExportStmtNode");
+        tabs++;
+
+        System.out.println("export:"+n.node.name);
+
+        tabs--;
     }
 
     @Override
