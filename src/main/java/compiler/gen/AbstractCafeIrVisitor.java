@@ -143,6 +143,11 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitCafeExport(CafeExport cafeExport) {
+        cafeExport.walk(this);
+    }
+
+    @Override
     public void visitReferenceLookup(ReferenceLookup referenceLookup) {
         referenceLookup.walk(this);
     }

@@ -400,12 +400,26 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitImportStmt(Node.ImportStmtNode n) {
-
+        Context context = Context.context;
+        CafeImport cafeImport = CafeImport.of(n.directory);
+        for(Map.Entry<Node.IdenNode, Node.IdenNode> entry: n.importAliasMap.entrySet()){
+            Node.IdenNode value = entry.getValue();
+            String alias = "";
+            if(value != null)
+                alias = value.name;
+            cafeImport.add(entry.getKey().name, alias);
+        }
+        context.push(cafeImport);
     }
 
     @Override
     public void visitExportStmt(Node.ExportStmtNode n) {
-
+        Context context = Context.context;
+        String name = n.iden.name;
+        CafeExport export = CafeExport.export(name);
+        context.module.addExport(export);
+        n.node.accept(this);
+        //context.push(export);
     }
 
     @Override

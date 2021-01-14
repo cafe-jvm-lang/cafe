@@ -29,44 +29,43 @@
 
 package cafelang.ir;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
-public class CafeImport extends CafeElement<CafeImport> {
-    private final Map<String, String> nameAlias;
-    private final String moduleName;
-    private boolean isDefault=false;
+public class CafeExport extends CafeElement<CafeExport>{
+    private String name;
 
-    private CafeImport(String moduleName) {
-        nameAlias = new HashMap<>();
-        this.moduleName = moduleName;
+    private CafeExport(String name){
+        this.name = name;
     }
 
-    public static CafeImport of(String moduleName) {
-        return new CafeImport(moduleName);
+    public static CafeExport export(String name){
+        return new CafeExport(name);
     }
 
-    public void add(String name, String alias){
-        nameAlias.put(name,alias);
-    }
-
-    public CafeImport isDefault(){
-        isDefault = true;
-        return this;
-    }
-
-    public String getModuleName() {
-        return moduleName;
+    public String getName() {
+        return name;
     }
 
     @Override
-    protected CafeImport self() {
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CafeExport export = (CafeExport) o;
+        return Objects.equals(name, export.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    @Override
+    protected CafeExport self() {
         return this;
     }
 
     @Override
     public void accept(CafeIrVisitor visitor) {
-        visitor.visitCafeImport(this);
+        visitor.visitCafeExport(this);
     }
-
 }

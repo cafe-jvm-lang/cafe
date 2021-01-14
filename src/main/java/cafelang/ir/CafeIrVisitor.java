@@ -77,4 +77,6 @@ public interface CafeIrVisitor {
     void visitCafeImport(CafeImport cafeImport);
 
     void visitBreakContinue(BreakContinueStatement breakContinueStatement);
+
+    void visitCafeExport(CafeExport cafeExport);
 }

@@ -39,13 +39,14 @@ public class CafeModule extends CafeElement<CafeModule> {
 
     private Set<CafeFunction> functions = new LinkedHashSet<>();
     private List<CafeImport> imports = new LinkedList<>();
+    private List<CafeExport> exports = new LinkedList<>();
 
     public static final String INIT_FUNCTION = "#init";
 
     private static final CafeImport[] DEFAULT_IMPORTS = {
-            CafeImport.of("*", "cafe.io.BasicIO"),
-            CafeImport.of("*", "cafe.util.Conversions"),
-            CafeImport.of("*", "cafe.DynamicObject"),
+            CafeImport.of("cafe.io.BasicIO").isDefault(),
+            CafeImport.of("cafe.util.Conversions").isDefault(),
+            CafeImport.of("cafe.DynamicObject").isDefault(),
     };
 
     private CafeModule(String moduleName, ReferenceTable referenceTable) {
@@ -77,11 +78,19 @@ public class CafeModule extends CafeElement<CafeModule> {
         imports.add(cafeImport);
     }
 
+    public void addExport(CafeExport cafeExport){
+        exports.add(cafeExport);
+    }
+
     public Set<CafeImport> getImports() {
         Set<CafeImport> imp = new LinkedHashSet<>();
         imp.addAll(imports);
         Collections.addAll(imp, DEFAULT_IMPORTS);
         return imp;
+    }
+
+    public Set<CafeExport> getExports() {
+        return new HashSet<>(exports);
     }
 
     @Override
