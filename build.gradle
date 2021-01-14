@@ -95,10 +95,10 @@ startScripts{
 
 run {
     // RUN
-    // args = ["-r","-cp=.\\examples\\","HelloWorld"]
+    args = ["-r","-cp=.\\examples\\","HelloWorld"]
 
     // Compile
-    args = ["-c",".\\examples\\Export.cafe"]
+    // args = ["-c",".\\examples\\HelloWorld.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]

@@ -19,4 +19,4 @@
 func hello(){
     println("Hello, World!");
 }
-hello();
+export var z = hello();

@@ -29,13 +29,13 @@
 
 package compiler.main.cli;
 
+import cafelang.runtime.Runtime;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import compiler.main.Main;
 
 import java.io.File;
-import java.lang.invoke.MethodHandle;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -46,8 +46,6 @@ import java.util.List;
 import static compiler.util.Log.Type.MODULE_NOT_FOUND;
 import static compiler.util.Messages.error;
 import static compiler.util.Messages.message;
-import static java.lang.invoke.MethodHandles.publicLookup;
-import static java.lang.invoke.MethodType.methodType;
 
 @Parameters(commandNames = {"-r"}, separators = "=", commandDescription = "Executes compiled Cafe code")
 public class RunCommand implements Command {
@@ -89,9 +87,10 @@ public class RunCommand implements Command {
     }
 
     public void run(Class<?> clazz, String[] arguments)throws Throwable{
-        MethodHandle main;
-        main = publicLookup().findStatic(clazz, "main", methodType(void.class, String[].class));
-        main.invoke(arguments);
+//        MethodHandle main;
+//        main = publicLookup().findStatic(clazz, "main", methodType(void.class, String[].class));
+//        main.invoke(arguments);
+
     }
 
     @Override
@@ -99,7 +98,8 @@ public class RunCommand implements Command {
         URLClassLoader urlClassLoader = getURLClassLoader(classPath);
         try {
             Class<?> module = urlClassLoader.loadClass(arguments.get(0));
-            run(module, arguments.subList(1, arguments.size()).toArray(new String[0]));
+            //run(module, arguments.subList(1, arguments.size()).toArray(new String[0]));
+            Runtime.runtime(module, urlClassLoader);
         }catch (ClassNotFoundException e){
             error(message(MODULE_NOT_FOUND, arguments.get(0)));
             return Main.Result.ERROR;

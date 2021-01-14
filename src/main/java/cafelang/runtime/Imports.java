@@ -44,10 +44,10 @@ public final class Imports {
         throw new UnsupportedOperationException("Don't instantiate utility classes");
     }
 
-    static String[] metadata(String name, Class<?> callerClass, Class<?>[] types, Object[] args) {
+    public static String[] metadata(String name, Class<?> callerClass, Class<?>[] types, Object[] args) {
         String[] data;
         try {
-            Method dataMethod = callerClass.getMethod("$" + name, types);
+            Method dataMethod = callerClass.getMethod("#" + name, types);
             data = (String[]) dataMethod.invoke(null, args);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             // Cannot happen
