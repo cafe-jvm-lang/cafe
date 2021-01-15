@@ -29,7 +29,6 @@
 
 package compiler.gen;
 
-import cafe.BasePrototype;
 import cafe.Function;
 import cafelang.ir.*;
 import org.objectweb.asm.ClassWriter;
@@ -109,7 +108,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         } else {
             signature = MethodType.genericMethodType(function.getArity() + 1);
         }
-        signature = signature.changeParameterType(0, BasePrototype.class);
+        signature = signature.changeParameterType(0, Object.class);
         return signature.toMethodDescriptorString();
     }
 
@@ -120,7 +119,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     private String methodSignature(int arity) {
-        return genericMethodType(arity + 1).changeParameterType(0, BasePrototype.class)
+        return genericMethodType(arity + 1).changeParameterType(0, Object.class)
                                            .toMethodDescriptorString();
     }
 
@@ -263,10 +262,57 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     private void writeImportMetaData(Set<CafeImport> imports) {
         // TODO: return import name-alias in #imports function
-        writeMetaData("imports",
-                imports.stream()
-                       .map(CafeImport::getModuleName)
-                       .toArray(String[]::new));
+
+//        writeMetaData("imports",
+//                imports.stream()
+//                       .map(CafeImport::getModuleName)
+//                       .toArray(String[]::new));
+
+        String refTable = "cafelang/runtime/ReferenceTable";
+        String refSymbol = "cafelang/runtime/ReferenceSymbol";
+
+        MethodVisitor mv = cw.visitMethod(
+                ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC,
+                "#" + "imports",
+                "()L"+refTable+";",
+                null, null);
+        mv.visitCode();
+
+        // create an instance of runtime ReferenceTable
+        mv.visitTypeInsn(NEW, refTable);
+        mv.visitInsn(DUP);
+        mv.visitMethodInsn(INVOKESPECIAL, refTable, "<init>", "()V", false);
+        mv.visitVarInsn(ASTORE, 0);
+
+        // loop through each import
+        for(CafeImport cafeImport: imports){
+            String path = cafeImport.getModulePath();
+            for(Map.Entry<String, String> imp : cafeImport.getNameAlias().entrySet() ){
+                // create a new reference symbol
+                mv.visitTypeInsn(NEW, refSymbol);
+                mv.visitInsn(DUP);
+                mv.visitLdcInsn(imp.getKey());
+
+                if(imp.getValue() == null)
+                    mv.visitInsn(ACONST_NULL);
+                else
+                    mv.visitLdcInsn(imp.getValue());
+                mv.visitLdcInsn(path);
+                mv.visitMethodInsn(INVOKESPECIAL, refSymbol, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", false);
+                mv.visitVarInsn(ASTORE, 1);
+
+                // add reference symbol to table
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitVarInsn(ALOAD, 1);
+                mv.visitMethodInsn(INVOKEVIRTUAL, refTable, "add", "(L"+refSymbol+";)V", false);
+            }
+        }
+        // return reference table
+        mv.visitVarInsn(ALOAD,0);
+        mv.visitInsn(ARETURN);
+
+        mv.visitMaxs(0, 0);
+        mv.visitEnd();
     }
 
     // creates export method
@@ -346,7 +392,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
         MethodType type = genericMethodType(methodInvocation.getArity() + 2).changeParameterType(0, Function.class)
                                                                             .changeParameterType(1,
-                                                                                    BasePrototype.class);
+                                                                                    Object.class);
         String typedef = type.toMethodDescriptorString();
         Handle handle = FUNC_INVOCATION_HANDLE;
 
@@ -373,7 +419,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         GlobalThis.loadThis(mv, className);
 
         type = genericMethodType(functionInvocation.getArity() + 2).changeParameterType(0, Function.class)
-                                                                   .changeParameterType(1, BasePrototype.class);
+                                                                   .changeParameterType(1, Object.class);
         String name = functionInvocation.getName();
         String typedef = type.toMethodDescriptorString();
         Handle handle = FUNC_INVOCATION_HANDLE;
@@ -705,7 +751,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitConstantStatement(ConstantStatement constantStatement) {
-        Object value = constantStatement.value();
+        java.lang.Object value = constantStatement.value();
         if (value instanceof Integer) {
             int i = (Integer) value;
             loadInteger(mv, i);

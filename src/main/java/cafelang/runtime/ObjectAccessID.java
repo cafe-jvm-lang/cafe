@@ -29,8 +29,6 @@
 
 package cafelang.runtime;
 
-import cafe.BasePrototype;
-
 import java.lang.invoke.*;
 
 import static java.lang.invoke.MethodType.methodType;
@@ -45,7 +43,7 @@ public final class ObjectAccessID {
             FALLBACK = lookup.findStatic(
                     ObjectAccessID.class,
                     "fallback",
-                    methodType(Object.class, MethodCallSite.class, Object[].class));
+                    methodType(java.lang.Object.class, MethodCallSite.class, java.lang.Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
@@ -66,13 +64,13 @@ public final class ObjectAccessID {
         MethodCallSite callSite = new MethodCallSite(caller, name, type);
         MethodHandle fallbackHandle = FALLBACK
                 .bindTo(callSite)
-                .asCollector(Object[].class, type.parameterCount())
+                .asCollector(java.lang.Object[].class, type.parameterCount())
                 .asType(type);
         callSite.setTarget(fallbackHandle);
         return callSite;
     }
 
-    public static Object fallback(MethodCallSite callSite, Object[] args) throws Throwable {
+    public static java.lang.Object fallback(MethodCallSite callSite, java.lang.Object[] args) throws Throwable {
 //        System.out.println("OBJECT ACCESS ID");
 //        System.out.println(callSite.name);
 //        for (int i = 0; i < args.length; i++) {
@@ -87,9 +85,9 @@ public final class ObjectAccessID {
         return target.invokeWithArguments(args);
     }
 
-    private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args) {
-        if (args[0] instanceof BasePrototype) {
-            BasePrototype object = (BasePrototype) args[0];
+    private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, java.lang.Object[] args) {
+        if (args[0] instanceof Object) {
+            Object object = (Object) args[0];
             return object.invoker(callSite.name, callSite.type());
         }
         return null;

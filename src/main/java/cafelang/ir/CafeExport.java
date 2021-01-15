@@ -31,7 +31,7 @@ package cafelang.ir;
 
 import java.util.Objects;
 
-public class CafeExport extends CafeElement<CafeExport>{
+public class CafeExport extends CafeStatement<CafeExport>{
     private String name;
 
     private CafeExport(String name){

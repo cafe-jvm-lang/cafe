@@ -29,23 +29,21 @@
 
 package cafe.io;
 
-import cafe.BasePrototype;
-
 public class BasicIO {
-    public static void print(BasePrototype b, Object o) {
+    public static void print(Object b, java.lang.Object o) {
         System.out.print(o);
     }
 
-    public static void println(BasePrototype b, Object o) {
+    public static void println(Object b, java.lang.Object o) {
         System.out.println(o);
     }
 
-    public static String input(BasePrototype b) {
+    public static String input(Object b) {
         return System.console()
                      .readLine();
     }
 
-    public static String input(BasePrototype b, String s) {
+    public static String input(Object b, String s) {
         println(b, s);
         return input(b);
     }

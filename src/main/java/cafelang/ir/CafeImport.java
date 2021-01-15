@@ -32,14 +32,14 @@ package cafelang.ir;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CafeImport extends CafeElement<CafeImport> {
+public class CafeImport extends CafeStatement<CafeImport> {
     private final Map<String, String> nameAlias;
-    private final String moduleName;
+    private final String modulePath;
     private boolean isDefault=false;
 
-    private CafeImport(String moduleName) {
+    private CafeImport(String modulePath) {
         nameAlias = new HashMap<>();
-        this.moduleName = moduleName;
+        this.modulePath = modulePath;
     }
 
     public static CafeImport of(String moduleName) {
@@ -50,13 +50,21 @@ public class CafeImport extends CafeElement<CafeImport> {
         nameAlias.put(name,alias);
     }
 
-    public CafeImport isDefault(){
+    public Map<String, String> getNameAlias() {
+        return nameAlias;
+    }
+
+    public CafeImport asDefault(){
         isDefault = true;
         return this;
     }
 
-    public String getModuleName() {
-        return moduleName;
+    public boolean isDefault(){
+        return isDefault;
+    }
+
+    public String getModulePath() {
+        return modulePath;
     }
 
     @Override

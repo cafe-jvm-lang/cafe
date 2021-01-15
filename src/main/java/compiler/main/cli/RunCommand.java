@@ -99,7 +99,7 @@ public class RunCommand implements Command {
         try {
             Class<?> module = urlClassLoader.loadClass(arguments.get(0));
             //run(module, arguments.subList(1, arguments.size()).toArray(new String[0]));
-            Runtime.runtime(module, urlClassLoader);
+            Runtime.runtime(module);
         }catch (ClassNotFoundException e){
             error(message(MODULE_NOT_FOUND, arguments.get(0)));
             return Main.Result.ERROR;

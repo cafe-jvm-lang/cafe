@@ -29,27 +29,53 @@
 
 package cafelang.runtime;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 
-public final class Runtime {
+public class URLPath {
+    private String string;
+    private Path path;
+    private Class<?> module;
 
-    private Runtime(){}
-
-
-    public static ReferenceTable callImports(Class<?> module){
-        ReferenceTable data;
-        try {
-            Method dataMethod = module.getMethod("#imports");
-            data = (ReferenceTable) dataMethod.invoke(null, new Object[]{});
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            data = null;
-        }
-        return data;
+    URLPath(String path){
+        this.string = path;
+        this.path = FileSystems.getDefault().getPath(path);
     }
 
-    public static void runtime(Class<?> module) throws Throwable {
-        ImportEvaluator.evalute(module,null);
+    public Path getPath() {
+        return path;
+    }
+
+    public String asString() {
+        return string;
+    }
+
+    public void setModule(Class<?> module){
+        this.module = module;
+    }
+
+    public Class<?> getModule() {
+        return module;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        URLPath urlPath = (URLPath) o;
+        try {
+            return Files.isSameFile(path, urlPath.path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 }

@@ -29,26 +29,36 @@
 
 package cafelang.runtime;
 
-import java.util.Map;
+import java.util.*;
 
-public final class ExportMap {
-    private Class<?> clazz;
-    Map<String, Object> exports;
+public final class ReferenceTable {
 
-    private ExportMap(Class<?> clazz){
-        this.clazz = clazz;
+    private List<ReferenceSymbol> symbols = new LinkedList<>();
+
+    public ReferenceTable(){}
+
+    public void add(ReferenceSymbol symbol){
+        symbols.add(symbol);
     }
 
-    public static ExportMap of(Class<?> clazz){
-        return new ExportMap(clazz);
+    public Set<URLPath> getURLPaths() {
+        Set<URLPath> list = new HashSet<>();
+        for(ReferenceSymbol symbol: symbols){
+            list.add(new URLPath(symbol.getPath()));
+        }
+        return list;
     }
 
-    public ExportMap with(Map<String, Object> exports){
-        this.exports = exports;
-        return this;
+    public ReferenceSymbol resolve(String importName){
+        Optional<ReferenceSymbol> op = symbols.stream().filter(e -> e.getAlias() == importName).findFirst();
+        if(op.isPresent()){
+            return op.get();
+        }
+        op = symbols.stream().filter(e -> e.getName() == importName).findFirst();
+        if(op.isPresent()) {
+            return op.get();
+        }
+        return null;
     }
 
-    public Object get(String name){
-        return exports.get(name);
-    }
 }

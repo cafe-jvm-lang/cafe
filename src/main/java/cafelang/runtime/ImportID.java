@@ -32,7 +32,7 @@ package cafelang.runtime;
 import cafe.Function;
 
 import java.lang.invoke.*;
-import java.lang.reflect.Method;
+import java.util.Map;
 
 import static java.lang.invoke.MethodType.methodType;
 
@@ -81,16 +81,35 @@ public final class ImportID {
         MethodHandles.Lookup caller = callSite.callerLookup;
         Class<?> callerClass = caller.lookupClass();
 
-        Object obj = Imports.searchFromImports(callerClass, callSite.name, -1);
+        //Object obj = Imports.searchFromImports(callerClass, callSite.name, -1);
+        Object obj = searchFromImports(callSite.name);
         if (obj != null) {
-            if (obj instanceof Method) {
-                Method method = (Method) obj;
-                MethodHandle handle = caller.unreflect(method);
-                Function function = new Function(handle);
-                return function;
-            }
+//            if (obj instanceof Method) {
+//                Method method = (Method) obj;
+//                MethodHandle handle = caller.unreflect(method);
+//                Function function = new Function(handle);
+//                return function;
+//            }
+            return obj;
         }
 
         throw new NoSuchMethodError(callSite.name+" "+callSite.type().toMethodDescriptorString());
+    }
+
+    public static Object searchFromImports(String name){
+        ReferenceTable aliasImportTab = ImportEvaluator.getAliasNameTable();
+        Map<URLPath, ExportMap> exports = ImportEvaluator.getCurrentModuleExportMap();
+
+        ReferenceSymbol symbol = aliasImportTab.resolve(name);
+        URLPath path = new URLPath(symbol.getPath());
+
+        if(path == null){
+            // TODO: default imports
+                System.out.println(name);
+                return new Function(null);
+
+        }
+        ExportMap export = exports.get(path);
+        return export.get(symbol.getName());
     }
 }

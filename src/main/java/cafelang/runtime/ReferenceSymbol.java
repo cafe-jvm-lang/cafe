@@ -29,26 +29,31 @@
 
 package cafelang.runtime;
 
-import java.util.Map;
+public final class ReferenceSymbol {
+    private String name;
+    private String alias;
+    private String path;
 
-public final class ExportMap {
-    private Class<?> clazz;
-    Map<String, Object> exports;
-
-    private ExportMap(Class<?> clazz){
-        this.clazz = clazz;
+    public ReferenceSymbol(String name, String alias, String path) {
+        this.name = name;
+        this.alias = alias;
+        this.path = path;
     }
 
-    public static ExportMap of(Class<?> clazz){
-        return new ExportMap(clazz);
+    public String getPath() {
+        return path;
     }
 
-    public ExportMap with(Map<String, Object> exports){
-        this.exports = exports;
-        return this;
+    public String getName() {
+        return name;
     }
 
-    public Object get(String name){
-        return exports.get(name);
+    public String getAlias() {
+        return alias;
     }
+
+    public boolean hasAlias(){
+        return alias != null && !alias.isEmpty();
+    }
+
 }

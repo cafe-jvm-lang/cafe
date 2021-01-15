@@ -29,7 +29,6 @@
 
 package cafelang.runtime;
 
-import cafe.BasePrototype;
 import cafe.Function;
 
 import java.lang.invoke.CallSite;
@@ -47,7 +46,7 @@ public final class FunctionReferenceID {
                                 .getClassLoader()
                                 .loadClass(moduleClass);
         Method function = module.getDeclaredMethod(name, genericMethodType(arity, varargs == 1)
-                .changeParameterType(0, BasePrototype.class)
+                .changeParameterType(0, Object.class)
                 .parameterArray());
         function.setAccessible(true);
         return new ConstantCallSite(constant(

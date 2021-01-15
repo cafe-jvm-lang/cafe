@@ -404,11 +404,12 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         CafeImport cafeImport = CafeImport.of(n.directory);
         for(Map.Entry<Node.IdenNode, Node.IdenNode> entry: n.importAliasMap.entrySet()){
             Node.IdenNode value = entry.getValue();
-            String alias = "";
+            String alias = null;
             if(value != null)
                 alias = value.name;
             cafeImport.add(entry.getKey().name, alias);
         }
+        context.module.addImport(cafeImport);
         context.push(cafeImport);
     }
 
@@ -418,7 +419,13 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         String name = n.iden.name;
         CafeExport export = CafeExport.export(name);
         context.module.addExport(export);
-        n.node.accept(this);
+        if(n.node == null){
+            // Just pushing to avoid error
+            context.push(export);
+        }else {
+            n.node.accept(this);
+        }
+
         //context.push(export);
     }
 

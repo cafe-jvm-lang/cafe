@@ -29,8 +29,6 @@
 
 package cafelang.runtime;
 
-import cafe.BasePrototype;
-
 import java.io.InvalidClassException;
 import java.lang.invoke.*;
 
@@ -45,7 +43,7 @@ public final class MethodInvocationID {
             FALLBACK = lookup.findStatic(
                     MethodInvocationID.class,
                     "fallback",
-                    methodType(Object.class, MethodCallSite.class, Object[].class));
+                    methodType(java.lang.Object.class, MethodCallSite.class, java.lang.Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
@@ -66,13 +64,13 @@ public final class MethodInvocationID {
         MethodCallSite callSite = new MethodCallSite(caller, name, type);
         MethodHandle fallbackHandle = FALLBACK
                 .bindTo(callSite)
-                .asCollector(Object[].class, type.parameterCount())
+                .asCollector(java.lang.Object[].class, type.parameterCount())
                 .asType(type);
         callSite.setTarget(fallbackHandle);
         return callSite;
     }
 
-    public static Object fallback(MethodCallSite callSite, Object[] args) throws Throwable {
+    public static java.lang.Object fallback(MethodCallSite callSite, java.lang.Object[] args) throws Throwable {
 //        System.out.println("CALLSITE");
 //        System.out.println("Name:" + callSite.name);
 //        for (int i = 0; i < args.length; i++) {
@@ -90,9 +88,9 @@ public final class MethodInvocationID {
         return target.invokeWithArguments(args);
     }
 
-    private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, Object[] args) throws Throwable {
-        if (args[0] instanceof BasePrototype) {
-            BasePrototype object = (BasePrototype) args[0];
+    private static MethodHandle lookupTarget(Class<?> clazz, MethodCallSite callSite, java.lang.Object[] args) throws Throwable {
+        if (args[0] instanceof Object) {
+            Object object = (Object) args[0];
             return object.dispatchCallHandle(callSite.name, callSite.type());
         }
         throw new InvalidClassException(args[0].getClass()

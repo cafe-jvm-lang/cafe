@@ -16,7 +16,12 @@
  along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import a from "examples/ThisBinding";
+import b as A from "examples/ThisBinding";
+
 func hello(){
-    println("Hello, World!");
+    #println(a);
+    return a + A;
 }
-export var z = hello();
+hello();
+
