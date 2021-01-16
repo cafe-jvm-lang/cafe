@@ -29,7 +29,7 @@
 
 package compiler.gen;
 
-import cafelang.ir.*;
+import compiler.ir.*;
 
 import java.util.Deque;
 import java.util.LinkedList;

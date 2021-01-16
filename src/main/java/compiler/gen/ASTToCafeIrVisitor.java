@@ -29,8 +29,8 @@
 
 package compiler.gen;
 
-import cafelang.ir.*;
 import compiler.ast.Node;
+import compiler.ir.*;
 
 import java.util.*;
 

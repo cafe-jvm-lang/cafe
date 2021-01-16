@@ -36,7 +36,6 @@ import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
 import compiler.util.Position;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
@@ -1914,15 +1913,16 @@ public class MainParser extends Parser {
             blocks.put(id1, id2);
         }
         accept(TokenKind.FROM);
-        File file = new File(token.value()+".class");
-        if(!file.exists()){
-            logError(INVALID_IMPORT_FILE, token.value());
-            error = true;
-        } else {
+//        File file = new File(token.value()+".class");
+//        if(!file.exists()){
+//
+//            logError(INVALID_IMPORT_FILE, token.value());
+//            error = true;
+//        } else {
             importStmtNode = new ImportStmtNode(blocks, token.value());
             nextToken();
             accept(TokenKind.SEMICOLON);
-        }
+
         return importStmtNode; 
     }
 

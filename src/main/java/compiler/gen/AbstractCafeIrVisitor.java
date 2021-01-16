@@ -29,7 +29,7 @@
 
 package compiler.gen;
 
-import cafelang.ir.*;
+import compiler.ir.*;
 
 public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     @Override

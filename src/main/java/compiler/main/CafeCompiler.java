@@ -29,7 +29,6 @@
 
 package compiler.main;
 
-import cafelang.ir.CafeModule;
 import compiler.analyzer.PrettyPrinter;
 import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
@@ -37,6 +36,7 @@ import compiler.ast.Node.ProgramNode;
 import compiler.gen.ASTToCafeIrVisitor;
 import compiler.gen.JVMByteCodeGenVisitor;
 import compiler.gen.SymbolReferenceAssignmentVisitor;
+import compiler.ir.CafeModule;
 import compiler.main.Main.Result;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;

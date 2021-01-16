@@ -16,7 +16,7 @@
  along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import x from "examples/a";
+#import x from "examples/a";
 
 func foo() {
 	#println( this.a );

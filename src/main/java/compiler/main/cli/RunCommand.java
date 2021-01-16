@@ -29,11 +29,11 @@
 
 package compiler.main.cli;
 
-import cafelang.runtime.Runtime;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import compiler.main.Main;
+import runtime.Runtime;
 
 import java.io.File;
 import java.net.MalformedURLException;
