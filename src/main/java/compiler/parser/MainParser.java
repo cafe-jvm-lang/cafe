@@ -1899,22 +1899,32 @@ public class MainParser extends Parser {
         IdenNode id1, id2 = null;
 
         accept(TokenKind.IMPORT);
-        id1 = parseIdentifier();
-        if (token.kind == TokenKind.AS) {
-            accept(token.kind);
-            id2 = parseIdentifier();
-        }
-        blocks.put(id1, id2);
-        while (token.kind == TokenKind.COMMA) {
-            accept(TokenKind.COMMA);
+        if(token.kind == TokenKind.IDENTIFIER){
             id1 = parseIdentifier();
-            id2 = null;
             if (token.kind == TokenKind.AS) {
                 accept(token.kind);
                 id2 = parseIdentifier();
             }
             blocks.put(id1, id2);
+            while (token.kind == TokenKind.COMMA) {
+                accept(TokenKind.COMMA);
+                id1 = parseIdentifier();
+                id2 = null;
+                if (token.kind == TokenKind.AS) {
+                    accept(token.kind);
+                    id2 = parseIdentifier();
+                }
+                blocks.put(id1, id2);
+            }
+        } else {
+            if(accept(TokenKind.MUL)) {
+                id1 = new IdenNode("*");
+                accept(TokenKind.AS);
+                id2 = parseIdentifier();
+                blocks.put(id1, id2);
+            }
         }
+        
         accept(TokenKind.FROM);
 //        File file = new File(token.value()+".class");
 //        if(!file.exists()){
