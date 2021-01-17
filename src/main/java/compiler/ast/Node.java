@@ -88,7 +88,8 @@ public abstract class Node {
 
     public static abstract class DeclNode extends StmtNode {
         IdenNode iden;
-        public IdenNode getIden(){
+
+        public IdenNode getIden() {
             return iden;
         }
     }
@@ -659,6 +660,7 @@ public abstract class Node {
 
     public static class VarDeclNode extends DeclNode {
         public ExprNode value;
+
         public VarDeclNode(IdenNode var) {
             this(var, null);
         }
@@ -754,7 +756,7 @@ public abstract class Node {
         public Map<IdenNode, IdenNode> importAliasMap;
         public String directory;
 
-        public ImportStmtNode(Map<IdenNode, IdenNode> importAliasMap,  String directory) {
+        public ImportStmtNode(Map<IdenNode, IdenNode> importAliasMap, String directory) {
             this.importAliasMap = importAliasMap;
             this.directory = directory;
         }
@@ -769,12 +771,12 @@ public abstract class Node {
             v.visitImportStmt(this);
         }
     }
-    
-    public static class ExportStmtNode extends StmtNode{
+
+    public static class ExportStmtNode extends StmtNode {
         public IdenNode iden;
         public DeclNode node;
 
-        public ExportStmtNode(IdenNode iden, DeclNode node){
+        public ExportStmtNode(IdenNode iden, DeclNode node) {
             this.iden = iden;
             this.node = node;
         }

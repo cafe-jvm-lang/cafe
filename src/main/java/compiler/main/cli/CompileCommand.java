@@ -34,13 +34,13 @@ import com.beust.jcommander.Parameters;
 import compiler.main.CafeCompiler;
 import compiler.main.Main;
 
-@Parameters(commandNames = {"-c"},  commandDescription = "Compiles Cafe source files")
+@Parameters(commandNames = {"-c"}, commandDescription = "Compiles Cafe source files")
 public class CompileCommand implements Command {
 
     @Parameter(description = "[source-file].cafe", required = true)
     String source;
 
-    private CompileCommand(){
+    private CompileCommand() {
     }
 
     static {

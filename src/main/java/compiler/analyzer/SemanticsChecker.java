@@ -83,7 +83,7 @@ public class SemanticsChecker implements Node.Visitor {
     }
 
     private Symbol symbol(String name, boolean isConst) {
-        return new Symbol(name,isConst);
+        return new Symbol(name, isConst);
     }
 
     @Override
@@ -105,10 +105,10 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitIden(IdenNode n) {
-        if(exprType == Expr.LHS){
-            if(CST.isSymbolConstant(n.name)){
-               logError(REASSIGN_CONSTANT, n,
-                       message(REASSIGN_CONSTANT, n.name));
+        if (exprType == Expr.LHS) {
+            if (CST.isSymbolConstant(n.name)) {
+                logError(REASSIGN_CONSTANT, n,
+                        message(REASSIGN_CONSTANT, n.name));
             }
         }
 //        else {
@@ -353,12 +353,12 @@ public class SemanticsChecker implements Node.Visitor {
     @Override
     public void visitForStmt(ForStmtNode n) {
         CST = new SymbolTable(CST).notDeclarable();
-        if(n.init != null) {
+        if (n.init != null) {
             for (StmtNode stmt : n.init)
                 stmt.accept(this);
         }
         n.cond.accept(this);
-        if(n.counters != null) {
+        if (n.counters != null) {
             for (AsgnStmtNode stmt : n.counters)
                 stmt.accept(this);
         }
@@ -440,8 +440,8 @@ public class SemanticsChecker implements Node.Visitor {
 
     private void logError(Log.Type issue, Node n, String message) {
         System.out.println(message);
-        	log.report(issue, n.getSourcePosition(),
-        			errorDescription(n.getSourcePosition(), message));
+        log.report(issue, n.getSourcePosition(),
+                errorDescription(n.getSourcePosition(), message));
     }
 
 }

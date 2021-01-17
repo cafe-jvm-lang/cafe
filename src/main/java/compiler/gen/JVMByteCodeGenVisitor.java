@@ -121,8 +121,8 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         return signature.toMethodDescriptorString();
     }
 
-    private String functionType(CafeFunction function){
-        if(function.isInit())
+    private String functionType(CafeFunction function) {
+        if (function.isInit())
             return INIT_FUNC_TYPE;
         return null;
     }
@@ -192,7 +192,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 //            mv.visitTypeInsn(NEW, JDYNAMIC);
 //            mv.visitInsn(DUP);
 //            mv.visitMethodInsn(INVOKESPECIAL, JDYNAMIC, "<init>", "()V", false);
-            mv.visitMethodInsn(INVOKESTATIC, DOBJECT_CREATOR, "create", "()"+ LDOBJECT , false);
+            mv.visitMethodInsn(INVOKESTATIC, DOBJECT_CREATOR, "create", "()" + LDOBJECT, false);
             mv.visitFieldInsn(PUTSTATIC, className, THIS, LDOBJECT);
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);
@@ -236,8 +236,8 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     private int functionFlags(CafeFunction function) {
-        int accessFlags = ACC_STATIC ;
-        if(function.isInit())
+        int accessFlags = ACC_STATIC;
+        if (function.isInit() || function.isExported())
             accessFlags |= ACC_PUBLIC;
         else
             accessFlags |= ACC_PRIVATE;
@@ -270,8 +270,8 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitEnd();
     }
 
-    private void visitDObjectCreator(MethodVisitor mv){
-        mv.visitMethodInsn(INVOKESTATIC, DOBJECT_CREATOR, "create", "()"+ LDOBJECT, false);
+    private void visitDObjectCreator(MethodVisitor mv) {
+        mv.visitMethodInsn(INVOKESTATIC, DOBJECT_CREATOR, "create", "()" + LDOBJECT, false);
     }
 
     private void writeImportMetaData(Set<CafeImport> imports) {
@@ -288,7 +288,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         MethodVisitor mv = cw.visitMethod(
                 ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC,
                 "#" + "imports",
-                "()L"+refTable+";",
+                "()L" + refTable + ";",
                 null, null);
         mv.visitCode();
 
@@ -299,30 +299,32 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitVarInsn(ASTORE, 0);
 
         // loop through each import
-        for(CafeImport cafeImport: imports){
+        for (CafeImport cafeImport : imports) {
             String path = cafeImport.getModulePath();
-            for(Map.Entry<String, String> imp : cafeImport.getNameAlias().entrySet() ){
+            for (Map.Entry<String, String> imp : cafeImport.getNameAlias()
+                                                           .entrySet()) {
                 // create a new reference symbol
                 mv.visitTypeInsn(NEW, refSymbol);
                 mv.visitInsn(DUP);
                 mv.visitLdcInsn(imp.getKey());
 
-                if(imp.getValue() == null)
+                if (imp.getValue() == null)
                     mv.visitInsn(ACONST_NULL);
                 else
                     mv.visitLdcInsn(imp.getValue());
                 mv.visitLdcInsn(path);
-                mv.visitMethodInsn(INVOKESPECIAL, refSymbol, "<init>", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", false);
+                mv.visitMethodInsn(INVOKESPECIAL, refSymbol, "<init>",
+                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V", false);
                 mv.visitVarInsn(ASTORE, 1);
 
                 // add reference symbol to table
                 mv.visitVarInsn(ALOAD, 0);
                 mv.visitVarInsn(ALOAD, 1);
-                mv.visitMethodInsn(INVOKEVIRTUAL, refTable, "add", "(L"+refSymbol+";)V", false);
+                mv.visitMethodInsn(INVOKEVIRTUAL, refTable, "add", "(L" + refSymbol + ";)V", false);
             }
         }
         // return reference table
-        mv.visitVarInsn(ALOAD,0);
+        mv.visitVarInsn(ALOAD, 0);
         mv.visitInsn(ARETURN);
 
         mv.visitMaxs(0, 0);
@@ -333,7 +335,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     // public static Map<String, Object> #exports()
     // to return all exports from this module.
     // NOTE: this method should be called always at the end of #init func.
-    private void writeExportMetaData(Set<CafeExport> exports){
+    private void writeExportMetaData(Set<CafeExport> exports) {
         MethodVisitor mv = cw.visitMethod(
                 ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC,
                 "#" + "exports",
@@ -350,7 +352,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitVarInsn(ASTORE, 0);
 
         // put each export into map
-        for(CafeExport export: exports){
+        for (CafeExport export : exports) {
             mv.visitVarInsn(ALOAD, 0);
 
             // load key (export name)
@@ -358,10 +360,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
             // load value (export value from GlobalThis pointer)
             mv.visitLdcInsn(export.getName());
-            GlobalThis.retrieve(mv,className);
+            GlobalThis.retrieve(mv, className);
 
             // map.put(key,value);
-            mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
+            mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
 
             // pop boolean returned by map.put
             mv.visitInsn(POP);
@@ -426,7 +429,8 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         MethodType type;
 
         // This will load Function object (if present) or throw error during runtime.
-        functionInvocation.getReference().accept(this);
+        functionInvocation.getReference()
+                          .accept(this);
         mv.visitTypeInsn(CHECKCAST, JFUNC);
 
         // load global THIS pointer
@@ -584,13 +588,12 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
             String name = ((ReferenceLookup) lhs).getName();
             SymbolReference ref = ((ReferenceLookup) lhs).resolveIn(context.referenceTableStack.peek());
 
-            if(ref == null){
+            if (ref == null) {
                 // check in imports
-                if(context.importedVariables.contains(name)){
+                if (context.importedVariables.contains(name)) {
                     mv.visitLdcInsn(name);
                     GlobalThis.retrieve(mv, className);
-                }
-                else{
+                } else {
                     visitVariableInImports(name);
                 }
                 return;
@@ -735,7 +738,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         } else {
             ForLoopStatement loop = breakContinueStatement.getEnclosingLoop();
             jumpTarget = context.loopIncrMap.get(loop);
-            if(jumpTarget == null)
+            if (jumpTarget == null)
                 jumpTarget = context.loopStartMap.get(loop);
         }
         mv.visitLdcInsn(0);
@@ -833,7 +836,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         }
     }
 
-    private void visitVariableInImports(String varName){
+    private void visitVariableInImports(String varName) {
         // context.importedVariables.add(varName);
         mv.visitLdcInsn(varName);
         mv.visitInvokeDynamicInsn(

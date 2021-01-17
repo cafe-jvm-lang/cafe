@@ -39,8 +39,8 @@ public class Main {
         DObject objectProto = new DObject();
         Method[] methods = _ObjectProto.class.getDeclaredMethods();
         MethodHandles.Lookup lookup = MethodHandles.lookup();
-        for(Method method: methods){
-            if(Modifier.isPublic(method.getModifiers())){
+        for (Method method : methods) {
+            if (Modifier.isPublic(method.getModifiers())) {
                 MethodHandle h = lookup.unreflect(method);
                 objectProto.define(method.getName(), new DFunction(h));
             }

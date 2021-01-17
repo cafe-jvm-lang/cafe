@@ -31,6 +31,6 @@ package cafe;
 
 public class ObjectPrototype extends BasePrototype {
     ObjectPrototype() {
-        super(null,false);
+        super(null, false);
     }
 }

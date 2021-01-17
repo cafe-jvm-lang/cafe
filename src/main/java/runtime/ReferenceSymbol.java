@@ -52,7 +52,7 @@ public final class ReferenceSymbol {
         return alias;
     }
 
-    public boolean hasAlias(){
+    public boolean hasAlias() {
         return alias != null && !alias.isEmpty();
     }
 

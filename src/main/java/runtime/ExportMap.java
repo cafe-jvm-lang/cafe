@@ -35,20 +35,20 @@ public final class ExportMap {
     private Class<?> clazz;
     Map<String, Object> exports;
 
-    private ExportMap(Class<?> clazz){
+    private ExportMap(Class<?> clazz) {
         this.clazz = clazz;
     }
 
-    public static ExportMap of(Class<?> clazz){
+    public static ExportMap of(Class<?> clazz) {
         return new ExportMap(clazz);
     }
 
-    public ExportMap with(Map<String, Object> exports){
+    public ExportMap with(Map<String, Object> exports) {
         this.exports = exports;
         return this;
     }
 
-    public Object get(String name){
+    public Object get(String name) {
         return exports.get(name);
     }
 }

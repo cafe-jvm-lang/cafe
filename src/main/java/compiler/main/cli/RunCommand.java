@@ -62,9 +62,10 @@ public class RunCommand implements Command {
         Command.registerCommand(CommandName.RUN, new RunCommand());
     }
 
-    private RunCommand(){}
+    private RunCommand() {
+    }
 
-    public File getFile(String path){
+    public File getFile(String path) {
         File file = new File(path);
         if (file.exists() && !file.isDirectory()) {
             return file;
@@ -73,12 +74,13 @@ public class RunCommand implements Command {
     }
 
     public URLClassLoader getURLClassLoader(List<String> classpath) {
-        if(classpath.isEmpty())
+        if (classpath.isEmpty())
             classpath = Collections.singletonList(".");
         URL[] urls = new URL[classpath.size()];
         for (int i = 0; i < classpath.size(); i++) {
             try {
-                urls[i] = new File(classpath.get(i)).toURI().toURL();
+                urls[i] = new File(classpath.get(i)).toURI()
+                                                    .toURL();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -86,7 +88,7 @@ public class RunCommand implements Command {
         return new URLClassLoader(urls);
     }
 
-    public void run(Class<?> clazz, String[] arguments)throws Throwable{
+    public void run(Class<?> clazz, String[] arguments) throws Throwable {
 //        MethodHandle main;
 //        main = publicLookup().findStatic(clazz, "main", methodType(void.class, String[].class));
 //        main.invoke(arguments);
@@ -100,11 +102,10 @@ public class RunCommand implements Command {
             Class<?> module = urlClassLoader.loadClass(arguments.get(0));
             //run(module, arguments.subList(1, arguments.size()).toArray(new String[0]));
             Runtime.runtime(module);
-        }catch (ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             error(message(MODULE_NOT_FOUND, arguments.get(0)));
             return Main.Result.ERROR;
-        }
-        catch (Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
             return Main.Result.ERROR;
         }

@@ -69,18 +69,18 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-distributions{
-    main{
+distributions {
+    main {
         baseName("cafe")
-        contents{
-            from(projectDir){
+        contents {
+            from(projectDir) {
                 include('README*')
                 include('COPYRIGHT*')
                 include('LICENSE*')
                 include('THIRD-PARTY')
             }
-            into('examples'){
-                from('examples'){
+            into('examples') {
+                from('examples') {
                     include '**/*.cafe'
                 }
             }
@@ -89,16 +89,16 @@ distributions{
 
 }
 
-startScripts{
+startScripts {
     applicationName = 'cafe'
 }
 
 run {
     // RUN
-    args = ["-r","-cp=.\\examples\\","ThisBinding"]
+    args = ["-r", "-cp=.\\examples\\", "HelloWorld"]
 
     // Compile
-    // args = ["-c",".\\examples\\ThisBinding.cafe"]
+    // args = ["-c",".\\examples\\HelloWorld.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]

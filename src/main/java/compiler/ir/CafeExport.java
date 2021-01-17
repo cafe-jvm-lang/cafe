@@ -31,14 +31,14 @@ package compiler.ir;
 
 import java.util.Objects;
 
-public class CafeExport extends CafeStatement<CafeExport>{
+public class CafeExport extends CafeStatement<CafeExport> {
     private String name;
 
-    private CafeExport(String name){
+    private CafeExport(String name) {
         this.name = name;
     }
 
-    public static CafeExport export(String name){
+    public static CafeExport export(String name) {
         return new CafeExport(name);
     }
 

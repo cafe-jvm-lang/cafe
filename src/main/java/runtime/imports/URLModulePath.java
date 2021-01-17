@@ -27,40 +27,22 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package runtime.imports;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class URLPath {
+public class URLModulePath extends ModulePath {
     private String stringPath;
     private Path path;
-    private Class<?> module;
-    private boolean fromStdLib=false;
 
-    public URLPath(String path){
+    public URLModulePath(String path) {
         this.stringPath = path;
-        this.path = FileSystems.getDefault().getPath(path);
-    }
-
-    private boolean checkPath(){
-        File f = new File(stringPath +".class");
-        if(!f.exists()){
-            stringPath = stringPath.replaceAll("/",".").trim();
-            stringPath = "library."+ stringPath;
-            try {
-                Class.forName(stringPath);
-                fromStdLib = true;
-                return true;
-            } catch( ClassNotFoundException e ) {
-                return false;
-            }
-        }
-        return false;
+        this.path = FileSystems.getDefault()
+                               .getPath(path);
     }
 
     public Path getPath() {
@@ -71,19 +53,20 @@ public class URLPath {
         return stringPath;
     }
 
-    public void setModule(Class<?> module){
-        this.module = module;
-    }
-
     public Class<?> getModule() {
         return module;
+    }
+
+    @Override
+    public void accept(ImportPathVisitor v) {
+        v.visit(this);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        URLPath urlPath = (URLPath) o;
+        URLModulePath urlPath = (URLModulePath) o;
         try {
             return Files.isSameFile(path, urlPath.path);
         } catch (IOException e) {

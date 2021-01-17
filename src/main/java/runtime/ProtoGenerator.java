@@ -49,17 +49,18 @@ public class ProtoGenerator {
     private static DObject FUNCPROTO;
     private static String funcproto = "CFuncProto";
 
-    private ProtoGenerator(){}
+    private ProtoGenerator() {
+    }
 
-    private static DObject generate(Class<?> clazz){
+    private static DObject generate(Class<?> clazz) {
         DObject object = new DObject();
         Method[] methods = clazz.getDeclaredMethods();
         MethodHandles.Lookup lookup = MethodHandles.lookup();
-        for(Method method: methods){
-            if(Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())){
+        for (Method method : methods) {
+            if (Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())) {
                 try {
                     MethodHandle mh = lookup.unreflect(method);
-                    object.define(method.getName(),(new DFunc(mh)));
+                    object.define(method.getName(), (new DFunc(mh)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -67,8 +68,8 @@ public class ProtoGenerator {
         }
 
         Field[] fields = clazz.getDeclaredFields();
-        for(Field field: fields){
-            if(Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())){
+        for (Field field : fields) {
+            if (Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
                 try {
                     Object o = field.get(null);
                     object.define(field.getName(), o);
@@ -81,16 +82,16 @@ public class ProtoGenerator {
         return object;
     }
 
-    private static void setFuncProto(DObject object){
-        for(String key: object.keys()){
-            if(object.get(key) instanceof DFunc){
+    private static void setFuncProto(DObject object) {
+        for (String key : object.keys()) {
+            if (object.get(key) instanceof DFunc) {
                 DFunc function = (DFunc) object.get(key);
                 function.define(DObject.__PROTO__, FUNCPROTO);
             }
         }
     }
 
-    private static Map<String, DObject> generate(){
+    private static Map<String, DObject> generate() {
         OBJECTPROTO = generate(CObjectProto.class);
 
         FUNCPROTO = generate(CFuncProto.class);
@@ -107,14 +108,14 @@ public class ProtoGenerator {
     }
 
     public static DObject getObjectProto() {
-        if(OBJECTPROTO == null){
+        if (OBJECTPROTO == null) {
             generate();
         }
         return OBJECTPROTO;
     }
 
-    public static DObject getFuncProto(){
-        if(FUNCPROTO == null){
+    public static DObject getFuncProto() {
+        if (FUNCPROTO == null) {
             generate();
         }
         return FUNCPROTO;

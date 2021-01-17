@@ -78,7 +78,7 @@ public class CafeModule extends CafeElement<CafeModule> {
         imports.add(cafeImport);
     }
 
-    public void addExport(CafeExport cafeExport){
+    public void addExport(CafeExport cafeExport) {
         exports.add(cafeExport);
     }
 

@@ -29,23 +29,23 @@
 
 package compiler.ir;
 
-public class BreakContinueStatement extends CafeStatement<BreakContinueStatement>{
-    public enum Type{
+public class BreakContinueStatement extends CafeStatement<BreakContinueStatement> {
+    public enum Type {
         BREAK, CONTINUE
     }
 
     private final Type type;
     private ForLoopStatement enclosingLoop;
 
-    private BreakContinueStatement(Type type){
+    private BreakContinueStatement(Type type) {
         this.type = type;
     }
 
-    public static BreakContinueStatement newContinue(){
+    public static BreakContinueStatement newContinue() {
         return new BreakContinueStatement(Type.CONTINUE);
     }
 
-    public static BreakContinueStatement newBreak(){
+    public static BreakContinueStatement newBreak() {
         return new BreakContinueStatement(Type.BREAK);
     }
 

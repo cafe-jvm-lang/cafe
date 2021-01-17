@@ -30,7 +30,6 @@
 package runtime.indy;
 
 
-
 import library.DObject;
 
 import java.lang.invoke.*;

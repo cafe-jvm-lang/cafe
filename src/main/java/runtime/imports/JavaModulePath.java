@@ -27,20 +27,33 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package runtime.imports;
 
-import library.DFunc;
-import library.DObject;
+import java.util.Objects;
 
-import java.lang.invoke.MethodHandle;
+public class JavaModulePath extends ModulePath {
+    private String moduleString;
 
-public class DFuncCreator {
-    private DFuncCreator() {
+    public JavaModulePath(String moduleString, Class<?> module) {
+        this.moduleString = moduleString;
+        super.module = module;
     }
 
-    public static DFunc create(MethodHandle methodHandle) {
-        DFunc object = new DFunc(methodHandle);
-        object.define(DObject.__PROTO__, ProtoGenerator.getFuncProto());
-        return object;
+    @Override
+    public void accept(ImportPathVisitor v) {
+        v.visit(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JavaModulePath otherModule = (JavaModulePath) o;
+        return moduleString.equals(otherModule);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(moduleString);
     }
 }

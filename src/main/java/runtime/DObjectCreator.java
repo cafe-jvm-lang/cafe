@@ -32,9 +32,10 @@ package runtime;
 import library.DObject;
 
 public class DObjectCreator {
-    private DObjectCreator(){}
+    private DObjectCreator() {
+    }
 
-    public static DObject create(){
+    public static DObject create() {
         DObject object = new DObject();
         object.define(DObject.__PROTO__, ProtoGenerator.getObjectProto());
         return object;

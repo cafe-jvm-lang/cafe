@@ -31,10 +31,10 @@ package library;
 
 import java.lang.invoke.MethodHandle;
 
-public class DFunc extends DObject{
+public class DFunc extends DObject {
     private MethodHandle handle;
 
-    public DFunc(MethodHandle handle){
+    public DFunc(MethodHandle handle) {
         this.handle = handle;
     }
 
@@ -48,6 +48,6 @@ public class DFunc extends DObject{
 
     @Override
     public String toString() {
-        return "Function{"+super.map+"}";
+        return "Function{" + super.map + "}";
     }
 }

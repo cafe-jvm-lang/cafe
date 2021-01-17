@@ -72,7 +72,7 @@ public final class Messages {
             // Parsing Errors
             put(SYMBOL_EXPECTED, "`{0}` expected, found `{1}`");
             put(INVALID_EXPRESSION, "Invalid expression");
-            put(INVALID_IMPORT_FILE,"Import module `{0}` does not exist");
+            put(INVALID_IMPORT_FILE, "Import module `{0}` does not exist");
 
             // Semantic Errors
             put(DUPLICATE_SYMBOL, "Duplicate symbol `{0}`");
@@ -103,7 +103,10 @@ public final class Messages {
     public static void printPrefixed(Log.Type prefix, String message, Ansi.Color color) {
         AnsiConsole.systemInstall();
         System.out.println(
-                ansi().fg(color).a("["+MESSAGES.get(prefix)+"] ").reset().a(message)
+                ansi().fg(color)
+                      .a("[" + MESSAGES.get(prefix) + "] ")
+                      .reset()
+                      .a(message)
         );
         AnsiConsole.systemUninstall();
     }

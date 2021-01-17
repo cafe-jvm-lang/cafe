@@ -79,18 +79,17 @@ public final class Main {
         cmd.setProgramName("cafe");
 
         Command.initCommands();
-        for(Map.Entry<Command.CommandName, Command> command: Command.commands.entrySet()){
+        for (Map.Entry<Command.CommandName, Command> command : Command.commands.entrySet()) {
             cmd.addCommand(command.getValue());
         }
 
-        try{
+        try {
             cmd.parse(args);
             if (globalArguments.usageCommand != null) {
                 usageFormatter.usage(globalArguments.usageCommand);
-            } else
-            if(cmd.getParsedCommand() == null || globalArguments.help){
+            } else if (cmd.getParsedCommand() == null || globalArguments.help) {
                 cmd.usage();
-            }else {
+            } else {
                 String command = cmd.getParsedCommand();
                 JCommander parsedJCommander = cmd.getCommands()
                                                  .get(command);
@@ -102,8 +101,7 @@ public final class Main {
                     return Result.CMDERR;
                 }
             }
-        }
-        catch (ParameterException e){
+        } catch (ParameterException e) {
             System.err.println(e.getMessage());
         }
 

@@ -31,10 +31,10 @@ package cafe.test;
 
 import java.lang.invoke.MethodHandle;
 
-public class DFunction extends DObject{
+public class DFunction extends DObject {
     MethodHandle handle;
 
-    public DFunction(MethodHandle handle){
+    public DFunction(MethodHandle handle) {
         this.handle = handle;
     }
 }

@@ -35,7 +35,7 @@ import java.util.Map;
 public class CafeImport extends CafeStatement<CafeImport> {
     private final Map<String, String> nameAlias;
     private final String modulePath;
-    private boolean isDefault=false;
+    private boolean isDefault = false;
 
     private CafeImport(String modulePath) {
         nameAlias = new HashMap<>();
@@ -46,20 +46,20 @@ public class CafeImport extends CafeStatement<CafeImport> {
         return new CafeImport(moduleName);
     }
 
-    public void add(String name, String alias){
-        nameAlias.put(name,alias);
+    public void add(String name, String alias) {
+        nameAlias.put(name, alias);
     }
 
     public Map<String, String> getNameAlias() {
         return nameAlias;
     }
 
-    public CafeImport asDefault(){
+    public CafeImport asDefault() {
         isDefault = true;
         return this;
     }
 
-    public boolean isDefault(){
+    public boolean isDefault() {
         return isDefault;
     }
 

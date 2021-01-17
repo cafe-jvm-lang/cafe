@@ -53,6 +53,7 @@ public class MainParser extends Parser {
     private Log log;
     private boolean breakAllowed = false, innerLoop = false, error = false;
     private List<String> debug = new ArrayList<>();
+
     private MainParser() {
     }
 
@@ -113,16 +114,16 @@ public class MainParser extends Parser {
 //        return accept(tokenKindExpected);
 //    }
 
-    private void logError(TokenKind tokenKindExpected){
+    private void logError(TokenKind tokenKindExpected) {
         error = true;
         log.report(SYMBOL_EXPECTED, token.pos,
                 errorDescription(token.pos, message(SYMBOL_EXPECTED, tokenKindExpected, token.kind)));
     }
 
-    private void logError(Log.Type issue,Object... values){
+    private void logError(Log.Type issue, Object... values) {
         error = true;
         log.report(issue, token.pos,
-                errorDescription(token.pos, message(issue,values)));
+                errorDescription(token.pos, message(issue, values)));
 
     }
 
@@ -230,8 +231,8 @@ public class MainParser extends Parser {
         if (error) return null;
         Token tk = token;
         ExprNode exp1 = parseBitOrExpression();
-        if(exp1 == null){
-            error= true;
+        if (exp1 == null) {
+            error = true;
             return null;
         }
         while (token.kind == TokenKind.LT || token.kind == TokenKind.GT || token.kind == TokenKind.LTE
@@ -261,7 +262,7 @@ public class MainParser extends Parser {
             exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
-        if(exp1 != null)
+        if (exp1 != null)
             exp1.setFirstToken(tk);
         return exp1;
     }
@@ -560,7 +561,7 @@ public class MainParser extends Parser {
         if (error) return null;
         debug.add("Atom Expr Node Token: " + token.kind);
         ExprNode oExp = parseAtom();
-        if(oExp == null){
+        if (oExp == null) {
             error = true;
             return null;
         }
@@ -571,9 +572,9 @@ public class MainParser extends Parser {
                 oExp = trailer;
             }
         }
-        
+
         if (error) return null;
-        if(oExp == null){
+        if (oExp == null) {
             error = true;
             return null;
         }
@@ -647,7 +648,7 @@ public class MainParser extends Parser {
                 logError(INVALID_EXPRESSION);
         }
         if (error) return null;
-        if (exp1 == null){
+        if (exp1 == null) {
             error = true;
             return null;
         }
@@ -820,7 +821,7 @@ public class MainParser extends Parser {
     /* parseStatements */
     IfStmtNode parseIf() {
         if (error) return null;
-        ExprNode ifCond=null;
+        ExprNode ifCond = null;
         BlockNode ifBlock = new BlockNode();
 
         Token firstToken = token;
@@ -828,8 +829,8 @@ public class MainParser extends Parser {
         nextToken();
         accept(TokenKind.LPAREN);
         ifCond = parseLogicalOrExpression();
-        if(ifCond == null){
-        //    log.report(Type.ERROR, token.pos, errorDescription(token.pos,  "If without condition!"));
+        if (ifCond == null) {
+            //    log.report(Type.ERROR, token.pos, errorDescription(token.pos,  "If without condition!"));
             logError(INVALID_EXPRESSION);
             error = true;
             return null;
@@ -959,7 +960,7 @@ public class MainParser extends Parser {
             }
         }
         if (error) return null;
-        if(init.isEmpty()) return null;
+        if (init.isEmpty()) return null;
         return init;
     }
 
@@ -1082,7 +1083,7 @@ public class MainParser extends Parser {
          * if(CONTINUE) return ContinueNode if(BREAK) return BreakNode
          */
         if (error) return null;
-        Token tk=token;
+        Token tk = token;
         if (breakAllowed)
             if (token.kind == TokenKind.CONTINUE) {
                 if (error) return null;
@@ -1819,14 +1820,16 @@ public class MainParser extends Parser {
                 blockStmt.add(stm5);
                 break;
             case IDENTIFIER:
-            case THIS: case NULL:
+            case THIS:
+            case NULL:
                 StmtNode stm6 = parseExprStmt();
                 if (stm6 == null) return null;
                 blockStmt.add(stm6);
                 debug.add("Block Stmt: " + token.kind);
                 accept(TokenKind.SEMICOLON);
                 break;
-            case BREAK: case CONTINUE:
+            case BREAK:
+            case CONTINUE:
                 StmtNode stm7 = parseFlowStatement();
                 blockStmt.add(stm7);
                 debug.add("Block Stmt: " + token.kind);
@@ -1841,14 +1844,14 @@ public class MainParser extends Parser {
 
     List<ExportStmtNode> parseExportStatement() {
         List<ExportStmtNode> exportStmtNode = new ArrayList<ExportStmtNode>();
-        
+
         accept(TokenKind.EXPORT);
-        switch(token.kind){
+        switch (token.kind) {
             case IDENTIFIER:
                 IdenNode id = parseIdentifier();
                 if (id == null) return null;
                 exportStmtNode.add(new ExportStmtNode(id, null));
-                while(token.kind == TokenKind.COMMA){
+                while (token.kind == TokenKind.COMMA) {
                     accept(TokenKind.COMMA);
                     id = parseIdentifier();
                     if (id == null) return null;
@@ -1860,14 +1863,14 @@ public class MainParser extends Parser {
             case VAR:
                 List<VarDeclNode> stm = parseVariable();
                 if (stm == null) return null;
-                for(VarDeclNode var: stm){
-                    exportStmtNode.add(new ExportStmtNode(var.getIden(),var));
+                for (VarDeclNode var : stm) {
+                    exportStmtNode.add(new ExportStmtNode(var.getIden(), var));
                 }
                 break;
             case CONST:
                 List<ConstDeclNode> stm1 = parseConstVariable();
                 if (stm1 == null) return null;
-                for(ConstDeclNode var: stm1){
+                for (ConstDeclNode var : stm1) {
                     exportStmtNode.add(new ExportStmtNode(var.getIden(), var));
                 }
                 break;
@@ -1877,9 +1880,9 @@ public class MainParser extends Parser {
                 exportStmtNode.add(new ExportStmtNode(decl.getIden(), decl));
                 break;
             default:
-                error= true;
+                error = true;
         }
-        if(error) return null;
+        if (error) return null;
         return exportStmtNode;
     }
 
@@ -1919,11 +1922,11 @@ public class MainParser extends Parser {
 //            logError(INVALID_IMPORT_FILE, token.value());
 //            error = true;
 //        } else {
-            importStmtNode = new ImportStmtNode(blocks, token.value());
-            nextToken();
-            accept(TokenKind.SEMICOLON);
+        importStmtNode = new ImportStmtNode(blocks, token.value());
+        nextToken();
+        accept(TokenKind.SEMICOLON);
 
-        return importStmtNode; 
+        return importStmtNode;
     }
 
     // return Statement Node

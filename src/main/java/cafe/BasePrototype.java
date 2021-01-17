@@ -64,7 +64,7 @@ public abstract class BasePrototype {
     BasePrototype(Object __proto__, boolean isFunction) {
         map = new HashMap<>();
         map.put("__proto__", __proto__);
-        if(isFunction)
+        if (isFunction)
             map.put("prototype", new DynamicObject());
     }
 
@@ -115,9 +115,9 @@ public abstract class BasePrototype {
         BasePrototype obj = (BasePrototype) args[0];
         Object o = getObject(property, obj);
         //args = Arrays.copyOfRange(args, 1,args.length);
-        if(o instanceof Function)
+        if (o instanceof Function)
             return ((Function) o).invoke(args);
-        throw new NoSuchMethodError(obj.toString()+" has no such method "+ property);
+        throw new NoSuchMethodError(obj.toString() + " has no such method " + property);
     }
 
     public String toString(String clazz) {

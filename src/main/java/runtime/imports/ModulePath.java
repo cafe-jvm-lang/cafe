@@ -27,20 +27,36 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package runtime.imports;
 
-import library.DFunc;
-import library.DObject;
+import java.io.File;
 
-import java.lang.invoke.MethodHandle;
+public abstract class ModulePath {
+    Class<?> module;
 
-public class DFuncCreator {
-    private DFuncCreator() {
+    public Class<?> getModule() {
+        return module;
     }
 
-    public static DFunc create(MethodHandle methodHandle) {
-        DFunc object = new DFunc(methodHandle);
-        object.define(DObject.__PROTO__, ProtoGenerator.getFuncProto());
-        return object;
+    public void setModule(Class<?> module) {
+        this.module = module;
     }
+
+    public static ModulePath fromPath(String path) throws ClassNotFoundException {
+        File f = new File(path + ".class");
+        if (!f.exists()) {
+            path = path.replaceAll("/", ".")
+                       .trim();
+            path = "library." + path;
+            return new JavaModulePath(path, Class.forName(path));
+        } else {
+            return new URLModulePath(path);
+        }
+    }
+
+    public abstract void accept(ImportPathVisitor v);
+
+    public abstract boolean equals(Object o);
+
+    public abstract int hashCode();
 }

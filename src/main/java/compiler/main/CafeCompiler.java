@@ -69,10 +69,10 @@ public class CafeCompiler {
         log = Log.instance(context);
         fileManager = SourceFileManager.instance(context);
 
-        String fileName = source.substring( source.lastIndexOf('\\')+1);
+        String fileName = source.substring(source.lastIndexOf('\\') + 1);
         moduleName = fileName.substring(0, fileName.lastIndexOf('.'));
 
-        outputFilePath = source.substring( 0, source.lastIndexOf('\\')+1);
+        outputFilePath = source.substring(0, source.lastIndexOf('\\') + 1);
         outputFilePath += moduleName + ".class";
 
         parserFactory = ParserFactory.instance(context);

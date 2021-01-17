@@ -41,23 +41,24 @@ public interface Command {
         COMPILE("CompileCommand"),
         RUN("RunCommand");
 
-        CommandName(String className){
+        CommandName(String className) {
             this.commandClassName = className;
         }
 
         public String getCommandClassName() {
             return commandClassName;
         }
+
         String commandClassName;
     }
 
     Main.Result execute();
 
-    static void registerCommand(CommandName type, Command command){
+    static void registerCommand(CommandName type, Command command) {
         commands.put(type, command);
     }
 
-    static Command getCommand(CommandName type){
+    static Command getCommand(CommandName type) {
         return commands.get(type);
     }
 
@@ -71,7 +72,7 @@ public interface Command {
         }
     }
 
-    default void callRun(){
+    default void callRun() {
 
     }
 }

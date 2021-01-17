@@ -32,9 +32,10 @@ package runtime;
 
 public final class Runtime {
 
-    private Runtime(){}
+    private Runtime() {
+    }
 
     public static void runtime(Class<?> module) throws Throwable {
-        ImportEvaluator.evalute(module,null);
+        new ImportEvaluator().evaluate(module);
     }
 }

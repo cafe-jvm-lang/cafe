@@ -29,7 +29,12 @@
 
 package runtime.indy;
 
+import library.DObject;
 import runtime.*;
+import runtime.imports.ImportPathVisitor;
+import runtime.imports.JavaModulePath;
+import runtime.imports.ModulePath;
+import runtime.imports.URLModulePath;
 
 import java.lang.invoke.*;
 import java.util.Map;
@@ -38,6 +43,7 @@ import static java.lang.invoke.MethodType.methodType;
 
 public final class ImportID {
     private static final MethodHandle FALLBACK;
+    private static final ImportResolver RESOLVER;
 
     static {
         try {
@@ -46,6 +52,7 @@ public final class ImportID {
                     ImportID.class,
                     "fallback",
                     methodType(Object.class, ImportCallSite.class));
+            RESOLVER = new ImportResolver();
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
@@ -82,7 +89,7 @@ public final class ImportID {
         Class<?> callerClass = caller.lookupClass();
 
         //Object obj = Imports.searchFromImports(callerClass, callSite.name, -1);
-        Object obj = searchFromImports(callSite.name);
+        Object obj = RESOLVER.searchFromImports(callSite.name);
         if (obj != null) {
 //            if (obj instanceof Method) {
 //                Method method = (Method) obj;
@@ -93,21 +100,53 @@ public final class ImportID {
             return obj;
         }
 
-        throw new NoSuchMethodError(callSite.name+" "+callSite.type().toMethodDescriptorString());
+        throw new NoSuchMethodError(callSite.name + " " + callSite.type()
+                                                                  .toMethodDescriptorString());
     }
 
-    public static Object searchFromImports(String name){
-        ReferenceTable aliasImportTab = ImportEvaluator.getAliasNameTable();
-        Map<URLPath, ExportMap> exports = ImportEvaluator.getCurrentModuleExportMap();
 
-        ReferenceSymbol symbol = aliasImportTab.resolve(name);
-        URLPath path = new URLPath(symbol.getPath());
+    private static class ImportResolver implements ImportPathVisitor {
+        private ReferenceSymbol symbol;
+        private Object object = null;
+        private ReferenceTable importTable;
+        private Map<ModulePath, ExportMap> exportTable;
 
-        if(path == null){
-            // Search Java imports
-            return JavaImports.getObject(name);
+        public void init() {
+            importTable = ImportEvaluator.getImportTable();
+            exportTable = ImportEvaluator.getExportTable();
+            object = null;
         }
-        ExportMap export = exports.get(path);
-        return export.get(symbol.getName());
+
+        public Object searchFromImports(String name) throws ClassNotFoundException {
+            init();
+            symbol = importTable.resolve(name);
+            if (symbol == null) {
+                return JavaImports.getDefaultImport(name);
+            }
+
+            ModulePath path = ModulePath.fromPath(symbol.getPath());
+
+            path.accept(this);
+
+            return object;
+        }
+
+        @Override
+        public void visit(URLModulePath path) {
+            ExportMap export = exportTable.get(path);
+            object = export.get(symbol.getName());
+        }
+
+        @Override
+        public void visit(JavaModulePath path) {
+            DObject o = JavaImports.getObject(path);
+
+            if (symbol.getAlias()
+                      .equals("*")) {
+                object = o;
+            } else {
+                object = o.get(symbol.getName());
+            }
+        }
     }
 }

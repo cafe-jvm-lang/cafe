@@ -16,10 +16,10 @@
  along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#import x from "examples/a";
+#import x from "examples/HelloWorld";
 
 func foo() {
-	#println( this.a );
+	cmd.println( this.a );
 }
 
 var obj = {
@@ -27,11 +27,9 @@ var obj = {
 	foo: foo
 };
 
-export var a = 10;
-var b = 10;
-var bar = obj.foo; # function reference/alias!
+var a = "ThisBinding";
+export var b = 10;
+export var bar = obj.foo; # function reference/alias!
 
-var a = "oops, global"; # `a` also property on global object
 
 bar(); # "oops, global"
-export b;

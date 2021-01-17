@@ -27,20 +27,10 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package runtime.imports;
 
-import library.DFunc;
-import library.DObject;
+public interface ImportPathVisitor {
+    void visit(URLModulePath path);
 
-import java.lang.invoke.MethodHandle;
-
-public class DFuncCreator {
-    private DFuncCreator() {
-    }
-
-    public static DFunc create(MethodHandle methodHandle) {
-        DFunc object = new DFunc(methodHandle);
-        object.define(DObject.__PROTO__, ProtoGenerator.getFuncProto());
-        return object;
-    }
+    void visit(JavaModulePath path);
 }

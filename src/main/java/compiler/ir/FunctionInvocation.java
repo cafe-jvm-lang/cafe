@@ -57,8 +57,8 @@ public class FunctionInvocation extends ExpressionStatement<FunctionInvocation> 
             }
         }
         String name = "#_ANN_CALL";
-        if(ref instanceof ReferenceLookup)
-            name= ((ReferenceLookup) ref).getName();
+        if (ref instanceof ReferenceLookup)
+            name = ((ReferenceLookup) ref).getName();
         return new FunctionInvocation(
                 name,
                 ExpressionStatement.of(ref),

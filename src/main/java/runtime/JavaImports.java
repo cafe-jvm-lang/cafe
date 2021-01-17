@@ -29,26 +29,38 @@
 
 package runtime;
 
+import library.DObject;
 import library.base.CFunc;
 import library.base.CObject;
+import library.io.BasicIO;
+import runtime.imports.JavaModulePath;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static runtime.LibraryDObjectGenerator.generate;
+
 public final class JavaImports {
-    private static Map<String, Object> map = new HashMap<>();
+    private static Map<JavaModulePath, DObject> map = new HashMap<>();
+    private static final Map<String, DObject> DEFAULT_IMPORTS;
 
-    static{
-        // default imports
-        map.put("Object", LibraryDObjectGenerator.generate(CObject.class));
-        map.put("Function", LibraryDObjectGenerator.generate(CFunc.class));
+    static {
+        DEFAULT_IMPORTS = new HashMap<String, DObject>() {{
+            put("Object", generate(CObject.class));
+            put("Function", generate(CFunc.class));
+            put("cmd", generate(BasicIO.class));
+        }};
     }
 
-    public static Object getObject(String name){
-        return map.get(name);
+    public static DObject getObject(JavaModulePath path) {
+        return map.get(path);
     }
 
-    public static void add(String name, Object object){
-        map.put(name, object);
+    public static DObject getDefaultImport(String name) {
+        return DEFAULT_IMPORTS.get(name);
+    }
+
+    public static void add(JavaModulePath path, Class<?> module) {
+        map.put(path, generate(module));
     }
 }

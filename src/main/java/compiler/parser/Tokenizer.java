@@ -217,7 +217,7 @@ public class Tokenizer {
                 // Escape char after '\'
                 if (reader.ch == '\\') {
                     reader.scanChar();
-                    switch (reader.ch){
+                    switch (reader.ch) {
                         case 't':
                             reader.putChar('\t');
                             break;
@@ -228,8 +228,7 @@ public class Tokenizer {
                             reader.putChar('\r');
                             break;
                     }
-                }
-                else
+                } else
                     reader.putChar(reader.ch);
                 reader.scanChar();
             }

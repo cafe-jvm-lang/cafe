@@ -38,15 +38,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class LibraryDObjectGenerator {
-    public static DObject generate(Class<?> clazz){
+
+    public static DObject generate(Class<?> clazz) {
         DObject object = new DObject();
         Method[] methods = clazz.getDeclaredMethods();
         MethodHandles.Lookup lookup = MethodHandles.lookup();
-        for(Method method: methods){
-            if(Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())){
+        for (Method method : methods) {
+            if (Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())) {
                 try {
                     MethodHandle mh = lookup.unreflect(method);
-                    object.define(method.getName(),(DFuncCreator.create(mh)));
+                    object.define(method.getName(), (DFuncCreator.create(mh)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
@@ -54,8 +55,8 @@ public class LibraryDObjectGenerator {
         }
 
         Field[] fields = clazz.getDeclaredFields();
-        for(Field field: fields){
-            if(Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())){
+        for (Field field : fields) {
+            if (Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
                 try {
                     Object o = field.get(null);
                     object.define(field.getName(), o);

@@ -27,20 +27,26 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package library.io;
 
-import library.DFunc;
 import library.DObject;
 
-import java.lang.invoke.MethodHandle;
-
-public class DFuncCreator {
-    private DFuncCreator() {
+public class BasicIO {
+    public static void print(DObject b, Object o) {
+        System.out.print(o);
     }
 
-    public static DFunc create(MethodHandle methodHandle) {
-        DFunc object = new DFunc(methodHandle);
-        object.define(DObject.__PROTO__, ProtoGenerator.getFuncProto());
-        return object;
+    public static void println(DObject b, Object o) {
+        System.out.println(o);
+    }
+
+    public static String input(DObject b) {
+        return System.console()
+                     .readLine();
+    }
+
+    public static String input(DObject b, String s) {
+        println(b, s);
+        return input(b);
     }
 }

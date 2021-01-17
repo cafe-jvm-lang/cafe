@@ -29,33 +29,43 @@
 
 package runtime;
 
+import runtime.imports.ModulePath;
+
 import java.util.*;
 
 public final class ReferenceTable {
-
     private List<ReferenceSymbol> symbols = new LinkedList<>();
 
-    public ReferenceTable(){}
+    public ReferenceTable() {
+    }
 
-    public void add(ReferenceSymbol symbol){
+    public void add(ReferenceSymbol symbol) {
         symbols.add(symbol);
     }
 
-    public Set<URLPath> getURLPaths() {
-        Set<URLPath> list = new HashSet<>();
-        for(ReferenceSymbol symbol: symbols){
-            list.add(new URLPath(symbol.getPath()));
+    public Set<ModulePath> getImportPaths() {
+        Set<ModulePath> list = new HashSet<>();
+        for (ReferenceSymbol symbol : symbols) {
+            try {
+                list.add(ModulePath.fromPath(symbol.getPath()));
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         return list;
     }
 
-    public ReferenceSymbol resolve(String importName){
-        Optional<ReferenceSymbol> op = symbols.stream().filter(e -> e.getAlias() == importName).findFirst();
-        if(op.isPresent()){
+    public ReferenceSymbol resolve(String importName) {
+        Optional<ReferenceSymbol> op = symbols.stream()
+                                              .filter(e -> e.getAlias() == importName)
+                                              .findFirst();
+        if (op.isPresent()) {
             return op.get();
         }
-        op = symbols.stream().filter(e -> e.getName() == importName).findFirst();
-        if(op.isPresent()) {
+        op = symbols.stream()
+                    .filter(e -> e.getName() == importName)
+                    .findFirst();
+        if (op.isPresent()) {
             return op.get();
         }
         return null;

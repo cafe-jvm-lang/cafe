@@ -108,11 +108,10 @@ public final class OperatorID {
             target = callSite.callerLookup.findStatic(
                     OperatorID.class, callSite.name, methodType(Object.class, arg1Class, arg2Class));
         } catch (Throwable t) {
-            try{
+            try {
                 target = callSite.callerLookup.findStatic(
                         OperatorID.class, callSite.name, methodType(Object.class, Object.class, Object.class));
-            }
-            catch (Throwable t2) {
+            } catch (Throwable t2) {
                 return reject(args[0], args[1], callSite.name);
             }
         }
@@ -2367,13 +2366,13 @@ public final class OperatorID {
     }
 
 
-// ==========================
-    public static Object equals(Object a, Object b){
+    // ==========================
+    public static Object equals(Object a, Object b) {
         return a == b;
     }
 
-    public static Object plus(Object a, Object b){
-        return a.toString()+b.toString();
+    public static Object plus(Object a, Object b) {
+        return a.toString() + b.toString();
     }
 
 
@@ -2385,7 +2384,7 @@ public final class OperatorID {
         return builder.toString();
     }
 
-    public static Object times(Integer n, String string){
+    public static Object times(Integer n, String string) {
         return times(string, n);
     }
 

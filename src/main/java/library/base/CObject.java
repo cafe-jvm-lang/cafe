@@ -32,7 +32,7 @@ package library.base;
 import library.DObject;
 
 public class CObject {
-    public static DObject create(DObject o){
+    public static DObject create(DObject e, DObject o) {
         DObject object = new DObject();
         object.define("__proto__", o);
         return object;

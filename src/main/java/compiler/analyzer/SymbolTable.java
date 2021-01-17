@@ -35,7 +35,7 @@ import java.util.Map;
 public class SymbolTable {
     public final SymbolTable parent;
 
-    private final Map<String,Symbol> symbols;
+    private final Map<String, Symbol> symbols;
 
     private boolean canDeclare = true;
 
@@ -55,7 +55,7 @@ public class SymbolTable {
                 return false;
             }
         }
-        if(symbols.containsKey(n.name))
+        if (symbols.containsKey(n.name))
             return false;
         else {
             symbols.put(n.name, n);
@@ -76,8 +76,8 @@ public class SymbolTable {
     public boolean isSymbolConstant(String n) {
         SymbolTable table = this;
         while (table != null) {
-            if (table.symbols.containsKey(n)){
-                if(table.symbols.get(n).isConst)
+            if (table.symbols.containsKey(n)) {
+                if (table.symbols.get(n).isConst)
                     return true;
             }
             table = table.parent;

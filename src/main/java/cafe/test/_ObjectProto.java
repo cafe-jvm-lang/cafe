@@ -30,7 +30,7 @@
 package cafe.test;
 
 public class _ObjectProto {
-    public static void __define__(){
+    public static void __define__() {
 
     }
 }

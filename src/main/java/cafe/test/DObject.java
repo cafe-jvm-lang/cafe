@@ -35,11 +35,11 @@ import java.util.Map;
 public class DObject {
     private Map<String, Object> map = new HashMap<>();
 
-    public void define(String key, Object value){
-        map.put(key,value);
+    public void define(String key, Object value) {
+        map.put(key, value);
     }
 
-    public Object get(String key){
+    public Object get(String key) {
         return map.get(key);
     }
 }

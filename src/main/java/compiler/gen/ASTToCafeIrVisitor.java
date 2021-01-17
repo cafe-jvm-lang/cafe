@@ -48,6 +48,9 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         private boolean isProperty = false;
 
+        // for functions to be exported
+        private boolean isExport = false;
+
         public void enterProperty() {
             isProperty = true;
         }
@@ -227,6 +230,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         CafeFunction function = CafeFunction.function(name)
                                             .block(block)
                                             .withParameters(params);
+        if (context.isExport)
+            function = function.asExport();
         context.addFunction(function);
         FunctionWrapper wrapper = FunctionWrapper.wrap(function);
         SymbolReference ref = context.createSymbolReference(name, Node.VarDeclNode.class);
@@ -343,8 +348,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             n.invokedOn.accept(this);
             context.push(MethodInvocation.create(context.pop(), (List) context.pop()));
         } else {
-        // eg: a()
-        // a() is normal function call, thus function invocation node is created.
+            // eg: a()
+            // a() is normal function call, thus function invocation node is created.
             n.invokedOn.accept(this);
             context.push(FunctionInvocation.create(
                     context.pop(), (List) context.pop()
@@ -402,10 +407,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitImportStmt(Node.ImportStmtNode n) {
         Context context = Context.context;
         CafeImport cafeImport = CafeImport.of(n.directory);
-        for(Map.Entry<Node.IdenNode, Node.IdenNode> entry: n.importAliasMap.entrySet()){
+        for (Map.Entry<Node.IdenNode, Node.IdenNode> entry : n.importAliasMap.entrySet()) {
             Node.IdenNode value = entry.getValue();
             String alias = null;
-            if(value != null)
+            if (value != null)
                 alias = value.name;
             cafeImport.add(entry.getKey().name, alias);
         }
@@ -416,16 +421,17 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitExportStmt(Node.ExportStmtNode n) {
         Context context = Context.context;
+        context.isExport = true;
         String name = n.iden.name;
         CafeExport export = CafeExport.export(name);
         context.module.addExport(export);
-        if(n.node == null){
+        if (n.node == null) {
             // Just pushing to avoid error
             context.push(export);
-        }else {
+        } else {
             n.node.accept(this);
         }
-
+        context.isExport = false;
         //context.push(export);
     }
 
@@ -523,7 +529,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitContinueStmt(Node.ContinueStmtNode n) {
         Context context = Context.context;
         BreakContinueStatement continueStatement = BreakContinueStatement.newContinue()
-                                                                         .setEnclosingLoop(context.forLoopStack.peek());;
+                                                                         .setEnclosingLoop(context.forLoopStack.peek());
+        ;
         context.push(continueStatement);
     }
 

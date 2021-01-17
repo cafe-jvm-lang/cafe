@@ -119,7 +119,7 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
 
     @Override
     public void visitForLoop(ForLoopStatement forLoopStatement) {
-        if(forLoopStatement.getInitStatements() != null) {
+        if (forLoopStatement.getInitStatements() != null) {
             for (AssignedStatement init : forLoopStatement.getInitStatements())
                 init.accept(this);
             forLoopStatement.getBlock()

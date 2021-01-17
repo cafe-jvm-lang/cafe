@@ -46,21 +46,21 @@ public class DObject {
         map = new HashMap<>();
     }
 
-    public void define(String key, Object value){
+    public void define(String key, Object value) {
         map.put(key, value);
     }
 
-    public Object get(String key){
+    public Object get(String key) {
         return map.get(key);
     }
 
-    public Set<String> keys(){
+    public Set<String> keys() {
         return map.keySet();
     }
 
     @Override
     public String toString() {
-        return "Object{"+map+"}";
+        return "Object{" + map + "}";
     }
 
     //    Runtime support
@@ -125,9 +125,9 @@ public class DObject {
         DObject obj = (DObject) args[0];
         Object o = getObject(property, obj);
         //args = Arrays.copyOfRange(args, 1,args.length);
-        if(o instanceof DFunc)
+        if (o instanceof DFunc)
             return ((DFunc) o).invoke(args);
-        throw new NoSuchMethodError(obj.toString()+" has no such method "+ property);
+        throw new NoSuchMethodError(obj.toString() + " has no such method " + property);
     }
 
 

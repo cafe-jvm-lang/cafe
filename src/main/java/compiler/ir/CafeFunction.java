@@ -43,6 +43,7 @@ public class CafeFunction extends ExpressionStatement<CafeFunction> {
     private boolean isSynthetic = false;
     private boolean isVarargs = false;
     private boolean isInit = false;
+    private boolean isExported = false;
 
     public enum Scope {
         MODULE, CLOSURE
@@ -70,6 +71,11 @@ public class CafeFunction extends ExpressionStatement<CafeFunction> {
         return isInit;
     }
 
+    public CafeFunction asExport() {
+        isExported = true;
+        return this;
+    }
+
     public String getName() {
         return name;
     }
@@ -89,6 +95,10 @@ public class CafeFunction extends ExpressionStatement<CafeFunction> {
 
     public boolean isVarargs() {
         return isVarargs;
+    }
+
+    public boolean isExported() {
+        return isExported;
     }
 
     public CafeFunction withVarargs() {

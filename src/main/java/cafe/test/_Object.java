@@ -30,7 +30,7 @@
 package cafe.test;
 
 public class _Object {
-    public static DObject create(DObject object){
+    public static DObject create(DObject object) {
         DObject object1 = new DObject();
         object1.define("__proto__", object);
         return object1;

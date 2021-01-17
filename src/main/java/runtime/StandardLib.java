@@ -30,7 +30,7 @@
 package runtime;
 
 public final class StandardLib {
-    public static Object search(String name){
+    public static Object search(String name) {
         return null;
     }
 }
