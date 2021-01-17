@@ -50,7 +50,7 @@ public abstract class ModulePath {
             path = "library." + path;
             return new JavaModulePath(path, Class.forName(path));
         } else {
-            return new URLModulePath(path);
+            return new CafeModulePath(path);
         }
     }
 
@@ -59,4 +59,11 @@ public abstract class ModulePath {
     public abstract boolean equals(Object o);
 
     public abstract int hashCode();
+
+    @Override
+    public String toString() {
+        return "ModulePath{" +
+                "module=" + module +
+                '}';
+    }
 }

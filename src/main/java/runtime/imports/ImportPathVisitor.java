@@ -30,7 +30,7 @@
 package runtime.imports;
 
 public interface ImportPathVisitor {
-    void visit(URLModulePath path);
+    void visit(CafeModulePath path);
 
     void visit(JavaModulePath path);
 }

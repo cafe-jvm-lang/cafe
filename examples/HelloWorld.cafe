@@ -18,6 +18,7 @@
 
 import bar from "examples/ThisBinding";
 import b as A from "examples/ThisBinding";
+import println from "io/BasicIO";
 
 func hello(){
     cmd.println(A);
@@ -29,7 +30,7 @@ var aa = {
 };
 
 var b = Object.create(aa);
-cmd.println(b);
+println(b);
 
 hello();
 

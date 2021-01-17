@@ -49,11 +49,13 @@ public class JavaModulePath extends ModulePath {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         JavaModulePath otherModule = (JavaModulePath) o;
-        return moduleString.equals(otherModule);
+        return moduleString.equals(otherModule.moduleString);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(moduleString);
     }
+
+
 }

@@ -31,10 +31,10 @@ package runtime.indy;
 
 import library.DObject;
 import runtime.*;
+import runtime.imports.CafeModulePath;
 import runtime.imports.ImportPathVisitor;
 import runtime.imports.JavaModulePath;
 import runtime.imports.ModulePath;
-import runtime.imports.URLModulePath;
 
 import java.lang.invoke.*;
 import java.util.Map;
@@ -132,7 +132,7 @@ public final class ImportID {
         }
 
         @Override
-        public void visit(URLModulePath path) {
+        public void visit(CafeModulePath path) {
             ExportMap export = exportTable.get(path);
             object = export.get(symbol.getName());
         }
@@ -141,8 +141,8 @@ public final class ImportID {
         public void visit(JavaModulePath path) {
             DObject o = JavaImports.getObject(path);
 
-            if (symbol.getAlias()
-                      .equals("*")) {
+            if (symbol.hasAlias() && symbol.getAlias()
+                                           .equals("*")) {
                 object = o;
             } else {
                 object = o.get(symbol.getName());

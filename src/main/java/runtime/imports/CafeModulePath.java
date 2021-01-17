@@ -35,11 +35,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class URLModulePath extends ModulePath {
+public class CafeModulePath extends ModulePath {
     private String stringPath;
     private Path path;
 
-    public URLModulePath(String path) {
+    public CafeModulePath(String path) {
         this.stringPath = path;
         this.path = FileSystems.getDefault()
                                .getPath(path);
@@ -66,7 +66,7 @@ public class URLModulePath extends ModulePath {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        URLModulePath urlPath = (URLModulePath) o;
+        CafeModulePath urlPath = (CafeModulePath) o;
         try {
             return Files.isSameFile(path, urlPath.path);
         } catch (IOException e) {

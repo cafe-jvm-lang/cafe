@@ -29,10 +29,10 @@
 
 package runtime;
 
+import runtime.imports.CafeModulePath;
 import runtime.imports.ImportPathVisitor;
 import runtime.imports.JavaModulePath;
 import runtime.imports.ModulePath;
-import runtime.imports.URLModulePath;
 
 import java.io.File;
 import java.lang.invoke.MethodHandle;
@@ -101,7 +101,7 @@ public final class ImportEvaluator implements ImportPathVisitor {
     }
 
     @Override
-    public void visit(URLModulePath path) {
+    public void visit(CafeModulePath path) {
         try {
             // cyclic imports
             if (EVALUATING.contains(path)) {
