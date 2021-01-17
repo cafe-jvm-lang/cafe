@@ -1,1 +1,5 @@
-export var a = 10;
+var obj = {
+    a : "from-A"
+};
+
+export obj;

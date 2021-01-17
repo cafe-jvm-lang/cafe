@@ -29,7 +29,6 @@
 
 package compiler.main;
 
-import compiler.analyzer.PrettyPrinter;
 import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
 import compiler.ast.Node.ProgramNode;
@@ -110,8 +109,8 @@ public class CafeCompiler {
                     programNode = parser.parse();
                     break;
                 case ANALYZE:
-                    System.out.println((char) 27 + "[33m" + "\nPrettyPrint");
-                    new PrettyPrinter().prettyPrint(programNode);
+//                    System.out.println((char) 27 + "[33m" + "\nPrettyPrint");
+//                    new PrettyPrinter().prettyPrint(programNode);
                     analyzer.visitProgram((ProgramNode) programNode);
                     break;
                 case IR:

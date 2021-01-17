@@ -140,9 +140,10 @@ public final class ImportID {
         @Override
         public void visit(JavaModulePath path) {
             DObject o = JavaImports.getObject(path);
-
-            if (symbol.hasAlias() && symbol.getAlias()
-                                           .equals("*")) {
+            if (o == null) {
+                object = null;
+            } else if (symbol.hasAlias() && symbol.getAlias()
+                                                  .equals("*")) {
                 object = o;
             } else {
                 object = o.get(symbol.getName());

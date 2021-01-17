@@ -30,6 +30,7 @@ var obj = {
 var a = "ThisBinding";
 export var b = 10;
 export var bar = obj.foo; # function reference/alias!
+export obj;
 
 
 bar(); # "oops, global"
