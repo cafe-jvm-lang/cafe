@@ -134,7 +134,12 @@ public final class ImportID {
         @Override
         public void visit(CafeModulePath path) {
             ExportMap export = exportTable.get(path);
-            object = export.get(symbol.getName());
+            if (symbol.getName()
+                      .equals("*")) {
+                object = export.getAsDObject();
+            } else {
+                object = export.getExport(symbol.getName());
+            }
         }
 
         @Override
@@ -142,8 +147,8 @@ public final class ImportID {
             DObject o = JavaImports.getObject(path);
             if (o == null) {
                 object = null;
-            } else if (symbol.hasAlias() && symbol.getAlias()
-                                                  .equals("*")) {
+            } else if (symbol.getName()
+                             .equals("*")) {
                 object = o;
             } else {
                 object = o.get(symbol.getName());

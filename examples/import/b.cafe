@@ -1,0 +1,4 @@
+import c from "examples/import/c";
+
+export var b = "i m b";
+cmd.println("in b: "+c);
