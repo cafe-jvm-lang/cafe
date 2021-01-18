@@ -1,3 +1,3 @@
 
-import * as n from "io/BasicIO";
+import * from "io/BasicIO";
 n.println("in a: ");

@@ -39,6 +39,13 @@ public class JavaModulePath extends ModulePath {
         super.module = module;
     }
 
+    public static JavaModulePath fromPath(String path) throws ClassNotFoundException {
+        path = path.replaceAll("/", ".")
+                   .trim();
+        path = "library." + path;
+        return new JavaModulePath(path, Class.forName(path));
+    }
+
     @Override
     public void accept(ImportPathVisitor v) {
         v.visit(this);

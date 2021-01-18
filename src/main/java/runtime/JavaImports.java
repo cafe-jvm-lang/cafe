@@ -43,6 +43,7 @@ import static runtime.LibraryDObjectGenerator.generate;
 public final class JavaImports {
     private static Map<JavaModulePath, DObject> map = new HashMap<>();
     private static final Map<String, DObject> DEFAULT_IMPORTS;
+    private static final Map<JavaModulePath, String> DEFAULT_MODULE_PATHS;
 
     static {
         DEFAULT_IMPORTS = new HashMap<String, DObject>() {{
@@ -50,10 +51,21 @@ public final class JavaImports {
             put("Function", generate(CFunc.class));
             put("cmd", generate(BasicIO.class));
         }};
+
+        DEFAULT_MODULE_PATHS = new HashMap<JavaModulePath, String>() {{
+            put(new JavaModulePath("library.base.CObject", CObject.class), "Object");
+            put(new JavaModulePath("library.base.CFunc", CFunc.class), "Function");
+            put(new JavaModulePath("library.io.BasicIO", BasicIO.class), "cmd");
+        }};
     }
 
     public static DObject getObject(JavaModulePath path) {
-        return map.get(path);
+        DObject object = map.get(path);
+        if (object == null) {
+            String name = DEFAULT_MODULE_PATHS.get(path);
+            object = DEFAULT_IMPORTS.get(name);
+        }
+        return object;
     }
 
     public static DObject getDefaultImport(String name) {
@@ -61,6 +73,8 @@ public final class JavaImports {
     }
 
     public static void add(JavaModulePath path, Class<?> module) {
+        if (DEFAULT_MODULE_PATHS.containsKey(path))
+            return;
         map.put(path, generate(module));
     }
 }

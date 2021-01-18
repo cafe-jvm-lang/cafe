@@ -82,8 +82,7 @@ public final class ImportEvaluator implements ImportPathVisitor {
         }
         IMPORT_TABLE.put(CURR_MODULE_PATH, data);
 
-        Set<ModulePath> paths = data.getImportPaths();
-        return paths;
+        return data.getImportPaths();
     }
 
     private static Set<ModulePath> updateSets(Set<ModulePath> modules) {
@@ -135,6 +134,10 @@ public final class ImportEvaluator implements ImportPathVisitor {
 
     @Override
     public void visit(JavaModulePath path) {
+        // already evaluated
+        if (EVAL.contains(path)) {
+            return;
+        }
         JavaImports.add(path, path.getModule());
     }
 
