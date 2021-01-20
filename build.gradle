@@ -38,7 +38,7 @@ plugins {
 }
 
 group 'cafe'
-version '0.0.1-beta'
+version '0.1.0-beta'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
