@@ -3,7 +3,7 @@
 [![Build](https://github.com/cafe-jvm-lang/cafe/workflows/Build/badge.svg)](https://github.com/cafe-jvm-lang/cafe/actions?query=workflow%3ABuild)
 [![Join the chat at https://gitter.im/cafe-jvm-lang/cafe-lang](https://badges.gitter.im/cafe-jvm-lang/cafe-lang.svg)](https://gitter.im/cafe-jvm-lang/cafe-lang?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A simple, dynamic, weakly typed, prototype based language for the JVM.
+A simple, dynamic, weakly typed, prototype based language for the JVM. 
 Built with `invokedynamic` instruction introduced in Java 7, Cafe takes advantage of latest advances of JVM.
 
 This project is developed with an intent to explore `how a programming language runs internally` and is also a major project for the graduation year.
