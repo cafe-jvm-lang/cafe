@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/cafe-jvm-lang/cafe/workflows/Build/badge.svg)](https://github.com/cafe-jvm-lang/cafe/actions?query=workflow%3ABuild)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Github All Releases](https://img.shields.io/github/downloads/cafe-jvm-lang/cafe/total.svg)]()
+[![Github All Releases](https://img.shields.io/github/downloads/cafe-jvm-lang/cafe/total.svg)](#)
 [![Join the chat at https://gitter.im/cafe-jvm-lang/cafe-lang](https://badges.gitter.im/cafe-jvm-lang/cafe-lang.svg)](https://gitter.im/cafe-jvm-lang/cafe-lang?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A simple, dynamic, weakly typed, prototype based language for the JVM. 
