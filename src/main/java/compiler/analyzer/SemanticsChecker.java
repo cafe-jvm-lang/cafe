@@ -335,11 +335,11 @@ public class SemanticsChecker implements Node.Visitor {
     public void visitIfStmt(IfStmtNode n) {
         n.ifCond.accept(this);
 
-        CST = new SymbolTable(CST).notDeclarable();
+        CST = new SymbolTable(CST).dontOverrideParentDeclarations();
         n.ifBlock.accept(this);
         CST = CST.parent;
         if (n.elsePart != null) {
-            CST = new SymbolTable(CST).notDeclarable();
+            CST = new SymbolTable(CST).dontOverrideParentDeclarations();
             n.elsePart.accept(this);
             CST = CST.parent;
         }
@@ -352,7 +352,7 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitForStmt(ForStmtNode n) {
-        CST = new SymbolTable(CST).notDeclarable();
+        CST = new SymbolTable(CST).dontOverrideParentDeclarations();
         if (n.init != null) {
             for (StmtNode stmt : n.init)
                 stmt.accept(this);
