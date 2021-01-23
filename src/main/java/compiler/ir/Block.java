@@ -74,7 +74,6 @@ public class Block extends ExpressionStatement<Block> {
     }
 
     private void updateStateWith(CafeStatement<?> statement) {
-        referenceTable.updateFrom(statement);
         checkForReturns(statement);
     }
 
