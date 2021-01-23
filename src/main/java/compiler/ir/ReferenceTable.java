@@ -62,13 +62,6 @@ public class ReferenceTable {
         return null;
     }
 
-    public void updateFrom(CafeStatement<?> statement) {
-        if (statement instanceof ReferencesHolder) {
-            for (SymbolReference ref : ((ReferencesHolder) statement).getReferences())
-                this.add(ref);
-        }
-    }
-
     public ReferenceTable fork() {
         return new ReferenceTable(this);
     }
