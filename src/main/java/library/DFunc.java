@@ -30,9 +30,14 @@
 package library;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DFunc extends DObject {
     private MethodHandle handle;
+    private DObject thisP = null;
+    private List<Object> arguments = new LinkedList<>();
 
     public DFunc(MethodHandle handle) {
         this.handle = handle;
@@ -44,6 +49,17 @@ public class DFunc extends DObject {
 
     public MethodHandle handle() {
         return handle;
+    }
+
+    public DFunc bind(DObject thisP, Object... args) {
+        if (thisP != null) {
+            this.thisP = thisP;
+            handle = handle.bindTo(thisP);
+        }
+        if (args.length > 0) {
+            handle = MethodHandles.insertArguments(handle, 1, args);
+        }
+        return this;
     }
 
     @Override
