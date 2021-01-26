@@ -63,7 +63,7 @@ public class DObject {
         return "Object{" + map + "}";
     }
 
-    //    Runtime support
+//    Runtime support
 //    =============================================================
 
     public static final String __PROTO__ = "__proto__";
@@ -116,7 +116,7 @@ public class DObject {
         return null;
     }
 
-    public static Object setObject(String property, DObject object, Object arg) throws Throwable {
+    public static Object setObject(String property, DObject object, Object arg) {
         object.define(property, arg);
         return null;
     }

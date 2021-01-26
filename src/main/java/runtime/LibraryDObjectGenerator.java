@@ -44,7 +44,11 @@ public class LibraryDObjectGenerator {
         Method[] methods = clazz.getDeclaredMethods();
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         for (Method method : methods) {
-            if (Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())) {
+            if (Modifier.isPublic(method.getModifiers())
+                //  TODO: should importable methods be static ?
+
+                //        && Modifier.isStatic(method.getModifiers())
+            ) {
                 try {
                     MethodHandle mh = lookup.unreflect(method);
                     object.define(method.getName(), (DFuncCreator.create(mh)));
