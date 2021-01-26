@@ -1,0 +1,32 @@
+func A(){
+    var a = "outside closure";
+    cmd.println("in A");
+
+    # Closure
+    func B(z){
+        z();
+
+        # nested Closure
+        func DC(){
+            cmd.println("Nested Closure in DC");
+            z();
+            cmd.println(a);
+        }
+
+        # access outside variables inside closure
+        cmd.println(a);
+        DC();
+    }
+
+    # return closure
+    return B;
+}
+
+var c = A();
+
+func Q(){
+    cmd.println("Works like a charm");
+}
+
+# pass method as arg in closure
+c(Q);
