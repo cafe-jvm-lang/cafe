@@ -70,7 +70,6 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     private static final Class<?> DFUNC_CLASS = DFunc.class;
 
     private static final String DOBJECT_CREATOR = "runtime/DObjectCreator";
-    private static final String LDOBJECT_CREATOR = "runtime/DObjectCreator;";
 
     private static final String INIT_FUNC_SIGN = "()Ljava/util/Map;";
     private static final String INIT_FUNC_TYPE = "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;";
@@ -411,12 +410,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
                                                                             .changeParameterType(1,
                                                                                     DOBJECT_CLASS);
         String typedef = type.toMethodDescriptorString();
-        Handle handle = FUNC_INVOCATION_HANDLE;
 
         visitInvocationArguments(methodInvocation.getArguments());
         mv.visitInvokeDynamicInsn("#_ANNCALL",
                 typedef,
-                handle);
+                FUNC_INVOCATION_HANDLE);
     }
 
     @Override
@@ -440,10 +438,9 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
                                                                    .changeParameterType(1, DOBJECT_CLASS);
         String name = functionInvocation.getName();
         String typedef = type.toMethodDescriptorString();
-        Handle handle = FUNC_INVOCATION_HANDLE;
 
         visitInvocationArguments(functionInvocation.getArguments());
-        mv.visitInvokeDynamicInsn(name, typedef, handle);
+        mv.visitInvokeDynamicInsn(name, typedef, FUNC_INVOCATION_HANDLE);
     }
 
     private void visitInvocationArguments(List<CafeElement<?>> arguments) {
@@ -557,6 +554,36 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitClosure(CafeClosure cafeClosure) {
+        loadTargetFunction(cafeClosure.getTarget());
+        final int closureReferencesSize = cafeClosure.getClosureReferencesSize();
+
+        if (closureReferencesSize > 0) {
+            String[] ref = cafeClosure.getClosureReferences()
+                                      .toArray(new String[closureReferencesSize]);
+            mv.visitInsn(ACONST_NULL);
+            loadInteger(mv, closureReferencesSize);
+            mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+
+            for (int i = 0; i < closureReferencesSize; i++) {
+                mv.visitInsn(DUP);
+                loadInteger(mv, i);
+                ReferenceLookup lookup = ReferenceLookup.of(ref[i]);
+                lookup.accept(this);
+                mv.visitInsn(AASTORE);
+            }
+
+            mv.visitMethodInsn(
+                    INVOKEVIRTUAL,
+                    "library/DFunc",
+                    "bind",
+                    "(" + LDOBJECT + "[Ljava/lang/Object;)Llibrary/DFunc;",
+                    false
+            );
+        }
+    }
+
+    @Override
     public void visitObjectCreation(ObjectCreationStatement creationStatement) {
         Map<String, ExpressionStatement<?>> map = creationStatement.getMap();
         int index = creationStatement.index();
@@ -609,7 +636,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
             return;
         }
 
-        ObjectAccessStatement node = null;
+        ObjectAccessStatement node;
         if (lhs instanceof ObjectAccessStatement)
             node = (ObjectAccessStatement) lhs;
         else throw new AssertionError("Unknown LHS expression");
@@ -658,7 +685,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         mv.visitInvokeDynamicInsn(name,
                 MethodType.genericMethodType(2)
                           .toMethodDescriptorString()
-                , OPERATOR_HANDLE, (Integer) 2);
+                , OPERATOR_HANDLE, 2);
     }
 
     private void orOperator(BinaryExpression binaryOperation) {
@@ -766,7 +793,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         unaryExpression.walk(this);
         mv.visitInvokeDynamicInsn(name, MethodType.genericMethodType(1)
                                                   .toMethodDescriptorString()
-                , OPERATOR_HANDLE, (Integer) 1);
+                , OPERATOR_HANDLE, 1);
     }
 
     @Override
@@ -851,15 +878,18 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitFunctionWrapper(FunctionWrapper functionWrapper) {
         //functionWrapper.walk(this);
-        CafeFunction target = functionWrapper.getTarget();
+        loadTargetFunction(functionWrapper.getTarget());
+    }
+
+    private void loadTargetFunction(CafeFunction target) {
         int arity = (target.isVarargs()) ? target.getArity() - 1 : target.getArity() + 1;
         mv.visitInvokeDynamicInsn(
                 target.getName(),
                 methodType(DFUNC_CLASS).toMethodDescriptorString(),
                 FUNC_REF_HANDLE,
                 className,
-                (Integer) arity,
-                (Boolean) target.isVarargs()
+                arity,
+                target.isVarargs()
         );
     }
 
