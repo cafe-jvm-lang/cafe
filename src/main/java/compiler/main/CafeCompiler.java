@@ -33,6 +33,7 @@ import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
 import compiler.ast.Node.ProgramNode;
 import compiler.gen.ASTToCafeIrVisitor;
+import compiler.gen.ClosureReferenceVisitor;
 import compiler.gen.JVMByteCodeGenVisitor;
 import compiler.gen.SymbolReferenceAssignmentVisitor;
 import compiler.ir.CafeModule;
@@ -98,7 +99,7 @@ public class CafeCompiler {
     public Result compile() {
         Node programNode = null;
         CafeModule module = null;
-        byte[] byteCode = null;
+        byte[] byteCode;
         for (Phase phase : Phase.values()) {
             switch (phase) {
                 case INIT:
@@ -115,6 +116,7 @@ public class CafeCompiler {
                     break;
                 case IR:
                     module = new ASTToCafeIrVisitor().transform((ProgramNode) programNode, moduleName);
+                    module.accept(new ClosureReferenceVisitor());
                     module.accept(new SymbolReferenceAssignmentVisitor());
                     break;
                 case GEN:
