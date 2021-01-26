@@ -42,20 +42,26 @@ public class SymbolReference extends CafeElement<SymbolReference> {
     }
 
     public enum Kind {
-        VAR, CONST, GLOBAL_VAR, GLOBAL_CONST
+        VAR, CONST
+    }
+
+    public enum Scope {
+        GLOBAL, LOCAL
     }
 
     private final String name;
     private final Kind kind;
+    private final Scope scope;
     private int index = -1;
 
-    private SymbolReference(String name, Kind kind) {
+    private SymbolReference(String name, Kind kind, Scope scope) {
         this.kind = kind;
         this.name = name;
+        this.scope = scope;
     }
 
-    public static SymbolReference of(String name, Kind kind) {
-        return new SymbolReference(name, kind);
+    public static SymbolReference of(String name, Kind kind, Scope scope) {
+        return new SymbolReference(name, kind, scope);
     }
 
     public String getName() {
@@ -67,7 +73,11 @@ public class SymbolReference extends CafeElement<SymbolReference> {
     }
 
     public boolean isGlobal() {
-        return kind == Kind.GLOBAL_VAR || kind == Kind.GLOBAL_CONST;
+        return scope == Scope.GLOBAL;
+    }
+
+    public boolean isLocal() {
+        return scope == Scope.LOCAL;
     }
 
     public void setIndex(int index) {
@@ -83,6 +93,7 @@ public class SymbolReference extends CafeElement<SymbolReference> {
         return "SymbolReference{" +
                 "name='" + name + '\'' +
                 ", kind=" + kind +
+                ", scope=" + scope +
                 ", index=" + index +
                 '}';
     }
