@@ -29,6 +29,7 @@
 
 package compiler.ir;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,6 +99,11 @@ public class Block extends ExpressionStatement<Block> {
     private void checkForReturns(CafeStatement<?> statement) {
         if (statement instanceof ReturnStatement)
             hasReturn = true;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return Collections.unmodifiableList(statements);
     }
 
     @Override
