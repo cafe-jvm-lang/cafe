@@ -37,17 +37,14 @@ import java.util.List;
 public class CafeFunction extends ExpressionStatement<CafeFunction> {
 
     private String name;
-    private Scope scope;
     private Block block;
     private List<String> parameterNames = new LinkedList<>();
+    private List<String> closureParameterNames = new LinkedList<>();
     private boolean isSynthetic = false;
     private boolean isVarargs = false;
     private boolean isInit = false;
     private boolean isExported = false;
-
-    public enum Scope {
-        MODULE, CLOSURE
-    }
+    private boolean isClosure = false;
 
     private CafeFunction(String name) {
         this.name = name;
@@ -101,6 +98,16 @@ public class CafeFunction extends ExpressionStatement<CafeFunction> {
         return isExported;
     }
 
+    public CafeClosure asClosure() {
+        isClosure = true;
+        isExported = true;
+        return new CafeClosure(this);
+    }
+
+    public boolean isClosure() {
+        return isClosure;
+    }
+
     public CafeFunction withVarargs() {
         isVarargs = true;
         return this;
@@ -114,18 +121,28 @@ public class CafeFunction extends ExpressionStatement<CafeFunction> {
         return this;
     }
 
+    public void addClosureParameters(List<String> closureParameterNames) {
+        this.closureParameterNames.addAll(closureParameterNames);
+    }
+
     private void addParamterToBlockReferences(String name) {
         this.getBlock()
             .getReferenceTable()
-            .add(SymbolReference.of(name, SymbolReference.Kind.VAR));
+            .add(SymbolReference.of(name, SymbolReference.Kind.VAR, SymbolReference.Scope.LOCAL));
     }
 
     public int getArity() {
-        return parameterNames.size();
+        return parameterNames.size() + closureParameterNames.size();
     }
 
     public List<String> getParameterNames() {
-        return parameterNames;
+        LinkedList<String> list = new LinkedList<>(closureParameterNames);
+        list.addAll(parameterNames);
+        return list;
+    }
+
+    public List<String> getClosureParameterNames() {
+        return closureParameterNames;
     }
 
     @Override
