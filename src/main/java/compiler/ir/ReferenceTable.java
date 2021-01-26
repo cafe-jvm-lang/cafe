@@ -29,8 +29,10 @@
 
 package compiler.ir;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ReferenceTable {
     private ReferenceTable parent;
@@ -60,6 +62,14 @@ public class ReferenceTable {
         if (parent != null)
             return parent.get(name);
         return null;
+    }
+
+    public Set<String> getOwnedReferences() {
+        return Collections.unmodifiableSet(table.keySet());
+    }
+
+    public void relink(ReferenceTable parent) {
+        this.parent = parent;
     }
 
     public ReferenceTable fork() {
