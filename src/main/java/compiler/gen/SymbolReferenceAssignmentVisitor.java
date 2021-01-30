@@ -36,7 +36,6 @@ import java.util.LinkedList;
 
 public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
 
-    private CafeModule module = null;
     private final AssignmentCounter assignmentCounter = new AssignmentCounter();
     private final Deque<ReferenceTable> tableStack = new LinkedList<>();
 
@@ -59,7 +58,6 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
 
     @Override
     public void visitModule(CafeModule module) {
-        this.module = module;
         module.walk(this);
     }
 
@@ -87,8 +85,7 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
                                            .getReferenceTable();
         for (String parameter : cafeFunction.getParameterNames()) {
             SymbolReference ref = table.get(parameter);
-            if (!ref.isGlobal())
-                ref.setIndex(assignmentCounter.next());
+            ref.setIndex(assignmentCounter.next());
         }
 
         cafeFunction.walk(this);

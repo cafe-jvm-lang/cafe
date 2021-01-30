@@ -32,6 +32,7 @@ package runtime.indy;
 import library.DFunc;
 
 import java.lang.invoke.*;
+import java.util.Arrays;
 
 import static java.lang.invoke.MethodType.methodType;
 
@@ -80,14 +81,7 @@ public final class FunctionInvocationID {
 //        }
 //        System.out.println("====================");
 
-        MethodHandle target = null;
-        MethodHandle invoker = null;
-
         DFunc targetRef = (DFunc) args[0];
-        target = targetRef.handle();
-
-        invoker = MethodHandles.dropArguments(target, 0, DFunc.class);
-        //System.out.println(invoker);
-        return invoker.invokeWithArguments(args);
+        return targetRef.invoke(Arrays.copyOfRange(args, 1, args.length));
     }
 }

@@ -31,6 +31,33 @@ package compiler.ir;
 
 import java.util.List;
 
-public interface ReferencesHolder {
-    List<SymbolReference> getReferences();
+public class CafeClosure extends ExpressionStatement<CafeClosure> {
+    private CafeFunction target;
+
+    public CafeClosure(CafeFunction target) {
+        this.target = target;
+    }
+
+    public CafeFunction getTarget() {
+        return target;
+    }
+
+    public List<String> getClosureReferences() {
+        return target.getClosureParameterNames();
+    }
+
+    public int getClosureReferencesSize() {
+        return target.getClosureParameterNames()
+                     .size();
+    }
+
+    @Override
+    protected CafeClosure self() {
+        return this;
+    }
+
+    @Override
+    public void accept(CafeIrVisitor visitor) {
+        visitor.visitClosure(this);
+    }
 }

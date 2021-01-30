@@ -41,6 +41,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
+        private final Deque<Node.FuncDeclNode> functionStack = new LinkedList<>();
         private final Deque<Deque<Object>> objectStack = new LinkedList<>();
         private final Deque<ForLoopStatement> forLoopStack = new LinkedList<>();
 
@@ -77,13 +78,34 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             ReferenceTable blockReferenceTable = referenceTableStack.peek()
                                                                     .fork();
             referenceTableStack.push(blockReferenceTable);
-            isModuleScope = false;
             return Block.create(blockReferenceTable);
         }
 
         public void leaveScope() {
             referenceTableStack.pop();
-            isModuleScope = true;
+        }
+
+        public void enterFunc(Node.FuncDeclNode n) {
+            isModuleScope = false;
+            functionStack.push(n);
+        }
+
+        public void leaveFunc() {
+            functionStack.pop();
+            if (functionStack.size() == 0)
+                isModuleScope = true;
+        }
+
+        public enum Scope {
+            GLOBAL, LOCAL, CLOSURE
+        }
+
+        public Scope currentScope() {
+            if (functionStack.size() == 0)
+                return Scope.GLOBAL;
+            if (functionStack.size() == 1)
+                return Scope.LOCAL;
+            return Scope.CLOSURE;
         }
 
         public void newObjectStack() {
@@ -111,15 +133,15 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             return objectStack.peek();
         }
 
-        SymbolReference createSymbolReference(String name, SymbolReference.Kind kind) {
-            SymbolReference ref = SymbolReference.of(name, kind);
+        SymbolReference createSymbolReference(String name, SymbolReference.Kind kind, SymbolReference.Scope scope) {
+            SymbolReference ref = SymbolReference.of(name, kind, scope);
             referenceTableStack.peek()
                                .add(ref);
             return ref;
         }
 
-        public SymbolReference createSymbolReference(String name, Class<?> clazz) {
-            return createSymbolReference(name, getSymbolKind(clazz));
+        public SymbolReference createSymbolReference(String name, Node.Tag tag) {
+            return createSymbolReference(name, getSymbolKind(tag), getSymbolScope());
         }
 
         public SymbolReference getReference(String name) {
@@ -127,29 +149,30 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
                                       .get(name);
         }
 
-        SymbolReference.Kind getSymbolKind(Class<?> clazz) {
-            if (clazz == Node.VarDeclNode.class) {
-                if (isModuleScope)
-                    return SymbolReference.Kind.GLOBAL_VAR;
-                else
-                    return SymbolReference.Kind.VAR;
-            } else if (clazz == Node.ConstDeclNode.class) {
-                if (isModuleScope)
-                    return SymbolReference.Kind.GLOBAL_CONST;
-                else
-                    return SymbolReference.Kind.CONST;
+        SymbolReference.Kind getSymbolKind(Node.Tag tag) {
+            if (tag == Node.Tag.VARDECL) {
+                return SymbolReference.Kind.VAR;
+            } else if (tag == Node.Tag.CONSTDECL) {
+                return SymbolReference.Kind.CONST;
             }
             throw new AssertionError("Invalid Symbol Kind");
+        }
+
+        SymbolReference.Scope getSymbolScope() {
+            // There can be only 2 visible symbol scopes: GLOBAL & LOCAL.
+            // A symbol declared inside a closure is LOCAL to that closure & a CLOSURE itself is LOCAL to its parent block.
+            // So there is no CLOSURE scope for symbols.
+            Scope scope = currentScope();
+            if (scope == Scope.GLOBAL)
+                return SymbolReference.Scope.GLOBAL;
+            if (scope == Scope.LOCAL || scope == Scope.CLOSURE)
+                return SymbolReference.Scope.LOCAL;
+            throw new AssertionError("Invalid Symbol Scope");
         }
 
         public void addFunction(CafeFunction function) {
             context.module.addFunction(function);
         }
-    }
-
-    private <T extends Node> void iterChildren(Collection<T> nodes) {
-        for (T child : nodes)
-            child.accept(this);
     }
 
     public CafeModule transform(Node.ProgramNode n, String moduleName) {
@@ -164,14 +187,14 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Context context = Context.context;
         for (Node.StmtNode stmt : n.stmts) {
             stmt.accept(this);
-            context.module.add((CafeStatement) context.pop());
+            context.module.add((CafeStatement<?>) context.pop());
         }
     }
 
     @Override
     public void visitVarDecl(Node.VarDeclNode n) {
         Node.IdenNode iden = n.getIden();
-        SymbolReference sym = Context.context.createSymbolReference(iden.name, Node.VarDeclNode.class);
+        SymbolReference sym = Context.context.createSymbolReference(iden.name, Node.Tag.VARDECL);
         if (n.value != null)
             n.value.accept(this);
         else
@@ -193,7 +216,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     public void visitConstDecl(Node.ConstDeclNode n) {
         Context context = Context.context;
         Node.IdenNode iden = n.getIden();
-        SymbolReference sym = context.createSymbolReference(iden.name, Node.ConstDeclNode.class);
+        SymbolReference sym = context.createSymbolReference(iden.name, Node.Tag.CONSTDECL);
         n.val.accept(this);
         DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, context.pop());
         context.push(stmt);
@@ -220,9 +243,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitFuncDecl(Node.FuncDeclNode n) {
         Context context = Context.context;
+        context.enterFunc(n);
         String name = n.getIden().name;
         n.params.accept(this);
-        List<String> params = (List) context.pop();
+        List<String> params = (List<String>) context.pop();
         n.block.accept(this);
         Block block = (Block) context.pop();
         if (!block.hasReturn())
@@ -232,10 +256,18 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
                                             .withParameters(params);
         if (context.isExport)
             function = function.asExport();
+
         context.addFunction(function);
-        FunctionWrapper wrapper = FunctionWrapper.wrap(function);
-        SymbolReference ref = context.createSymbolReference(name, Node.VarDeclNode.class);
-        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, wrapper);
+
+        ExpressionStatement<?> expression;
+        if (context.currentScope() == Context.Scope.CLOSURE) {
+            expression = function.asClosure();
+        } else {
+            expression = FunctionWrapper.wrap(function);
+        }
+        context.leaveFunc();
+        SymbolReference ref = context.createSymbolReference(name, Node.Tag.VARDECL);
+        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, expression);
         context.push(statement);
     }
 
@@ -268,7 +300,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         for (Node.StmtNode stmt : n.block) {
             stmt.accept(this);
-            CafeStatement<?> statement = (CafeStatement) context.pop();
+            CafeStatement<?> statement = (CafeStatement<?>) context.pop();
             block.add(statement);
         }
         context.push(block);
@@ -456,13 +488,6 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
                 .whenTrue(context.pop());
 
         if (n.elsePart != null) {
-//            List<Node.StmtNode> branches = n.elsePart.block;
-//            branches.get(0).accept(this);
-//            ConditionalBranching branch = (ConditionalBranching) context.pop();
-//            for(int i=1; i < branches.size() ;i++) {
-//                branches.get(i).accept(this);
-//                branch.otherwise( context.pop() );
-
             n.elsePart.accept(this);
             conditionalBranching.otherwise(context.pop());
         }
@@ -530,7 +555,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Context context = Context.context;
         BreakContinueStatement continueStatement = BreakContinueStatement.newContinue()
                                                                          .setEnclosingLoop(context.forLoopStack.peek());
-        ;
+
         context.push(continueStatement);
     }
 

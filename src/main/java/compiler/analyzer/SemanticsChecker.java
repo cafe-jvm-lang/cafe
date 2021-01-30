@@ -35,6 +35,8 @@ import compiler.util.Context;
 import compiler.util.Log;
 import compiler.util.Position;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Map;
 
 import static compiler.util.Log.Type.*;
@@ -48,8 +50,6 @@ public class SemanticsChecker implements Node.Visitor {
 
     // Current Symbol Table
     private SymbolTable CST;
-
-    boolean isGlobal = true;
 
     private enum Expr {
         LHS, RHS
@@ -85,6 +85,37 @@ public class SemanticsChecker implements Node.Visitor {
     private Symbol symbol(String name, boolean isConst) {
         return new Symbol(name, isConst);
     }
+
+    private class FuncStack {
+        private Deque<Node.FuncDeclNode> funcStack = new LinkedList<>();
+
+        boolean isGlobal() {
+            return funcStack.size() == 0;
+        }
+
+        boolean isTopLevel() {
+            return funcStack.size() == 1;
+        }
+
+        boolean isClosure() {
+            return funcStack.size() > 1;
+        }
+
+        SymbolTable push(Node.FuncDeclNode n, SymbolTable t) {
+            funcStack.push(n);
+            SymbolTable table = new SymbolTable(t);
+            if (isClosure()) {
+                table = table.dontOverrideParentDeclarations();
+            }
+            return table;
+        }
+
+        Node.FuncDeclNode pop() {
+            return funcStack.pop();
+        }
+    }
+
+    private FuncStack funcStack = new FuncStack();
 
     @Override
     public void visitProgram(ProgramNode n) {
@@ -154,11 +185,10 @@ public class SemanticsChecker implements Node.Visitor {
         if (!CST.insert(sym))
             logError(DUPLICATE_SYMBOL, n,
                     message(DUPLICATE_SYMBOL, n.getIden().name));
-        CST = new SymbolTable(CST);
-        isGlobal = false;
+        CST = funcStack.push(n, CST);
         n.params.accept(this);
         n.block.accept(this);
-        isGlobal = true;
+        funcStack.pop();
         CST = CST.parent;
     }
 
@@ -267,10 +297,9 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitObjAccess(ObjectAccessNode n) {
-        ObjectAccessNode node = n;
-        Node.Tag tag = n.prop.getTag();
+        Node.Tag tag;
         if (exprType == Expr.LHS) {
-            tag = node.prop.getTag();
+            tag = n.prop.getTag();
             if (tag != Node.Tag.IDEN && tag != Node.Tag.SUBSCRIPT) {
                 logError(LHS_EXPR_ERROR, n,
                         message(LHS_EXPR_ERROR, ""));
@@ -335,11 +364,11 @@ public class SemanticsChecker implements Node.Visitor {
     public void visitIfStmt(IfStmtNode n) {
         n.ifCond.accept(this);
 
-        CST = new SymbolTable(CST).notDeclarable();
+        CST = new SymbolTable(CST).dontOverrideParentDeclarations();
         n.ifBlock.accept(this);
         CST = CST.parent;
         if (n.elsePart != null) {
-            CST = new SymbolTable(CST).notDeclarable();
+            CST = new SymbolTable(CST).dontOverrideParentDeclarations();
             n.elsePart.accept(this);
             CST = CST.parent;
         }
@@ -352,7 +381,7 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitForStmt(ForStmtNode n) {
-        CST = new SymbolTable(CST).notDeclarable();
+        CST = new SymbolTable(CST).dontOverrideParentDeclarations();
         if (n.init != null) {
             for (StmtNode stmt : n.init)
                 stmt.accept(this);
@@ -376,7 +405,7 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitReturnStmt(ReturnStmtNode n) {
-        if (isGlobal) {
+        if (funcStack.isGlobal()) {
             logError(RETURN_OUTSIDE_BLOCK, n,
                     message(RETURN_OUTSIDE_BLOCK));
             return;

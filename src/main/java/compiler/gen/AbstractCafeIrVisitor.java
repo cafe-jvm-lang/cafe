@@ -156,4 +156,9 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     public void visitBreakContinue(BreakContinueStatement breakContinueStatement) {
 
     }
+
+    @Override
+    public void visitClosure(CafeClosure cafeClosure) {
+
+    }
 }

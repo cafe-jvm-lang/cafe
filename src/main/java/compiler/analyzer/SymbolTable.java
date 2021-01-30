@@ -37,20 +37,20 @@ public class SymbolTable {
 
     private final Map<String, Symbol> symbols;
 
-    private boolean canDeclare = true;
+    private boolean canOverrideParentDeclarations = true;
 
     public SymbolTable(SymbolTable parent) {
         this.parent = parent;
         symbols = new HashMap<>();
     }
 
-    public SymbolTable notDeclarable() {
-        canDeclare = false;
+    public SymbolTable dontOverrideParentDeclarations() {
+        canOverrideParentDeclarations = false;
         return this;
     }
 
     public boolean insert(Symbol n) {
-        if (!canDeclare) {
+        if (!canOverrideParentDeclarations) {
             if (parent.isSymbolPresent(n.name)) {
                 return false;
             }
