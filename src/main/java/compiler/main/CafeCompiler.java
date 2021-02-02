@@ -134,7 +134,7 @@ public class CafeCompiler {
                     result.ok(byteCode);
             }
             if (checkErrors()) {
-                result.error();
+                return result.error();
             }
         }
         success("");

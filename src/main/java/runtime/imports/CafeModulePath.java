@@ -36,10 +36,12 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class CafeModulePath extends ModulePath {
+    private String className;
     private String stringPath;
     private Path path;
 
     public CafeModulePath(String path) {
+        this.className = path.substring(path.lastIndexOf('/') + 1);
         this.stringPath = path;
         this.path = FileSystems.getDefault()
                                .getPath(path);
@@ -49,12 +51,12 @@ public class CafeModulePath extends ModulePath {
         return path;
     }
 
-    public String asString() {
-        return stringPath;
+    public String getClassName() {
+        return className;
     }
 
-    public Class<?> getModule() {
-        return module;
+    public String asString() {
+        return stringPath;
     }
 
     @Override
@@ -78,5 +80,12 @@ public class CafeModulePath extends ModulePath {
     @Override
     public int hashCode() {
         return Objects.hash(path);
+    }
+
+    @Override
+    public String toString() {
+        return "CafeModulePath{" +
+                "Path='" + stringPath + '\'' +
+                '}';
     }
 }
