@@ -34,12 +34,9 @@ import runtime.imports.ImportPathVisitor;
 import runtime.imports.JavaModulePath;
 import runtime.imports.ModulePath;
 
-import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,6 +46,8 @@ import static java.lang.invoke.MethodHandles.publicLookup;
 import static java.lang.invoke.MethodType.methodType;
 
 public final class ImportEvaluator implements ImportPathVisitor {
+
+    private static final CafeClassLoader classLoader = new CafeClassLoader();
 
     private static ModulePath CURR_MODULE_PATH = null;
 
@@ -111,16 +110,16 @@ public final class ImportEvaluator implements ImportPathVisitor {
                 return;
             }
 
-            String importPath = path.asString();
-            String classpath = importPath + ".class";
-            File f = new File(classpath);
-            classpath = f.getParentFile()
-                         .getPath();
-            String className = importPath.substring(importPath.lastIndexOf('/') + 1);
-            URL url = new File(classpath).toURI()
-                                         .toURL();
-            URLClassLoader loader = new URLClassLoader(new URL[]{url});
-            Class<?> importedModule = loader.loadClass(className);
+//            String importPath = path.asString();
+//            String classpath = importPath + ".class";
+//            File f = new File(classpath);
+//            classpath = f.getParentFile()
+//                         .getPath();
+//            String className = importPath.substring(importPath.lastIndexOf('/') + 1);
+//            URL url = new File(classpath).toURI()
+//                                         .toURL();
+//            URLClassLoader loader = new URLClassLoader(new URL[]{url});
+            Class<?> importedModule = classLoader.loadModule(path);
 
             EVALUATING.add(path);
             CURR_MODULE_PATH = path;

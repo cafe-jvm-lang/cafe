@@ -64,5 +64,10 @@ public class JavaModulePath extends ModulePath {
         return Objects.hash(moduleString);
     }
 
-
+    @Override
+    public String toString() {
+        return "JavaModulePath{" +
+                "module='" + moduleString + '\'' +
+                '}';
+    }
 }

@@ -60,10 +60,5 @@ public abstract class ModulePath {
 
     public abstract int hashCode();
 
-    @Override
-    public String toString() {
-        return "ModulePath{" +
-                "module=" + module +
-                '}';
-    }
+
 }
