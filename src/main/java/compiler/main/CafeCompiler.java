@@ -47,7 +47,7 @@ import static compiler.util.Messages.success;
 
 /**
  * The Cafe Compiler.
- * <p> An instance of this class compiles one source Cafe file. Multiple instances needs to be created to compile multiple Cafe sources. </p>
+ * <p> An instance of this class compiles one Cafe source file. Multiple instances need to be created to compile multiple Cafe sources. </p>
  */
 public class CafeCompiler {
     private ParserFactory parserFactory;
@@ -131,7 +131,7 @@ public class CafeCompiler {
                     break;
                 case GEN:
                     byteCode = new JVMByteCodeGenVisitor().generateByteCode(module, moduleName);
-                    result.byteCode(byteCode);
+                    result.ok(byteCode);
             }
             if (checkErrors()) {
                 result.error();

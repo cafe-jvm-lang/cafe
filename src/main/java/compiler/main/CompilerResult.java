@@ -56,7 +56,7 @@ public class CompilerResult {
         return this;
     }
 
-    public CompilerResult byteCode(byte[] byteCode) {
+    public CompilerResult ok(byte[] byteCode) {
         this.byteCode = byteCode;
         result = Main.Result.OK;
         return this;
