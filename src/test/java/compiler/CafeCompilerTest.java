@@ -41,7 +41,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class CafeCompilerTest {
     public static final String SRC = "src/test/resources/compilation/";
@@ -56,10 +56,13 @@ public class CafeCompilerTest {
         CafeCompiler compiler = new CafeCompiler(cafeFile.getAbsolutePath());
         CompilerResult result = compiler.compile();
 
-        ClassReader reader = new ClassReader(result.getByteCode());
+        assertTrue(result.getByteCode().length > 0);
+        System.out.println("Tested: " + cafeFile);
+    }
+
+    private void trace(byte[] result) {
+        ClassReader reader = new ClassReader(result);
         TraceClassVisitor tracer = new TraceClassVisitor(new PrintWriter(System.out));
         reader.accept(tracer, 0);
-
-        assertEquals(result.getByteCode().length > 0, true);
     }
 }
