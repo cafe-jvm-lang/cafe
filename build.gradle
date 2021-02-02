@@ -59,14 +59,17 @@ dependencies {
     // https://mvnrepository.com/artifact/org.ow2.asm/asm
     implementation group: 'org.ow2.asm', name: 'asm', version: '7.3.1'
 
+    // https://mvnrepository.com/artifact/org.ow2.asm/asm-util
+    implementation group: 'org.ow2.asm', name: 'asm-util', version: '7.3.1'
+
     // https://mvnrepository.com/artifact/com.beust/jcommander
     implementation group: 'com.beust', name: 'jcommander', version: '1.78'
 
     // https://search.maven.org/artifact/org.fusesource.jansi/jansi/2.1.1/jar
     implementation 'org.fusesource.jansi:jansi:2.1.1'
 
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
+    // https://mvnrepository.com/artifact/org.testng/testng
+    testCompile group: 'org.testng', name: 'testng', version: '7.3.0'
 }
 
 distributions {
@@ -95,13 +98,17 @@ startScripts {
 
 run {
     // RUN
-    args = ["-r", "-cp=.\\examples\\", "closure"]
+    args = ["-r", "-cp=.\\examples\\", "HelloWorld"]
 
     // Compile
-    // args = ["-c",".\\examples\\closure.cafe"]
+    // args = ["-c",".\\examples\\HelloWorld.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]
+}
+
+test{
+    useTestNG()
 }
 
 application {

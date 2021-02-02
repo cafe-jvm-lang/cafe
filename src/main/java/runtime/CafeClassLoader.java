@@ -29,6 +29,8 @@
 
 package runtime;
 
+import compiler.main.CafeCompiler;
+import compiler.main.CompilerResult;
 import runtime.imports.CafeModulePath;
 
 import java.util.*;
@@ -80,5 +82,19 @@ public class CafeClassLoader extends ClassLoader {
         }
 
         return addModule(path).loadModule(path);
+    }
+
+    /**
+     * Compiles & Loads JVM bytecode for a given Cafe source file.
+     *
+     * @param source cafe file to be compiled.
+     * @return a class loaded from the compiled output.
+     */
+    public Class<?> compileAndLoadModule(String source) {
+        CafeCompiler compiler = new CafeCompiler(source);
+        CompilerResult result = compiler.compile();
+        byte[] byteCode = result.getByteCode();
+        Class<?> clazz = defineClass(null, byteCode, 0, byteCode.length);
+        return clazz;
     }
 }

@@ -1,0 +1,5 @@
+func A(){
+    cmd.println("Hello");
+}
+
+A();
