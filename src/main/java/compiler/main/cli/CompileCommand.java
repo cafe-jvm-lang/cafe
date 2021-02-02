@@ -32,6 +32,7 @@ package compiler.main.cli;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import compiler.main.CafeCompiler;
+import compiler.main.CompilerResult;
 import compiler.main.Main;
 
 @Parameters(commandNames = {"-c"}, commandDescription = "Compiles Cafe source files")
@@ -49,6 +50,14 @@ public class CompileCommand implements Command {
 
     @Override
     public Main.Result execute() {
-        return new CafeCompiler(source).compile();
+        CompilerResult result = new CafeCompiler(source).compile();
+
+        if (result.isOk()) {
+            result.writeByteCode();
+        }
+
+        return result.getResult();
     }
+
+
 }

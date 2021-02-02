@@ -37,19 +37,18 @@ import compiler.gen.ClosureReferenceVisitor;
 import compiler.gen.JVMByteCodeGenVisitor;
 import compiler.gen.SymbolReferenceAssignmentVisitor;
 import compiler.ir.CafeModule;
-import compiler.main.Main.Result;
 import compiler.parser.Parser;
 import compiler.parser.ParserFactory;
 import compiler.parser.ParserType;
 import compiler.util.Context;
 import compiler.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import static compiler.util.Messages.success;
 
+/**
+ * The Cafe Compiler.
+ * <p> An instance of this class compiles one source Cafe file. Multiple instances needs to be created to compile multiple Cafe sources. </p>
+ */
 public class CafeCompiler {
     private ParserFactory parserFactory;
     private Log log;
@@ -58,21 +57,26 @@ public class CafeCompiler {
     private Parser parser;
     private SemanticsChecker analyzer;
 
-    private final String source;
+    private final String sourceFile;
     private String outputFilePath;
     private final String moduleName;
 
-    public CafeCompiler(String source) {
+    /**
+     * Instantiates this class by specifying the Cafe source to be compiled.
+     *
+     * @param sourceFile the cafe source file to be compiled.
+     */
+    public CafeCompiler(String sourceFile) {
         Context context = new Context();
-        this.source = source;
+        this.sourceFile = sourceFile;
 
         log = Log.instance(context);
         fileManager = SourceFileManager.instance(context);
 
-        String fileName = source.substring(source.lastIndexOf('\\') + 1);
+        String fileName = sourceFile.substring(sourceFile.lastIndexOf('\\') + 1);
         moduleName = fileName.substring(0, fileName.lastIndexOf('.'));
 
-        outputFilePath = source.substring(0, source.lastIndexOf('\\') + 1);
+        outputFilePath = sourceFile.substring(0, sourceFile.lastIndexOf('\\') + 1);
         outputFilePath += moduleName + ".class";
 
         parserFactory = ParserFactory.instance(context);
@@ -96,14 +100,20 @@ public class CafeCompiler {
         return false;
     }
 
-    public Result compile() {
+    /**
+     * Compiles the Cafe source file specified during instantiation.
+     *
+     * @return a compilation result.
+     */
+    public CompilerResult compile() {
         Node programNode = null;
         CafeModule module = null;
         byte[] byteCode;
+        CompilerResult result = CompilerResult.forModule(moduleName, sourceFile);
         for (Phase phase : Phase.values()) {
             switch (phase) {
                 case INIT:
-                    fileManager.setSourceFile(source);
+                    fileManager.setSourceFile(sourceFile);
                     break;
                 case PARSE:
                     parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.asCharList());
@@ -121,18 +131,13 @@ public class CafeCompiler {
                     break;
                 case GEN:
                     byteCode = new JVMByteCodeGenVisitor().generateByteCode(module, moduleName);
-                    File op = new File(outputFilePath);
-                    try (FileOutputStream out = new FileOutputStream(op)) {
-                        out.write(byteCode);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    result.byteCode(byteCode);
             }
             if (checkErrors()) {
-                return Result.ERROR;
+                result.error();
             }
         }
         success("");
-        return Result.OK;
+        return result;
     }
 }
