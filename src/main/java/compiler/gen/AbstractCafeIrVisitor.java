@@ -98,6 +98,11 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitAnonymousFunction(AnonymousFunction anonymousFunction) {
+        anonymousFunction.walk(this);
+    }
+
+    @Override
     public void visitSymbolReference(SymbolReference symbolReference) {
         symbolReference.walk(this);
     }

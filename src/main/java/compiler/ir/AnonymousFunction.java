@@ -29,36 +29,38 @@
 
 package compiler.ir;
 
+import java.util.Collections;
 import java.util.List;
 
-public class CafeClosure extends ExpressionStatement<CafeClosure> implements TargetFuncWrapper {
-    private CafeFunction target;
+public class AnonymousFunction extends ExpressionStatement<AnonymousFunction> {
+    private TargetFuncWrapper targetFuncWrapper;
 
-    public CafeClosure(CafeFunction target) {
-        this.target = target;
+    private AnonymousFunction(TargetFuncWrapper targetFuncWrapper) {
+        this.targetFuncWrapper = targetFuncWrapper;
+    }
+
+    public static AnonymousFunction func(TargetFuncWrapper targetFuncWrapper) {
+        return new AnonymousFunction(targetFuncWrapper);
+    }
+
+    public CafeFunction getFunction() {
+        return targetFuncWrapper.getTarget();
     }
 
     @Override
-    public CafeFunction getTarget() {
-        return target;
-    }
-
-    public List<String> getClosureReferences() {
-        return target.getClosureParameterNames();
-    }
-
-    public int getClosureReferencesSize() {
-        return target.getClosureParameterNames()
-                     .size();
+    public List<CafeElement<?>> children() {
+        if (targetFuncWrapper instanceof CafeClosure)
+            return Collections.singletonList((CafeClosure) targetFuncWrapper);
+        return Collections.singletonList((FunctionWrapper) targetFuncWrapper);
     }
 
     @Override
-    protected CafeClosure self() {
+    protected AnonymousFunction self() {
         return this;
     }
 
     @Override
     public void accept(CafeIrVisitor visitor) {
-        visitor.visitClosure(this);
+        visitor.visitAnonymousFunction(this);
     }
 }

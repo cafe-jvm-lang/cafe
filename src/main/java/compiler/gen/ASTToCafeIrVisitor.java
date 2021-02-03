@@ -41,9 +41,10 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
-        private final Deque<Node.FuncDeclNode> functionStack = new LinkedList<>();
+        private final Deque<Node.FuncNode> functionStack = new LinkedList<>();
         private final Deque<Deque<Object>> objectStack = new LinkedList<>();
         private final Deque<ForLoopStatement> forLoopStack = new LinkedList<>();
+        private final AnnFuncNameGenerator annFuncNameGenerator = new AnnFuncNameGenerator();
 
         private boolean isModuleScope = true;
 
@@ -85,15 +86,23 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             referenceTableStack.pop();
         }
 
-        public void enterFunc(Node.FuncDeclNode n) {
+        public void enterFunc(Node.FuncNode n) {
             isModuleScope = false;
             functionStack.push(n);
+            annFuncNameGenerator.enter();
         }
 
         public void leaveFunc() {
             functionStack.pop();
             if (functionStack.size() == 0)
                 isModuleScope = true;
+            annFuncNameGenerator.leave();
+        }
+
+        public String getNextAnnFuncName() {
+            String name = annFuncNameGenerator.current();
+            annFuncNameGenerator.next();
+            return name;
         }
 
         public enum Scope {
@@ -243,17 +252,80 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
     @Override
     public void visitFuncDecl(Node.FuncDeclNode n) {
         Context context = Context.context;
+//        context.enterFunc(n);
+//        String name = n.getIden().name;
+//        n.params.accept(this);
+//        List<String> params = (List<String>) context.pop();
+//        n.block.accept(this);
+//        Block block = (Block) context.pop();
+//        if (!block.hasReturn())
+//            block.add(ReturnStatement.of(null));
+//        CafeFunction function = CafeFunction.function(name)
+//                                            .block(block)
+//                                            .withParameters(params);
+//        if (context.isExport)
+//            function = function.asExport();
+//
+//        context.addFunction(function);
+//
+//        ExpressionStatement<?> expression;
+//        if (context.currentScope() == Context.Scope.CLOSURE) {
+//            expression = function.asClosure();
+//        } else {
+//            expression = FunctionWrapper.wrap(function);
+//        }
+//        context.leaveFunc();
+
+        visitFunc(n);
+        String name = (String) context.pop();
+        ExpressionStatement<?> expression = (ExpressionStatement<?>) context.pop();
+        SymbolReference ref = context.createSymbolReference(name, Node.Tag.VARDECL);
+        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, expression);
+        context.push(statement);
+    }
+
+    @Override
+    public void visitAnnFunc(Node.AnnFuncNode n) {
+        Context context = Context.context;
+        visitFunc(n);
+        String name = (String) context.pop();
+        TargetFuncWrapper targetFuncWrapper = (TargetFuncWrapper) context.pop();
+
+//        CafeFunction function;
+//        if(expression instanceof FunctionWrapper){
+//            function = ((FunctionWrapper) expression).getTarget();
+//        }
+//        else {
+//            function = ((CafeClosure) expression).getTarget();
+//        }
+
+        AnonymousFunction anonymousFunction = AnonymousFunction.func(targetFuncWrapper);
+        context.push(anonymousFunction);
+    }
+
+    private void visitFunc(Node.FuncNode n) {
+        Context context = Context.context;
         context.enterFunc(n);
-        String name = n.getIden().name;
-        n.params.accept(this);
-        List<String> params = (List<String>) context.pop();
-        n.block.accept(this);
+
+        String name = n.getName();
+        Node.ParameterListNode params = n.getParams();
+        Node.BlockNode blockNode = n.getBlock();
+
+        if (name == null || name.isEmpty()) {
+            // anonymous function name
+            name = context.getNextAnnFuncName();
+        }
+
+        params.accept(this);
+        List<String> paramList = (List<String>) context.pop();
+        blockNode.accept(this);
         Block block = (Block) context.pop();
+
         if (!block.hasReturn())
             block.add(ReturnStatement.of(null));
         CafeFunction function = CafeFunction.function(name)
                                             .block(block)
-                                            .withParameters(params);
+                                            .withParameters(paramList);
         if (context.isExport)
             function = function.asExport();
 
@@ -266,14 +338,8 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
             expression = FunctionWrapper.wrap(function);
         }
         context.leaveFunc();
-        SymbolReference ref = context.createSymbolReference(name, Node.Tag.VARDECL);
-        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, expression);
-        context.push(statement);
-    }
-
-    @Override
-    public void visitAnnFunc(Node.AnnFuncNode n) {
-
+        context.push(expression);
+        context.push(name);
     }
 
     @Override

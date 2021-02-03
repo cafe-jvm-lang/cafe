@@ -894,6 +894,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     @Override
+    public void visitAnonymousFunction(AnonymousFunction anonymousFunction) {
+        anonymousFunction.walk(this);
+    }
+
+    @Override
     public void visitDeclarativeAssignment(DeclarativeAssignmentStatement declarativeAssignmentStatement) {
         SymbolReference reference = declarativeAssignmentStatement.getSymbolReference();
         if (reference.isGlobal()) {

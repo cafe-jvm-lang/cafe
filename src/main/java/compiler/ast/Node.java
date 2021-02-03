@@ -94,6 +94,14 @@ public abstract class Node {
         }
     }
 
+    public interface FuncNode {
+        String getName();
+
+        ParameterListNode getParams();
+
+        BlockNode getBlock();
+    }
+
     public static class ProgramNode extends StmtNode {
         public List<StmtNode> stmts;
 
@@ -215,13 +223,28 @@ public abstract class Node {
 
     }
 
-    public static class AnnFuncNode extends ExprNode {
+    public static class AnnFuncNode extends ExprNode implements FuncNode {
         public ParameterListNode params;
         public BlockNode block;
 
         public AnnFuncNode(ParameterListNode a, BlockNode b) {
             params = a;
             block = b;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public ParameterListNode getParams() {
+            return params;
+        }
+
+        @Override
+        public BlockNode getBlock() {
+            return block;
         }
 
         @Override
@@ -700,7 +723,7 @@ public abstract class Node {
         }
     }
 
-    public static class FuncDeclNode extends DeclNode {
+    public static class FuncDeclNode extends DeclNode implements FuncNode {
         public ParameterListNode params;
         public BlockNode block;
 
@@ -708,6 +731,21 @@ public abstract class Node {
             iden = name;
             this.params = params;
             this.block = block;
+        }
+
+        @Override
+        public String getName() {
+            return iden.name;
+        }
+
+        @Override
+        public ParameterListNode getParams() {
+            return params;
+        }
+
+        @Override
+        public BlockNode getBlock() {
+            return block;
         }
 
         @Override

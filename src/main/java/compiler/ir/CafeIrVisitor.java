@@ -81,4 +81,6 @@ public interface CafeIrVisitor {
     void visitCafeExport(CafeExport cafeExport);
 
     void visitClosure(CafeClosure cafeClosure);
+
+    void visitAnonymousFunction(AnonymousFunction anonymousFunction);
 }

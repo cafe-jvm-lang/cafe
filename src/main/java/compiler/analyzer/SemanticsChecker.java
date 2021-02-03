@@ -87,7 +87,7 @@ public class SemanticsChecker implements Node.Visitor {
     }
 
     private class FuncStack {
-        private Deque<Node.FuncDeclNode> funcStack = new LinkedList<>();
+        private Deque<Node.FuncNode> funcStack = new LinkedList<>();
 
         boolean isGlobal() {
             return funcStack.size() == 0;
@@ -101,7 +101,7 @@ public class SemanticsChecker implements Node.Visitor {
             return funcStack.size() > 1;
         }
 
-        SymbolTable push(Node.FuncDeclNode n, SymbolTable t) {
+        SymbolTable push(Node.FuncNode n, SymbolTable t) {
             funcStack.push(n);
             SymbolTable table = new SymbolTable(t);
             if (isClosure()) {
@@ -110,7 +110,7 @@ public class SemanticsChecker implements Node.Visitor {
             return table;
         }
 
-        Node.FuncDeclNode pop() {
+        Node.FuncNode pop() {
             return funcStack.pop();
         }
     }
@@ -209,7 +209,8 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitAnnFunc(AnnFuncNode n) {
-        CST = new SymbolTable(CST);
+        CST = funcStack.push(n, CST);
+        ;
         n.params.accept(this);
         n.block.accept(this);
         CST = CST.parent;

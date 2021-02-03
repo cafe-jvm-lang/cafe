@@ -32,7 +32,7 @@ package compiler.ir;
 import java.util.Collections;
 import java.util.List;
 
-public class FunctionWrapper extends ExpressionStatement<FunctionWrapper> {
+public class FunctionWrapper extends ExpressionStatement<FunctionWrapper> implements TargetFuncWrapper {
     private CafeFunction target;
 
     private FunctionWrapper(CafeFunction function) {
@@ -43,6 +43,7 @@ public class FunctionWrapper extends ExpressionStatement<FunctionWrapper> {
         return new FunctionWrapper(target);
     }
 
+    @Override
     public CafeFunction getTarget() {
         return target;
     }
