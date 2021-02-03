@@ -1,0 +1,7 @@
+import z as a from "./examples/annFunc/ann_func_export";
+
+func test(){
+    cmd.println(a());
+}
+
+test();

@@ -1,0 +1,7 @@
+var a = func(){
+    return func(){
+                   return "inside closure";
+               };
+};
+
+export var z = a();
