@@ -33,6 +33,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import compiler.main.Main;
+import runtime.CafeClassLoader;
 import runtime.Runtime;
 
 import java.io.File;
@@ -98,9 +99,9 @@ public class RunCommand implements Command {
     @Override
     public Main.Result execute() {
         URLClassLoader urlClassLoader = getURLClassLoader(classPath);
+        CafeClassLoader cafeLoader = new CafeClassLoader(urlClassLoader);
         try {
-            Class<?> module = urlClassLoader.loadClass(arguments.get(0));
-            //run(module, arguments.subList(1, arguments.size()).toArray(new String[0]));
+            Class<?> module = Class.forName(arguments.get(0), true, cafeLoader);
             Runtime.runtime(module);
         } catch (ClassNotFoundException e) {
             error(message(MODULE_NOT_FOUND, arguments.get(0)));

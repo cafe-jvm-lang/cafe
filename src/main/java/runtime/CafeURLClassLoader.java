@@ -38,7 +38,7 @@ import java.net.URLClassLoader;
 
 public class CafeURLClassLoader extends URLClassLoader {
 
-    public CafeURLClassLoader(URL[] urls) {
+    private CafeURLClassLoader(URL[] urls) {
         super(urls);
     }
 

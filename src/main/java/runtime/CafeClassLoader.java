@@ -44,6 +44,14 @@ public class CafeClassLoader extends ClassLoader {
     // a set unique module names, can be used as key for `classLoaders`.
     private final static List<Set<CafeModulePath>> uniqueModulesPaths = new ArrayList<>();
 
+    public CafeClassLoader(ClassLoader loader) {
+        super(loader);
+    }
+
+    public CafeClassLoader() {
+
+    }
+
     private CafeURLClassLoader addModule(CafeModulePath path) {
 
         // check if module name is unique and can be added to any existing sets.
@@ -96,5 +104,14 @@ public class CafeClassLoader extends ClassLoader {
         byte[] byteCode = result.getByteCode();
         Class<?> clazz = defineClass(null, byteCode, 0, byteCode.length);
         return clazz;
+    }
+
+    public void compileAndStoreModule(String source, String destination) {
+        CafeCompiler compiler = new CafeCompiler(source);
+        CompilerResult result = compiler.compile();
+        if (destination == null || destination.isEmpty())
+            result.writeByteCode();
+        else
+            result.writeByteCode(destination);
     }
 }

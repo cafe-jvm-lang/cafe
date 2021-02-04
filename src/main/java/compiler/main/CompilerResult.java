@@ -38,17 +38,19 @@ import java.io.IOException;
  */
 public class CompilerResult {
     private String moduleName;
-    private String sourceFile;
+    private File sourceFile;
+    private String sourceFolder;
     private byte[] byteCode;
     private Main.Result result;
 
-    private CompilerResult(String moduleName, String sourceFile) {
+    private CompilerResult(String moduleName, File sourceFile) {
         this.moduleName = moduleName;
         this.sourceFile = sourceFile;
+        sourceFolder = sourceFile.getParent() + File.separator;
     }
 
     public static CompilerResult forModule(String moduleName, String sourceFile) {
-        return new CompilerResult(moduleName, sourceFile);
+        return new CompilerResult(moduleName, new File(sourceFile));
     }
 
     public CompilerResult error() {
@@ -71,8 +73,7 @@ public class CompilerResult {
      * See {@link #writeByteCode(String)} to set the target directory.
      */
     public void writeByteCode() {
-        String op = sourceFile.substring(0, sourceFile.lastIndexOf('\\') + 1);
-        writeByteCode(op);
+        writeByteCode(sourceFolder);
     }
 
     /**
@@ -112,7 +113,7 @@ public class CompilerResult {
         return moduleName;
     }
 
-    public String getSourceFile() {
+    public File getSourceFile() {
         return sourceFile;
     }
 }

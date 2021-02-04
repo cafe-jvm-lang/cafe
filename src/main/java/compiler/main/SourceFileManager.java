@@ -74,6 +74,10 @@ public class SourceFileManager {
         }
     }
 
+    public void setSourceFile(File file) {
+        this.file = file;
+    }
+
     List<Character> asCharList() {
         char ch;
         List<Character> list = new ArrayList<>(100);

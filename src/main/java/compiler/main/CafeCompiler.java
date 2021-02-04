@@ -43,6 +43,8 @@ import compiler.parser.ParserType;
 import compiler.util.Context;
 import compiler.util.Log;
 
+import java.io.File;
+
 import static compiler.util.Messages.success;
 
 /**
@@ -58,7 +60,6 @@ public class CafeCompiler {
     private SemanticsChecker analyzer;
 
     private final String sourceFile;
-    private String outputFilePath;
     private final String moduleName;
 
     /**
@@ -73,11 +74,9 @@ public class CafeCompiler {
         log = Log.instance(context);
         fileManager = SourceFileManager.instance(context);
 
-        String fileName = sourceFile.substring(sourceFile.lastIndexOf('\\') + 1);
+        File f = new File(sourceFile);
+        String fileName = f.getName();
         moduleName = fileName.substring(0, fileName.lastIndexOf('.'));
-
-        outputFilePath = sourceFile.substring(0, sourceFile.lastIndexOf('\\') + 1);
-        outputFilePath += moduleName + ".class";
 
         parserFactory = ParserFactory.instance(context);
 
