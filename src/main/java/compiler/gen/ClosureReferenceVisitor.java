@@ -95,7 +95,10 @@ public class ClosureReferenceVisitor extends AbstractCafeIrVisitor {
     public void visitFunction(CafeFunction cafeFunction) {
         if (cafeFunction.isClosure()) {
             newContext();
+            pushBlockTable(cafeFunction.getBlock());
             cafeFunction.walk(this);
+            captureClosureReferences();
+            dropBlockTable();
             cafeFunction.addClosureParameters(context().closureReferences);
             dropContext();
         } else {
@@ -105,10 +108,10 @@ public class ClosureReferenceVisitor extends AbstractCafeIrVisitor {
 
     @Override
     public void visitBlock(Block block) {
-        pushBlockTable(block);
+
         block.walk(this);
-        captureClosureReferences();
-        dropBlockTable();
+
+
     }
 
     @Override
