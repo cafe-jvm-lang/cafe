@@ -1,3 +1,0 @@
-export var c = 10;
-
-cmd.println("in c: "+c);

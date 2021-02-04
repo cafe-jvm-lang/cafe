@@ -151,6 +151,15 @@ public class CafeFunction extends ExpressionStatement<CafeFunction> {
     }
 
     @Override
+    public String toString() {
+        return "CafeFunction{" +
+                "name='" + name + '\'' +
+                ", parameterNames=" + parameterNames +
+                ", closureParameterNames=" + closureParameterNames +
+                '}';
+    }
+
+    @Override
     protected CafeFunction self() {
         return this;
     }

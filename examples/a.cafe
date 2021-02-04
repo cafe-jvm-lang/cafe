@@ -1,5 +1,0 @@
-var obj = {
-    a : "from-A"
-};
-
-export obj;

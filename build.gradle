@@ -98,10 +98,10 @@ startScripts {
 
 run {
     // RUN
-    // args = ["-r", "-cp=.\\examples\\annFunc", "ann_func_import"]
+    args = ["-r", "-cp=.\\examples\\", "closure"]
 
     // Compile
-    // args = ["-c",".\\examples\\annFunc\\ann_func_import.cafe"]
+    // args = ["-c",".\\examples\\closure.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]

@@ -1,3 +1,0 @@
-import a from "examples/HelloWorld";
-import a as A from "examples/HelloWorld";
-import a,b as B from "examples/HelloWorld";

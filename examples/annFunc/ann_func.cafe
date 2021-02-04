@@ -1,5 +1,0 @@
-var a = func(){
-    return "Hello";
-};
-
-cmd.println(a());
