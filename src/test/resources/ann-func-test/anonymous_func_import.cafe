@@ -1,5 +1,5 @@
 import a from "./src/test/resources/ann-func-test/anonymous_func_export";
 
-func test(){
+export func test(){
     return a();
 }

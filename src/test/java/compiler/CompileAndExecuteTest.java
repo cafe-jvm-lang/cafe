@@ -29,8 +29,6 @@
 
 package compiler;
 
-import compiler.main.CafeCompiler;
-import compiler.main.CompilerResult;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.util.TraceClassVisitor;
 import org.testng.annotations.DataProvider;
@@ -41,10 +39,11 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import static org.testng.Assert.assertTrue;
+import static testing.Utils.compileAndLoad;
+import static testing.Utils.execute;
 
-public class CafeCompilerTest {
-    public static final String SRC = "src/test/resources/compilation/";
+public class CompileAndExecuteTest {
+    public static final String SRC = "src/test/resources/compile-and-execute/";
 
     @DataProvider(name = "cafe-files")
     public static Iterator<Object[]> data() {
@@ -52,12 +51,9 @@ public class CafeCompilerTest {
     }
 
     @Test(dataProvider = "cafe-files")
-    public void generate_bytecode(File cafeFile) {
-        CafeCompiler compiler = new CafeCompiler(cafeFile.getAbsolutePath());
-        CompilerResult result = compiler.compile();
-
-        assertTrue(result.getByteCode().length > 0);
-        System.out.println("Tested: " + cafeFile);
+    public void call_init_func(File cafeFile) throws Throwable {
+        Class<?> clazz = compileAndLoad(cafeFile.getAbsolutePath());
+        execute(clazz);
     }
 
     private void trace(byte[] result) {

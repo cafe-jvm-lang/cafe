@@ -30,6 +30,7 @@
 package testing;
 
 import runtime.CafeClassLoader;
+import runtime.ImportEvaluator;
 
 import java.io.File;
 import java.util.Iterator;
@@ -43,6 +44,16 @@ public class Utils {
         return loader.compileAndLoadModule(filePath);
     }
 
+    public static void compileAndStore(String filePath) {
+        CafeClassLoader loader = new CafeClassLoader(Utils.class.getClassLoader());
+        loader.compileAndStoreModule(filePath, null);
+    }
+
+    public static void compileAndStore(String filePath, String destination) {
+        CafeClassLoader loader = new CafeClassLoader(Utils.class.getClassLoader());
+        loader.compileAndStoreModule(filePath, destination);
+    }
+
     public static Iterator<Object[]> cafeFilesIn(String path) {
         List<Object[]> data = new LinkedList<>();
         File[] files = new File(path).listFiles((dir, name) -> name.endsWith(".cafe"));
@@ -50,5 +61,10 @@ public class Utils {
             data.add(new Object[]{file});
         }
         return data.iterator();
+    }
+
+    public static void execute(Class<?> clazz) throws Throwable {
+        ImportEvaluator evaluator = new ImportEvaluator();
+        evaluator.evaluate(clazz);
     }
 }
