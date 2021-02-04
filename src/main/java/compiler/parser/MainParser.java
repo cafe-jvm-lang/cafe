@@ -868,8 +868,8 @@ public class MainParser extends Parser {
                 } else if (accept(TokenKind.LCURLY)) {
                     BlockNode blockNode = new BlockNode();
                     List<StmtNode> stmt = new LinkedList<>();
-                    if (token.kind != TokenKind.RCURLY)
-                        stmt = parseBlock();
+                    while(token.kind != TokenKind.RCURLY)
+                        stmt.addAll(parseBlock());
                     blockNode.setStmt(stmt);
                     accept(TokenKind.RCURLY);
                     elseBlock = new ElseStmtNode(ifNode, blockNode);
