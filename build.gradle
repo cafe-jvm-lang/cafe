@@ -101,7 +101,7 @@ run {
     // args = ["-r", "-cp=.\\examples\\", "closure"]
 
     // Compile
-    args = ["-c",".\\examples\\closure.cafe"]
+    // args = ["-c",".\\examples\\Objects.cafe"]
 
     // Usage
     // args = ["--usage", "-c"]

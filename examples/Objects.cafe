@@ -14,15 +14,12 @@ var acc = {
     withdraw: func(b){
         if(this.amount < b){
             cmd.println("Insufficient Balance");
-            cmd.println("Please check");
         } else {
-            cmd.print("Hello");
             updateBal(-b);
         }
     }
 };
 
-cmd.println(acc.amount);
 acc.init();
 acc.checkBalance();
 acc.deposit(1000);
