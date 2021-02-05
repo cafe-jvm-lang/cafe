@@ -507,6 +507,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         Class<?> statementClass = statement.getClass();
         if (statementClass == FunctionInvocation.class) {
             mv.visitInsn(POP);
+        } else if (statementClass == ObjectAccessStatement.class) {
+            if (((ObjectAccessStatement) statement).getProperty()
+                                                   .getClass() == MethodInvocation.class) {
+                mv.visitInsn(POP);
+            }
         }
     }
 
