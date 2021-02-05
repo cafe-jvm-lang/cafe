@@ -1,0 +1,30 @@
+var acc = {
+    init: func(){
+        this.amount = 0;
+    },
+    updateBal: func(amt){
+        this.amount = this.amount+amt;
+    },
+    checkBalance: func(){
+        cmd.println(this.amount);
+    },
+    deposit: func(b){
+        this.updateBal(b);
+    },
+    withdraw: func(b){
+        if(this.amount < b){
+            cmd.println("Insufficient Balance");
+            cmd.println("Please check");
+        } else {
+            cmd.print("Hello");
+            updateBal(-b);
+        }
+    }
+};
+
+cmd.println(acc.amount);
+acc.init();
+acc.checkBalance();
+acc.deposit(1000);
+acc.withdraw(2000);
+acc.checkBalance();

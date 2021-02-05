@@ -78,7 +78,7 @@ public class SourceFileManager {
         this.file = file;
     }
 
-    List<Character> asCharList() {
+    public List<Character> asCharList() {
         char ch;
         List<Character> list = new ArrayList<>(100);
         BufferedReader br;
