@@ -87,4 +87,12 @@ public class FunctionInvocation extends ExpressionStatement<FunctionInvocation> 
     public void accept(CafeIrVisitor visitor) {
         visitor.visitFunctionInvocation(this);
     }
+
+    @Override
+    public String toString() {
+        return "FunctionInvocation{" +
+                "name='" + name + '\'' +
+                ", arguments=" + arguments +
+                '}';
+    }
 }

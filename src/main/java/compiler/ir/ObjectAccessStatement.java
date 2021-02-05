@@ -73,4 +73,12 @@ public class ObjectAccessStatement extends ExpressionStatement<ObjectAccessState
     public void accept(CafeIrVisitor visitor) {
         visitor.visitObjectAccess(this);
     }
+
+    @Override
+    public String toString() {
+        return "ObjectAccessStatement{" +
+                "accessedOn=" + accessedOn +
+                ", property=" + property +
+                '}';
+    }
 }
