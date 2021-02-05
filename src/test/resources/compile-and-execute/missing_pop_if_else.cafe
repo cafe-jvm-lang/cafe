@@ -1,0 +1,16 @@
+var acc = {
+    amount: 0,
+    updateBal: func(b){
+    },
+    withdraw: func(b){
+        if(this.amount < b){
+            cmd.println("Insufficient Balance");
+            cmd.println("Please check");
+        } else {
+            cmd.print("Hello");
+            this.updateBal(-b);
+        }
+    }
+};
+
+acc.withdraw(2000);
