@@ -17,6 +17,15 @@ This project is still under development.
 
 ---
 
+## Authors
+In order to get in touch with Cafe Authors, join
+[cafe-jvm-lang/cafe-lang](https://gitter.im/cafe-jvm-lang/cafe-lang) (Gitter).
+|                                                                                                 | username                                                       | talk to me about...                               |
+--------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------|
+ <img src="https://avatars.githubusercontent.com/dhyey-shah"         height="50px" title="Dhyey Shah"/>           | [`@dhyey-shah`](https://github.com/dhyey-shah)                 | cafe grammar,semantic-analyzer,compiler back-end (IR,code-generation), runtime       |
+ <img src="https://avatars.githubusercontent.com/SaurabhPethani"         height="50px" title="Saurabh Pethani"/>           | [`@SaurabhPethani`](https://github.com/SaurabhPethani)                 | compiler front-end (RD parser, ast)       |
+ <img src="https://avatars.githubusercontent.com/supastrikaromil"         height="50px" title="Romil Nisar"/>           | [`@supastrikaromil`](https://github.com/supastrikaromil)                 | cafe grammar, compiler front-end (Tokenizer)       |
+
 ## Building CAFE
 Cafe is built with [Gradle](https://gradle.org).
 Since the source code contains the [Gradle wrapper scripts](https://docs.gradle.org/current/userguide/gradle_wrapper.html),
