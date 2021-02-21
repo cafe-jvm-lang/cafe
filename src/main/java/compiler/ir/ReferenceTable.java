@@ -55,6 +55,14 @@ public class ReferenceTable {
         return this;
     }
 
+    public ReferenceTable addToTopLevel(SymbolReference reference) {
+        if (parent != null)
+            parent.addToTopLevel(reference);
+        else
+            add(reference);
+        return this;
+    }
+
     public SymbolReference get(String name) {
         SymbolReference reference = table.get(name);
         if (reference != null)
