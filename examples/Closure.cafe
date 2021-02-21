@@ -1,0 +1,9 @@
+func A(){
+    func B(){
+        cmd.println("In B");
+    }
+    return B;
+}
+
+var a = A();
+a();
