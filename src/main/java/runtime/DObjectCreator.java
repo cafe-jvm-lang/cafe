@@ -56,6 +56,7 @@ public class DObjectCreator {
     private final static Map<Class<?>, DObject> mapper;
 
     static {
+        mapper = new HashMap<>();
         OBJECT_PROTO = generate(CObjectProto.class, null, null);
         FUNC_PROTO = generate(CFuncProto.class, null, null);
         FUNC_PROTO.define(DObject.__PROTO__, OBJECT_PROTO);
@@ -63,7 +64,6 @@ public class DObjectCreator {
         setFuncProto(FUNC_PROTO);
 
         LIST_PROTO = generateFrom(CListProto.class);
-        mapper = new HashMap<>();
     }
 
     private DObjectCreator() {
