@@ -560,7 +560,11 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitClosure(CafeClosure cafeClosure) {
+        // Method Call to CFuncProto.bind(DFunc, ThisPointer, Arguments...);
+
         loadTargetFunction(cafeClosure.getTarget());
+        mv.visitInsn(DUP);
+
         final int closureReferencesSize = cafeClosure.getClosureReferencesSize();
 
         if (closureReferencesSize > 0) {
@@ -578,13 +582,20 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
                 mv.visitInsn(AASTORE);
             }
 
-            mv.visitMethodInsn(
-                    INVOKEVIRTUAL,
-                    "library/DFunc",
+            mv.visitInvokeDynamicInsn(
                     "bind",
-                    "(" + LDOBJECT + "[Ljava/lang/Object;)Llibrary/DFunc;",
-                    false
+                    "(Llibrary/DFunc;" + LDOBJECT + "[Ljava/lang/Object;)Llibrary/DFunc;",
+                    METHOD_INVOCATION_HANDLE
+
             );
+
+//            mv.visitMethodInsn(
+//                    INVOKEVIRTUAL,
+//                    "library/DFunc",
+//                    "bind",
+//                    "(" + LDOBJECT + "[Ljava/lang/Object;)Llibrary/DFunc;",
+//                    false
+//            );
         }
     }
 
@@ -877,6 +888,9 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
                 IMPORT_HANDLE
         );
         mv.visitInsn(DUP_X1);
+//        context.referenceTableStack.peek().addToTopLevel(SymbolReference.of(varName,
+//                SymbolReference.Kind.VAR,
+//                SymbolReference.Scope.GLOBAL));
         GlobalThis.add(mv, className);
     }
 
