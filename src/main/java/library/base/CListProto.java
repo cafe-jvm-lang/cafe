@@ -29,10 +29,5 @@
 
 package library.base;
 
-import library.DObject;
-
-public class CObject {
-    public static DObject create(DObject e, DObject o) {
-        return new DObject(o);
-    }
+public class CListProto {
 }
