@@ -31,7 +31,7 @@ package runtime.indy;
 
 import library.DFunc;
 import library.DObject;
-import runtime.DFuncCreator;
+import runtime.DObjectCreator;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
@@ -53,6 +53,6 @@ public final class FunctionReferenceID {
         function.setAccessible(true);
         return new ConstantCallSite(constant(
                 DFunc.class,
-                DFuncCreator.create(caller.unreflect(function))));
+                DObjectCreator.createFunc(caller.unreflect(function))));
     }
 }
