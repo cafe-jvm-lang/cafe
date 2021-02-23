@@ -66,6 +66,9 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     private static final String JFUNC = "library/DFunc";
 
+    private static final String DLIST = "library/DList";
+    private static final String LLIST = "Llibrary/DList;";
+
     private static final Class<?> DOBJECT_CLASS = DObject.class;
     private static final Class<?> DFUNC_CLASS = DFunc.class;
 
@@ -965,5 +968,30 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitNull(NullStatement aNull) {
         mv.visitInsn(ACONST_NULL);
+    }
+
+    @Override
+    public void visitListCollection(ListCollection listCollection) {
+        int index = listCollection.index();
+
+        // create DList instance
+        visitDListCreator();
+
+        // store list
+        mv.visitVarInsn(ASTORE, index);
+
+        // insert items into list
+        for (ExpressionStatement<?> expr : listCollection.getItems()) {
+            mv.visitVarInsn(ALOAD, index);
+            expr.accept(this);
+            mv.visitMethodInsn(INVOKEVIRTUAL, DLIST, "add", "(Ljava/lang/Object;)V", false);
+        }
+
+        // load final list
+        mv.visitVarInsn(ALOAD, index);
+    }
+
+    private void visitDListCreator() {
+        mv.visitMethodInsn(INVOKESTATIC, DOBJECT_CREATOR, "createList", "()" + LLIST, false);
     }
 }

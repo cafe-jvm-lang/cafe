@@ -27,39 +27,50 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package library;
+package compiler.ir;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-public class DList extends DObject {
-    private List<Object> list;
+public class ListCollection extends ExpressionStatement<ListCollection> {
+    private List<ExpressionStatement<?>> items = new LinkedList<>();
+    private int index = -1;
 
-    public DList(DObject __proto__) {
-        super(__proto__);
-        list = new ArrayList<>();
+    private ListCollection() {
     }
 
-    public void add(Object object) {
-        list.add(object);
+    public static ListCollection list() {
+        return new ListCollection();
     }
 
-    public void remove(Object object) {
-        list.remove(object);
+    public void add(ExpressionStatement<?> expr) {
+        items.add(expr);
     }
 
-    public void removeAt(int index) {
-        list.remove(index);
+    public List<ExpressionStatement<?>> getItems() {
+        return items;
     }
 
-    public Object get(int index) {
-        return list.get(index);
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public int index() {
+        return index;
     }
 
     @Override
-    public String toString() {
-        return "DList{" +
-                "list=" + list +
-                '}';
+    public List<CafeElement<?>> children() {
+        return new LinkedList<>(items);
+    }
+
+    @Override
+    protected ListCollection self() {
+        return this;
+    }
+
+    @Override
+    public void accept(CafeIrVisitor visitor) {
+        visitor.visitListCollection(this);
     }
 }

@@ -166,4 +166,9 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     public void visitClosure(CafeClosure cafeClosure) {
 
     }
+
+    @Override
+    public void visitListCollection(ListCollection listCollection) {
+
+    }
 }

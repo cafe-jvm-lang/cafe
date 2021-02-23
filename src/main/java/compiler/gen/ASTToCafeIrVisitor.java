@@ -375,7 +375,16 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitListColl(Node.ListCollNode n) {
+        Context context = Context.context;
+        ListCollection list = ListCollection.list();
 
+        for (Node.ExprNode expr : n.val) {
+            expr.accept(this);
+            ExpressionStatement<?> statement = (ExpressionStatement<?>) context.pop();
+            list.add(statement);
+        }
+
+        context.push(list);
     }
 
     @Override

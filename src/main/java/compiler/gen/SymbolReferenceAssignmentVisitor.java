@@ -99,6 +99,13 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
     }
 
     @Override
+    public void visitListCollection(ListCollection listCollection) {
+        if (listCollection.index() < 0)
+            listCollection.setIndex(assignmentCounter.next());
+        listCollection.walk(this);
+    }
+
+    @Override
     public void visitFunctionInvocation(FunctionInvocation functionInvocation) {
         for (CafeElement<?> arg : functionInvocation.getArguments()) {
             arg.accept(this);

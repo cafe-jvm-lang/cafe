@@ -27,39 +27,31 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package library;
+package compiler;
 
-import java.util.ArrayList;
-import java.util.List;
+import compiler.main.CafeCompiler;
+import compiler.main.CompilerResult;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import testing.Utils;
 
-public class DList extends DObject {
-    private List<Object> list;
+import java.io.File;
+import java.util.Iterator;
 
-    public DList(DObject __proto__) {
-        super(__proto__);
-        list = new ArrayList<>();
+import static org.testng.Assert.assertTrue;
+
+public class CompileTest {
+    public static final String SRC = "src/test/resources/compile/";
+
+    @DataProvider(name = "cafe-files")
+    public static Iterator<Object[]> data() {
+        return Utils.cafeFilesIn(SRC);
     }
 
-    public void add(Object object) {
-        list.add(object);
-    }
-
-    public void remove(Object object) {
-        list.remove(object);
-    }
-
-    public void removeAt(int index) {
-        list.remove(index);
-    }
-
-    public Object get(int index) {
-        return list.get(index);
-    }
-
-    @Override
-    public String toString() {
-        return "DList{" +
-                "list=" + list +
-                '}';
+    @Test(dataProvider = "cafe-files")
+    public void compile(File cafeFile) {
+        CafeCompiler compiler = new CafeCompiler(cafeFile.getAbsolutePath());
+        CompilerResult result = compiler.compile();
+        assertTrue(result.isOk());
     }
 }
