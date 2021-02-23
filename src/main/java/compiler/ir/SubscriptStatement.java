@@ -31,11 +31,11 @@ package compiler.ir;
 
 public class SubscriptStatement extends ExpressionStatement<SubscriptStatement> {
     private ExpressionStatement<?> subscriptOf;
-    private ExpressionStatement<?> index;
+    private ExpressionStatement<?> subscriptIndex;
 
-    public SubscriptStatement(ExpressionStatement<?> subscriptOf, ExpressionStatement<?> index) {
+    public SubscriptStatement(ExpressionStatement<?> subscriptOf, ExpressionStatement<?> subscriptIndex) {
         this.subscriptOf = subscriptOf;
-        this.index = index;
+        this.subscriptIndex = subscriptIndex;
     }
 
     public static SubscriptStatement create(Object subscriptOf, Object index) {
@@ -43,6 +43,14 @@ public class SubscriptStatement extends ExpressionStatement<SubscriptStatement> 
                 ExpressionStatement.of(subscriptOf),
                 ExpressionStatement.of(index)
         );
+    }
+
+    public ExpressionStatement<?> getSubscriptOf() {
+        return subscriptOf;
+    }
+
+    public ExpressionStatement<?> getSubscriptIndex() {
+        return subscriptIndex;
     }
 
     @Override

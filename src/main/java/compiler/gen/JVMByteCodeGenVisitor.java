@@ -93,6 +93,10 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
             "ObjectAccessID", ""
     );
 
+    private static final Handle SUBSCRIPT_HANDLE = makeHandle(
+            "SubscriptID", ""
+    );
+
     private static final Handle OPERATOR_HANDLE = makeHandle(
             "OperatorID", "I"
     );
@@ -422,7 +426,13 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     @Override
     public void visitSubscript(SubscriptStatement subscriptStatement) {
-
+        subscriptStatement.getSubscriptOf()
+                          .accept(this);
+        subscriptStatement.getSubscriptIndex()
+                          .accept(this);
+        mv.visitInvokeDynamicInsn("none",
+                genericMethodType(2).toMethodDescriptorString(),
+                SUBSCRIPT_HANDLE);
     }
 
     @Override
@@ -656,12 +666,16 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         }
 
         ObjectAccessStatement node;
-        if (lhs instanceof ObjectAccessStatement)
+        if (lhs instanceof ObjectAccessStatement) {
             node = (ObjectAccessStatement) lhs;
-        else throw new AssertionError("Unknown LHS expression");
-
-        node.getAccessedOn()
-            .accept(this);
+            node.getAccessedOn()
+                .accept(this);
+        } else if (lhs instanceof SubscriptStatement) {
+//            SubscriptStatement subscriptStatement = (SubscriptStatement) lhs;
+//            subscriptStatement.getSubscriptOf().accept(this);
+//            subscriptStatement.getSubscriptIndex().accept(this);
+            return;
+        } else throw new AssertionError("Unknown LHS expression");
 
         ExpressionStatement<?> rhs = assignmentStatement.getRhsExpression();
         rhs.accept(this);

@@ -137,6 +137,11 @@ public abstract class Node {
         public void accept(Visitor v) {
             v.visitIden(this);
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     public static class NumLitNode extends ExprNode {
