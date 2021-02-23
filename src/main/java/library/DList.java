@@ -27,20 +27,32 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package library;
 
-import library.DFunc;
-import library.DObject;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.lang.invoke.MethodHandle;
+public class DList extends DObject {
+    private List<Object> list;
 
-public class DFuncCreator {
-    private DFuncCreator() {
+    public DList(DObject __proto__) {
+        super(__proto__);
+        list = new ArrayList<>();
     }
 
-    public static DFunc create(MethodHandle methodHandle) {
-        DFunc object = new DFunc(methodHandle);
-        object.define(DObject.__PROTO__, ProtoGenerator.getFuncProto());
-        return object;
+    public void add(Object object) {
+        list.add(object);
+    }
+
+    public void remove(Object object) {
+        list.remove(object);
+    }
+
+    public void removeAt(int index) {
+        list.remove(index);
+    }
+
+    public Object get(int index) {
+        return list.get(index);
     }
 }

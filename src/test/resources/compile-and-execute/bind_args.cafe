@@ -1,0 +1,7 @@
+func a(b,c){
+    cmd.println(b);
+}
+
+var z = {h:"inside z"};
+var q = a.bind(z,1);
+q(3);

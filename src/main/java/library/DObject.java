@@ -39,11 +39,15 @@ import java.util.Set;
 import static java.lang.invoke.MethodType.genericMethodType;
 import static java.lang.invoke.MethodType.methodType;
 
+/**
+ * Represents a Cafe Object. It sits at the root of entire Cafe object hierarchy. It contains a map of key-value pairs and provides methods to insert/modify/retrieve these pairs.
+ */
 public class DObject {
     protected final Map<String, Object> map;
 
-    public DObject() {
+    public DObject(DObject __proto__) {
         map = new HashMap<>();
+        define(__PROTO__, __proto__);
     }
 
     public void define(String key, Object value) {
@@ -104,7 +108,6 @@ public class DObject {
     public MethodHandle dispatchCallHandle(String property, MethodType type) {
         return DISPATCH_CALL.bindTo(property)
                             .asCollector(Object[].class, type.parameterCount());
-
     }
 
     public static Object getObject(String property, DObject object) {
@@ -124,11 +127,8 @@ public class DObject {
     public static Object dispatchCall(String property, Object... args) throws Throwable {
         DObject obj = (DObject) args[0];
         Object o = getObject(property, obj);
-        //args = Arrays.copyOfRange(args, 1,args.length);
         if (o instanceof DFunc)
             return ((DFunc) o).invoke(args);
         throw new NoSuchMethodError(obj.toString() + " has no such method " + property);
     }
-
-
 }

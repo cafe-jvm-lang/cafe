@@ -27,10 +27,7 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package runtime;
+package library.base;
 
-public final class StandardLib {
-    public static Object search(String name) {
-        return null;
-    }
+public class CList {
 }

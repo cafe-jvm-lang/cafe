@@ -52,6 +52,7 @@ public class CompileAndExecuteTest {
 
     @Test(dataProvider = "cafe-files")
     public void call_init_func(File cafeFile) throws Throwable {
+        System.out.println(cafeFile);
         Class<?> clazz = compileAndLoad(cafeFile.getAbsolutePath());
         execute(clazz);
     }

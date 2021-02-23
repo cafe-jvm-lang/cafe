@@ -38,7 +38,7 @@ import runtime.imports.JavaModulePath;
 import java.util.HashMap;
 import java.util.Map;
 
-import static runtime.LibraryDObjectGenerator.generate;
+import static runtime.DObjectCreator.generateFrom;
 
 public final class JavaImports {
     private static Map<JavaModulePath, DObject> map = new HashMap<>();
@@ -47,9 +47,9 @@ public final class JavaImports {
 
     static {
         DEFAULT_IMPORTS = new HashMap<String, DObject>() {{
-            put("Object", generate(CObject.class));
-            put("Function", generate(CFunc.class));
-            put("cmd", generate(BasicIO.class));
+            put("Object", generateFrom(CObject.class));
+            put("Function", generateFrom(CFunc.class));
+            put("cmd", generateFrom(BasicIO.class));
         }};
 
         DEFAULT_MODULE_PATHS = new HashMap<JavaModulePath, String>() {{
@@ -75,6 +75,6 @@ public final class JavaImports {
     public static void add(JavaModulePath path, Class<?> module) {
         if (DEFAULT_MODULE_PATHS.containsKey(path))
             return;
-        map.put(path, generate(module));
+        map.put(path, generateFrom(module));
     }
 }

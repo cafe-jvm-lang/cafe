@@ -30,40 +30,47 @@
 package library;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a Cafe Function. Every function is an instance of this class. Holds a reference to a JVM method using a method-handle.
+ */
 public class DFunc extends DObject {
     private MethodHandle handle;
-    private DObject thisP = null;
-    private List<Object> arguments = new LinkedList<>();
+    private boolean isVarity = false;
 
-    public DFunc(MethodHandle handle) {
+    public DFunc(DObject __proto__, MethodHandle handle) {
+        super(__proto__);
         this.handle = handle;
+        if (handle.isVarargsCollector())
+            isVarity = true;
     }
 
     public Object invoke(Object... args) throws Throwable {
-        return handle.invokeWithArguments(args);
+        List<Object> arguments = new ArrayList<>();
+        int pos = 0;
+        if (handle.type()
+                  .parameterArray()[0] != DObject.class) {
+            // if 1st arg is already bound, omit the thisP arg from args.
+            pos = 1;
+        }
+        for (int i = pos; i < args.length; i++)
+            arguments.add(args[i]);
+
+        return handle.invokeWithArguments(arguments);
     }
 
     public MethodHandle handle() {
         return handle;
     }
 
-    public DFunc bind(DObject thisP, Object... args) {
-        if (thisP != null) {
-            this.thisP = thisP;
-            handle = handle.bindTo(thisP);
-        }
-        if (args.length > 0) {
-            handle = MethodHandles.insertArguments(handle, 1, args);
-        }
-        return this;
+    public boolean isVarity() {
+        return isVarity;
     }
 
     @Override
     public String toString() {
-        return "Function{" + super.map + "}";
+        return "Function{  }";
     }
 }
