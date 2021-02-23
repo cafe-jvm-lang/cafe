@@ -42,7 +42,7 @@ import static java.lang.invoke.MethodType.methodType;
 /**
  * Represents a Cafe Object. It sits at the root of entire Cafe object hierarchy. It contains a map of key-value pairs and provides methods to insert/modify/retrieve these pairs.
  */
-public class DObject {
+public class DObject implements Subscriptable {
     protected final Map<String, Object> map;
 
     public DObject(DObject __proto__) {
@@ -130,5 +130,15 @@ public class DObject {
         if (o instanceof DFunc)
             return ((DFunc) o).invoke(args);
         throw new NoSuchMethodError(obj.toString() + " has no such method " + property);
+    }
+
+    @Override
+    public Object getSubscript(Object key) {
+        return getObject(key.toString(), this);
+    }
+
+    @Override
+    public void setSubscript(Object key, Object value) {
+        setObject(key.toString(), this, value);
     }
 }

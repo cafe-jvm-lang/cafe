@@ -29,47 +29,8 @@
 
 package library;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface Subscriptable {
+    Object getSubscript(Object key);
 
-public class DList extends DObject implements Subscriptable {
-    private List<Object> list;
-
-    public DList(DObject __proto__) {
-        super(__proto__);
-        list = new ArrayList<>();
-    }
-
-    public void add(Object object) {
-        list.add(object);
-    }
-
-    public void remove(Object object) {
-        list.remove(object);
-    }
-
-    public void removeAt(int index) {
-        list.remove(index);
-    }
-
-    public Object get(int index) {
-        return list.get(index);
-    }
-
-    @Override
-    public Object getSubscript(Object key) {
-        return get((Integer) key);
-    }
-
-    @Override
-    public void setSubscript(Object key, Object value) {
-        list.set((Integer) key, value);
-    }
-
-    @Override
-    public String toString() {
-        return "DList{" +
-                "list=" + list +
-                '}';
-    }
+    void setSubscript(Object key, Object value);
 }
