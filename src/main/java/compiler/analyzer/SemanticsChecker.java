@@ -64,6 +64,8 @@ public class SemanticsChecker implements Node.Visitor {
     // caller node
     private Node.Tag caller = null;
 
+    private boolean isSubscriptIndex = false;
+
     private Log log;
 
     public static SemanticsChecker instance(Context context) {
@@ -160,14 +162,14 @@ public class SemanticsChecker implements Node.Visitor {
 
     @Override
     public void visitNumLit(NumLitNode n) {
-        if (exprType == Expr.LHS)
+        if (exprType == Expr.LHS && !isSubscriptIndex)
             logError(LHS_EXPR_ERROR, n,
                     message(LHS_EXPR_ERROR, n.lit.toString()));
     }
 
     @Override
     public void visitStrLit(StrLitNode n) {
-        if (exprType == Expr.LHS)
+        if (exprType == Expr.LHS && !isSubscriptIndex)
             logError(LHS_EXPR_ERROR, n,
                     message(LHS_EXPR_ERROR, n.lit));
     }
@@ -285,6 +287,9 @@ public class SemanticsChecker implements Node.Visitor {
 //		if(objType != ObjAcc.prop) {
 //			n.invokedOn.accept(this);
 //		}
+        if (objType == null && exprType == Expr.LHS && !isSubscriptIndex)
+            logError(LHS_EXPR_ERROR, n,
+                    message(LHS_EXPR_ERROR, n.invokedOn));
         n.args.accept(this);
 
     }
@@ -293,7 +298,9 @@ public class SemanticsChecker implements Node.Visitor {
     public void visitSubscript(SubscriptNode n) {
         if (objType == ObjAcc.accesedOn)
             n.subscriptOf.accept(this);
+        isSubscriptIndex = true;
         n.index.accept(this);
+        isSubscriptIndex = false;
     }
 
     @Override
@@ -469,7 +476,6 @@ public class SemanticsChecker implements Node.Visitor {
     }
 
     private void logError(Log.Type issue, Node n, String message) {
-        System.out.println(message);
         log.report(issue, n.getSourcePosition(),
                 errorDescription(n.getSourcePosition(), message));
     }
