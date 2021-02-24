@@ -1,4 +1,8 @@
 var x = {a:10};
-var l = [1,[2,3],"string", x];
-var z = "a";
-cmd.println(x[z]);
+var l = [1,[2,3],"string"];
+l[1][0] = "new";
+cmd.println(l);
+
+x["l"] = l;
+x.l[1][0] = "new 2";
+cmd.println(x);

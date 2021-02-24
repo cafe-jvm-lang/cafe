@@ -329,8 +329,10 @@ public class SemanticsChecker implements Node.Visitor {
     public void visitSlice(SliceNode n) {
         if (objType == ObjAcc.accesedOn)
             n.slicedOn.accept(this);
+        isSubscriptIndex = true;
         n.start.accept(this);
         n.end.accept(this);
+        isSubscriptIndex = false;
     }
 
     @Override

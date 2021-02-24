@@ -430,7 +430,7 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
                           .accept(this);
         subscriptStatement.getSubscriptIndex()
                           .accept(this);
-        mv.visitInvokeDynamicInsn("none",
+        mv.visitInvokeDynamicInsn("#ann_index",
                 genericMethodType(2).toMethodDescriptorString(),
                 SUBSCRIPT_HANDLE);
     }
@@ -666,34 +666,38 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         }
 
         ObjectAccessStatement node;
+        ExpressionStatement<?> rhs = assignmentStatement.getRhsExpression();
         if (lhs instanceof ObjectAccessStatement) {
             node = (ObjectAccessStatement) lhs;
             node.getAccessedOn()
                 .accept(this);
+            if (node.getProperty() instanceof PropertyAccess)
+                visitLHSObjectProperty((PropertyAccess) node.getProperty(), rhs);
+            else
+                visitSubscriptSetter((SubscriptStatement) node.getProperty(), rhs);
         } else if (lhs instanceof SubscriptStatement) {
-//            SubscriptStatement subscriptStatement = (SubscriptStatement) lhs;
-//            subscriptStatement.getSubscriptOf().accept(this);
-//            subscriptStatement.getSubscriptIndex().accept(this);
-            return;
+            visitSubscriptSetter((SubscriptStatement) lhs, rhs);
         } else throw new AssertionError("Unknown LHS expression");
-
-        ExpressionStatement<?> rhs = assignmentStatement.getRhsExpression();
-        rhs.accept(this);
-        visitLHSObjectProperty(node.getProperty());
-
     }
 
-    private void visitLHSObjectProperty(ExpressionStatement<?> expressionStatement) {
-        if (expressionStatement instanceof PropertyAccess) {
-            mv.visitInvokeDynamicInsn(((PropertyAccess) expressionStatement).getName(),
-                    genericMethodType(2).toMethodDescriptorString(),
-                    OBJECT_ACCESS_HANDLE
-            );
-        } else if (expressionStatement instanceof SubscriptStatement) {
+    private void visitLHSObjectProperty(PropertyAccess propertyAccess, ExpressionStatement<?> rhs) {
+        rhs.accept(this);
+        mv.visitInvokeDynamicInsn(propertyAccess.getName(),
+                genericMethodType(2).toMethodDescriptorString(),
+                OBJECT_ACCESS_HANDLE
+        );
+    }
 
-        } else {
-            // TODO: error
-        }
+    private void visitSubscriptSetter(SubscriptStatement subscriptStatement, ExpressionStatement<?> rhsValue) {
+        subscriptStatement.getSubscriptOf()
+                          .accept(this);
+        subscriptStatement.getSubscriptIndex()
+                          .accept(this);
+        rhsValue.accept(this);
+
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(3).toMethodDescriptorString(),
+                SUBSCRIPT_HANDLE);
     }
 
     @Override
