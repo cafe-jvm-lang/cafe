@@ -29,5 +29,19 @@
 
 package library.base;
 
+import library.DList;
+import library.DObject;
+
 public class CListProto {
+    public static void add(DObject object, Object value) {
+        ((DList) object).add(value);
+    }
+
+    public static void remove(DObject object, Object value) {
+        ((DList) object).remove(value);
+    }
+
+    public static void removeAt(DObject object, Object value) {
+        ((DList) object).removeAt((Integer) value);
+    }
 }
