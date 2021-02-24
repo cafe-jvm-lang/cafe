@@ -1,8 +1,23 @@
 var x = {a:10};
-var l = [1,[2,3],"string"];
+var z = "string";
+var l = [1,[2,3],z];
 l[1][0] = "new";
 cmd.println(l);
 
 x["l"] = l;
 x.l[1][0] = "new 2";
+x.l[0:1] = 3;
 cmd.println(x);
+
+cmd.println(l[1:3]);
+l[2:3] = ["slice1","slice2"];
+cmd.println(l);
+
+l[0:3] = "a";
+cmd.println(l);
+
+l.add("last element");
+l.remove(z);
+l.removeAt(0);
+cmd.println(l);
+
