@@ -97,6 +97,10 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
             "SubscriptID", ""
     );
 
+    private static final Handle SLICE_HANDLE = makeHandle(
+            "SliceID", ""
+    );
+
     private static final Handle OPERATOR_HANDLE = makeHandle(
             "OperatorID", "I"
     );
@@ -425,14 +429,28 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     @Override
-    public void visitSubscript(SubscriptStatement subscriptStatement) {
-        subscriptStatement.getSubscriptOf()
-                          .accept(this);
-        subscriptStatement.getSubscriptIndex()
-                          .accept(this);
+    public void visitSubscript(SubscriptExpression subscriptExpression) {
+        subscriptExpression.getSubscriptOf()
+                           .accept(this);
+        subscriptExpression.getSubscriptIndex()
+                           .accept(this);
         mv.visitInvokeDynamicInsn("#ann_index",
                 genericMethodType(2).toMethodDescriptorString(),
                 SUBSCRIPT_HANDLE);
+    }
+
+    @Override
+    public void visitSlice(SliceExpression sliceExpression) {
+        sliceExpression.getSlicedOn()
+                       .accept(this);
+        sliceExpression.getBeginIndex()
+                       .accept(this);
+        sliceExpression.getEndIndex()
+                       .accept(this);
+
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(3).toMethodDescriptorString(),
+                SLICE_HANDLE);
     }
 
     @Override
@@ -673,10 +691,14 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
                 .accept(this);
             if (node.getProperty() instanceof PropertyAccess)
                 visitLHSObjectProperty((PropertyAccess) node.getProperty(), rhs);
+            else if (node.getProperty() instanceof SliceExpression)
+                visitSliceSetter((SliceExpression) node.getProperty(), rhs);
             else
-                visitSubscriptSetter((SubscriptStatement) node.getProperty(), rhs);
-        } else if (lhs instanceof SubscriptStatement) {
-            visitSubscriptSetter((SubscriptStatement) lhs, rhs);
+                visitSubscriptSetter((SubscriptExpression) node.getProperty(), rhs);
+        } else if (lhs instanceof SubscriptExpression) {
+            visitSubscriptSetter((SubscriptExpression) lhs, rhs);
+        } else if (lhs instanceof SliceExpression) {
+            visitSliceSetter((SliceExpression) lhs, rhs);
         } else throw new AssertionError("Unknown LHS expression");
     }
 
@@ -688,16 +710,29 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         );
     }
 
-    private void visitSubscriptSetter(SubscriptStatement subscriptStatement, ExpressionStatement<?> rhsValue) {
-        subscriptStatement.getSubscriptOf()
-                          .accept(this);
-        subscriptStatement.getSubscriptIndex()
-                          .accept(this);
+    private void visitSubscriptSetter(SubscriptExpression subscriptExpression, ExpressionStatement<?> rhsValue) {
+        subscriptExpression.getSubscriptOf()
+                           .accept(this);
+        subscriptExpression.getSubscriptIndex()
+                           .accept(this);
         rhsValue.accept(this);
 
         mv.visitInvokeDynamicInsn("#ann_index",
                 genericMethodType(3).toMethodDescriptorString(),
                 SUBSCRIPT_HANDLE);
+    }
+
+    private void visitSliceSetter(SliceExpression sliceExpression, ExpressionStatement<?> rhsValue) {
+        sliceExpression.getSlicedOn()
+                       .accept(this);
+        sliceExpression.getBeginIndex()
+                       .accept(this);
+        sliceExpression.getEndIndex()
+                       .accept(this);
+        rhsValue.accept(this);
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(4).toMethodDescriptorString(),
+                SLICE_HANDLE);
     }
 
     @Override

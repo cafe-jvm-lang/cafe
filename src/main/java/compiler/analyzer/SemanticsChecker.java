@@ -308,7 +308,7 @@ public class SemanticsChecker implements Node.Visitor {
         Node.Tag tag;
         if (exprType == Expr.LHS) {
             tag = n.prop.getTag();
-            if (tag != Node.Tag.IDEN && tag != Node.Tag.SUBSCRIPT) {
+            if (tag != Node.Tag.IDEN && tag != Node.Tag.SUBSCRIPT && tag != Node.Tag.SLICE) {
                 logError(LHS_EXPR_ERROR, n,
                         message(LHS_EXPR_ERROR, ""));
                 return;
