@@ -29,17 +29,17 @@
 
 package compiler.ir;
 
-public class SubscriptStatement extends ExpressionStatement<SubscriptStatement> {
+public class SubscriptExpression extends ExpressionStatement<SubscriptExpression> {
     private ExpressionStatement<?> subscriptOf;
     private ExpressionStatement<?> subscriptIndex;
 
-    public SubscriptStatement(ExpressionStatement<?> subscriptOf, ExpressionStatement<?> subscriptIndex) {
+    public SubscriptExpression(ExpressionStatement<?> subscriptOf, ExpressionStatement<?> subscriptIndex) {
         this.subscriptOf = subscriptOf;
         this.subscriptIndex = subscriptIndex;
     }
 
-    public static SubscriptStatement create(Object subscriptOf, Object index) {
-        return new SubscriptStatement(
+    public static SubscriptExpression create(Object subscriptOf, Object index) {
+        return new SubscriptExpression(
                 ExpressionStatement.of(subscriptOf),
                 ExpressionStatement.of(index)
         );
@@ -54,7 +54,7 @@ public class SubscriptStatement extends ExpressionStatement<SubscriptStatement> 
     }
 
     @Override
-    protected SubscriptStatement self() {
+    protected SubscriptExpression self() {
         return this;
     }
 

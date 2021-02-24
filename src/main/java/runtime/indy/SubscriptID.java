@@ -38,13 +38,19 @@ import static java.lang.invoke.MethodType.methodType;
 public final class SubscriptID {
     private static final MethodHandle FALLBACK;
 
+    static final class ObjectNotSubscriptable extends RuntimeException {
+        public ObjectNotSubscriptable(String type) {
+            super("Object " + type + " cannot be subscripted ");
+        }
+    }
+
     static {
         try {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             FALLBACK = lookup.findStatic(
                     SubscriptID.class,
                     "fallback",
-                    methodType(java.lang.Object.class, MethodCallSite.class, java.lang.Object[].class));
+                    methodType(java.lang.Object.class, MethodCallSite.class, Object[].class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new Error("Could not bootstrap the required method handles", e);
         }
@@ -71,19 +77,34 @@ public final class SubscriptID {
         return callSite;
     }
 
-    public static Object fallback(MethodCallSite callSite, java.lang.Object[] args) throws Throwable {
+    /**
+     * @param callSite
+     * @param args     max 3 arguments: <ol> <li> Object to be subscripted. </li>
+     *                 <li> index </li>
+     *                 <li> value to be set at that index (optional) </li>
+     *                 </ol>
+     * @return
+     * @throws Throwable
+     */
+    public static Object fallback(MethodCallSite callSite, Object[] args) throws Throwable {
+        int argsCount = args.length;
         if (args[0] instanceof Subscriptable) {
             Subscriptable obj = (Subscriptable) args[0];
-            if (callSite.type()
-                        .parameterCount() == 2) {
+            if (argsCount == 2) {
                 return obj.getSubscript(args[1]);
             } else {
                 obj.setSubscript(args[1], args[2]);
             }
             return null;
+        } else if (args[0] instanceof String) {
+            String s = (String) args[0];
+            if (argsCount == 2) {
+                return s.charAt((Integer) args[1]);
+            }
         }
 
-        throw new IllegalAccessException("Type " + args[0].getClass() + " is not subscriptable");
+        throw new ObjectNotSubscriptable(args[0].getClass()
+                                                .toString());
 
     }
 }
