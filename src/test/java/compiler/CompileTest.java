@@ -27,21 +27,31 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package library.base;
+package compiler;
 
-import library.DList;
-import library.DObject;
+import compiler.main.CafeCompiler;
+import compiler.main.CompilerResult;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import testing.Utils;
 
-public class CListProto {
-    public static void add(DObject object, Object value) {
-        ((DList) object).add(value);
+import java.io.File;
+import java.util.Iterator;
+
+import static org.testng.Assert.assertTrue;
+
+public class CompileTest {
+    public static final String SRC = "src/test/resources/compile/";
+
+    @DataProvider(name = "cafe-files")
+    public static Iterator<Object[]> data() {
+        return Utils.cafeFilesIn(SRC);
     }
 
-    public static void remove(DObject object, Object value) {
-        ((DList) object).remove(value);
-    }
-
-    public static void removeAt(DObject object, Object value) {
-        ((DList) object).removeAt((Integer) value);
+    @Test(dataProvider = "cafe-files")
+    public void compile(File cafeFile) {
+        CafeCompiler compiler = new CafeCompiler(cafeFile.getAbsolutePath());
+        CompilerResult result = compiler.compile();
+        assertTrue(result.isOk());
     }
 }

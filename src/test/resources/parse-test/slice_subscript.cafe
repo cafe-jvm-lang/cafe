@@ -1,0 +1,7 @@
+var x = {a:10};
+var l = [1,[2,3],"string", x];
+cmd.println(x[z]);
+# var r = l[a:b()];
+var r1 = l[0:4];
+var r = l[2:b()];
+l[0:1] = r;

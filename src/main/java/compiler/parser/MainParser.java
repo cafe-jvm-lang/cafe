@@ -509,16 +509,14 @@ public class MainParser extends Parser {
                         if (error)
                             return null;
                         accept(TokenKind.LSQU);
-                        if (token.kind == TokenKind.IDENTIFIER)
-                            exp1 = parseIdentifier();
-                        else
-                            exp1 = parseNumberLiteral();
+                        // if (token.kind == TokenKind.IDENTIFIER)
+                        //     exp1 = parseIdentifier();
+                        // else
+                        //     exp1 = parseNumberLiteral();
+                        exp1 = parseAtomExpression();
                         if (token.kind == TokenKind.COLON) {
                             accept(TokenKind.COLON);
-                            if (token.kind == TokenKind.IDENTIFIER)
-                                exp2 = parseIdentifier();
-                            else
-                                exp2 = parseNumberLiteral();
+                            exp2 = parseAtomExpression();
                             accept(TokenKind.RSQU);
                             node = new SliceNode(oExp, exp1, exp2);
                         } else {

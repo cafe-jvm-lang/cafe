@@ -29,10 +29,12 @@
 
 package library;
 
+import runtime.DObjectCreator;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DList extends DObject {
+public class DList extends DObject implements Subscriptable, Slicable {
     private List<Object> list;
 
     public DList(DObject __proto__) {
@@ -54,5 +56,52 @@ public class DList extends DObject {
 
     public Object get(int index) {
         return list.get(index);
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    @Override
+    public Object getSubscript(Object key) {
+        return get((Integer) key);
+    }
+
+    @Override
+    public void setSubscript(Object key, Object value) {
+        list.set((Integer) key, value);
+    }
+
+    @Override
+    public List<Object> slice(int s, int e) {
+        return new ArrayList<>(list.subList(s, e));
+    }
+
+    @Override
+    public void setSlice(int s, int e, Object value) {
+        DList o = DObjectCreator.createList();
+        if (value instanceof DList)
+            o = (DList) value;
+        else
+            o.add(value);
+        int i, j, size = o.size();
+        for (i = s, j = 0; i < e && j < size; i++, j++) {
+            list.set(i, o.get(j));
+        }
+        while (j < o.size()) {
+            list.add(o.get(j++));
+        }
+
+        while (i < e) {
+            list.remove(i);
+            e--;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "DList{" +
+                "list=" + list +
+                '}';
     }
 }

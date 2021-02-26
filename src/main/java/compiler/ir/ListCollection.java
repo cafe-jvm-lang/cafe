@@ -27,21 +27,50 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package library.base;
+package compiler.ir;
 
-import library.DList;
-import library.DObject;
+import java.util.LinkedList;
+import java.util.List;
 
-public class CListProto {
-    public static void add(DObject object, Object value) {
-        ((DList) object).add(value);
+public class ListCollection extends ExpressionStatement<ListCollection> {
+    private List<ExpressionStatement<?>> items = new LinkedList<>();
+    private int index = -1;
+
+    private ListCollection() {
     }
 
-    public static void remove(DObject object, Object value) {
-        ((DList) object).remove(value);
+    public static ListCollection list() {
+        return new ListCollection();
     }
 
-    public static void removeAt(DObject object, Object value) {
-        ((DList) object).removeAt((Integer) value);
+    public void add(ExpressionStatement<?> expr) {
+        items.add(expr);
+    }
+
+    public List<ExpressionStatement<?>> getItems() {
+        return items;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public int index() {
+        return index;
+    }
+
+    @Override
+    public List<CafeElement<?>> children() {
+        return new LinkedList<>(items);
+    }
+
+    @Override
+    protected ListCollection self() {
+        return this;
+    }
+
+    @Override
+    public void accept(CafeIrVisitor visitor) {
+        visitor.visitListCollection(this);
     }
 }

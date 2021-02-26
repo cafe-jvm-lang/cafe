@@ -66,6 +66,9 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     private static final String JFUNC = "library/DFunc";
 
+    private static final String DLIST = "library/DList";
+    private static final String LLIST = "Llibrary/DList;";
+
     private static final Class<?> DOBJECT_CLASS = DObject.class;
     private static final Class<?> DFUNC_CLASS = DFunc.class;
 
@@ -88,6 +91,14 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
 
     private static final Handle OBJECT_ACCESS_HANDLE = makeHandle(
             "ObjectAccessID", ""
+    );
+
+    private static final Handle SUBSCRIPT_HANDLE = makeHandle(
+            "SubscriptID", ""
+    );
+
+    private static final Handle SLICE_HANDLE = makeHandle(
+            "SliceID", ""
     );
 
     private static final Handle OPERATOR_HANDLE = makeHandle(
@@ -418,8 +429,28 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     }
 
     @Override
-    public void visitSubscript(SubscriptStatement subscriptStatement) {
+    public void visitSubscript(SubscriptExpression subscriptExpression) {
+        subscriptExpression.getSubscriptOf()
+                           .accept(this);
+        subscriptExpression.getSubscriptIndex()
+                           .accept(this);
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(2).toMethodDescriptorString(),
+                SUBSCRIPT_HANDLE);
+    }
 
+    @Override
+    public void visitSlice(SliceExpression sliceExpression) {
+        sliceExpression.getSlicedOn()
+                       .accept(this);
+        sliceExpression.getBeginIndex()
+                       .accept(this);
+        sliceExpression.getEndIndex()
+                       .accept(this);
+
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(3).toMethodDescriptorString(),
+                SLICE_HANDLE);
     }
 
     @Override
@@ -653,30 +684,55 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
         }
 
         ObjectAccessStatement node;
-        if (lhs instanceof ObjectAccessStatement)
-            node = (ObjectAccessStatement) lhs;
-        else throw new AssertionError("Unknown LHS expression");
-
-        node.getAccessedOn()
-            .accept(this);
-
         ExpressionStatement<?> rhs = assignmentStatement.getRhsExpression();
-        rhs.accept(this);
-        visitLHSObjectProperty(node.getProperty());
-
+        if (lhs instanceof ObjectAccessStatement) {
+            node = (ObjectAccessStatement) lhs;
+            node.getAccessedOn()
+                .accept(this);
+            if (node.getProperty() instanceof PropertyAccess)
+                visitLHSObjectProperty((PropertyAccess) node.getProperty(), rhs);
+            else if (node.getProperty() instanceof SliceExpression)
+                visitSliceSetter((SliceExpression) node.getProperty(), rhs);
+            else
+                visitSubscriptSetter((SubscriptExpression) node.getProperty(), rhs);
+        } else if (lhs instanceof SubscriptExpression) {
+            visitSubscriptSetter((SubscriptExpression) lhs, rhs);
+        } else if (lhs instanceof SliceExpression) {
+            visitSliceSetter((SliceExpression) lhs, rhs);
+        } else throw new AssertionError("Unknown LHS expression");
     }
 
-    private void visitLHSObjectProperty(ExpressionStatement<?> expressionStatement) {
-        if (expressionStatement instanceof PropertyAccess) {
-            mv.visitInvokeDynamicInsn(((PropertyAccess) expressionStatement).getName(),
-                    genericMethodType(2).toMethodDescriptorString(),
-                    OBJECT_ACCESS_HANDLE
-            );
-        } else if (expressionStatement instanceof SubscriptStatement) {
+    private void visitLHSObjectProperty(PropertyAccess propertyAccess, ExpressionStatement<?> rhs) {
+        rhs.accept(this);
+        mv.visitInvokeDynamicInsn(propertyAccess.getName(),
+                genericMethodType(2).toMethodDescriptorString(),
+                OBJECT_ACCESS_HANDLE
+        );
+    }
 
-        } else {
-            // TODO: error
-        }
+    private void visitSubscriptSetter(SubscriptExpression subscriptExpression, ExpressionStatement<?> rhsValue) {
+        subscriptExpression.getSubscriptOf()
+                           .accept(this);
+        subscriptExpression.getSubscriptIndex()
+                           .accept(this);
+        rhsValue.accept(this);
+
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(3).toMethodDescriptorString(),
+                SUBSCRIPT_HANDLE);
+    }
+
+    private void visitSliceSetter(SliceExpression sliceExpression, ExpressionStatement<?> rhsValue) {
+        sliceExpression.getSlicedOn()
+                       .accept(this);
+        sliceExpression.getBeginIndex()
+                       .accept(this);
+        sliceExpression.getEndIndex()
+                       .accept(this);
+        rhsValue.accept(this);
+        mv.visitInvokeDynamicInsn("#ann_index",
+                genericMethodType(4).toMethodDescriptorString(),
+                SLICE_HANDLE);
     }
 
     @Override
@@ -965,5 +1021,30 @@ public class JVMByteCodeGenVisitor implements CafeIrVisitor {
     @Override
     public void visitNull(NullStatement aNull) {
         mv.visitInsn(ACONST_NULL);
+    }
+
+    @Override
+    public void visitListCollection(ListCollection listCollection) {
+        int index = listCollection.index();
+
+        // create DList instance
+        visitDListCreator();
+
+        // store list
+        mv.visitVarInsn(ASTORE, index);
+
+        // insert items into list
+        for (ExpressionStatement<?> expr : listCollection.getItems()) {
+            mv.visitVarInsn(ALOAD, index);
+            expr.accept(this);
+            mv.visitMethodInsn(INVOKEVIRTUAL, DLIST, "add", "(Ljava/lang/Object;)V", false);
+        }
+
+        // load final list
+        mv.visitVarInsn(ALOAD, index);
+    }
+
+    private void visitDListCreator() {
+        mv.visitMethodInsn(INVOKESTATIC, DOBJECT_CREATOR, "createList", "()" + LLIST, false);
     }
 }

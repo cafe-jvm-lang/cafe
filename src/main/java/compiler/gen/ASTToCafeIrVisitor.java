@@ -375,7 +375,16 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitListColl(Node.ListCollNode n) {
+        Context context = Context.context;
+        ListCollection list = ListCollection.list();
 
+        for (Node.ExprNode expr : n.val) {
+            expr.accept(this);
+            ExpressionStatement<?> statement = (ExpressionStatement<?>) context.pop();
+            list.add(statement);
+        }
+
+        context.push(list);
     }
 
     @Override
@@ -460,7 +469,7 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
         Context context = Context.context;
         n.index.accept(this);
         n.subscriptOf.accept(this);
-        context.push(SubscriptStatement.create(context.pop(), context.pop()));
+        context.push(SubscriptExpression.create(context.pop(), context.pop()));
     }
 
     @Override
@@ -477,7 +486,15 @@ public class ASTToCafeIrVisitor implements Node.Visitor {
 
     @Override
     public void visitSlice(Node.SliceNode n) {
+        Context context = Context.context;
 
+        n.end.accept(this);
+        n.start.accept(this);
+        n.slicedOn.accept(this);
+
+        context.push(SliceExpression.slice(context.pop())
+                                    .beginsAt(context.pop())
+                                    .endsAt(context.pop()));
     }
 
     @Override

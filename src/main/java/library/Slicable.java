@@ -27,31 +27,12 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package compiler.ir;
+package library;
 
-public class SubscriptStatement extends ExpressionStatement<SubscriptStatement> {
-    private ExpressionStatement<?> subscriptOf;
-    private ExpressionStatement<?> index;
+import java.util.List;
 
-    public SubscriptStatement(ExpressionStatement<?> subscriptOf, ExpressionStatement<?> index) {
-        this.subscriptOf = subscriptOf;
-        this.index = index;
-    }
+public interface Slicable {
+    List<Object> slice(int s, int e);
 
-    public static SubscriptStatement create(Object subscriptOf, Object index) {
-        return new SubscriptStatement(
-                ExpressionStatement.of(subscriptOf),
-                ExpressionStatement.of(index)
-        );
-    }
-
-    @Override
-    protected SubscriptStatement self() {
-        return this;
-    }
-
-    @Override
-    public void accept(CafeIrVisitor visitor) {
-        visitor.visitSubscript(this);
-    }
+    void setSlice(int s, int e, Object value);
 }

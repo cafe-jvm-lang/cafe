@@ -31,6 +31,7 @@ package runtime;
 
 import library.DObject;
 import library.base.CFunc;
+import library.base.CList;
 import library.base.CObject;
 import library.io.BasicIO;
 import runtime.imports.JavaModulePath;
@@ -49,12 +50,14 @@ public final class JavaImports {
         DEFAULT_IMPORTS = new HashMap<String, DObject>() {{
             put("Object", generateFrom(CObject.class));
             put("Function", generateFrom(CFunc.class));
+            put("List", generateFrom(CList.class));
             put("cmd", generateFrom(BasicIO.class));
         }};
 
         DEFAULT_MODULE_PATHS = new HashMap<JavaModulePath, String>() {{
             put(new JavaModulePath("library.base.CObject", CObject.class), "Object");
             put(new JavaModulePath("library.base.CFunc", CFunc.class), "Function");
+            put(new JavaModulePath("library.base.CList", CList.class), "List");
             put(new JavaModulePath("library.io.BasicIO", BasicIO.class), "cmd");
         }};
     }

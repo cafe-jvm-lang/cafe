@@ -33,8 +33,8 @@ import compiler.ir.*;
 
 public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
     @Override
-    public void visitSubscript(SubscriptStatement subscriptStatement) {
-        subscriptStatement.walk(this);
+    public void visitSubscript(SubscriptExpression subscriptExpression) {
+        subscriptExpression.walk(this);
     }
 
     @Override
@@ -164,6 +164,16 @@ public abstract class AbstractCafeIrVisitor implements CafeIrVisitor {
 
     @Override
     public void visitClosure(CafeClosure cafeClosure) {
+
+    }
+
+    @Override
+    public void visitListCollection(ListCollection listCollection) {
+
+    }
+
+    @Override
+    public void visitSlice(SliceExpression sliceExpression) {
 
     }
 }

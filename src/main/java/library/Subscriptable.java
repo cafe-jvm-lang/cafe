@@ -27,21 +27,10 @@
  * along with Cafe.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package library.base;
+package library;
 
-import library.DList;
-import library.DObject;
+public interface Subscriptable {
+    Object getSubscript(Object key);
 
-public class CListProto {
-    public static void add(DObject object, Object value) {
-        ((DList) object).add(value);
-    }
-
-    public static void remove(DObject object, Object value) {
-        ((DList) object).remove(value);
-    }
-
-    public static void removeAt(DObject object, Object value) {
-        ((DList) object).removeAt((Integer) value);
-    }
+    void setSubscript(Object key, Object value);
 }

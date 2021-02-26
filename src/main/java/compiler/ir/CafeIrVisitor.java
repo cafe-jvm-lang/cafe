@@ -60,7 +60,7 @@ public interface CafeIrVisitor {
 
     void visitNull(NullStatement aNull);
 
-    void visitSubscript(SubscriptStatement subscriptStatement);
+    void visitSubscript(SubscriptExpression subscriptExpression);
 
     void visitPropertyAccess(PropertyAccess propertyAccess);
 
@@ -83,4 +83,8 @@ public interface CafeIrVisitor {
     void visitClosure(CafeClosure cafeClosure);
 
     void visitAnonymousFunction(AnonymousFunction anonymousFunction);
+
+    void visitListCollection(ListCollection listCollection);
+
+    void visitSlice(SliceExpression sliceExpression);
 }
