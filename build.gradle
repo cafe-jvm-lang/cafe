@@ -115,3 +115,33 @@ application {
     // Define the main class for the application.
     mainClassName = 'compiler.Main'
 }
+
+tasks.register("exe"){
+    dependsOn tasks.installDist
+    doLast {
+        def innoSetupDir = new File("${buildDir}/innosetup")
+        delete innoSetupDir
+        innoSetupDir.mkdir();
+
+        copy{
+            from("${projectDir}/LICENSE", "${projectDir}/README.md")
+            rename("LICENSE","LICENSE.txt")
+            rename("README.md", "README.txt")
+            into(innoSetupDir)
+        }
+
+        copy {
+            from("${rootProject.projectDir}/gradle/innosetup/cafe_exe_compiler.iss")
+            expand([
+                    applicationVersion: "${project.version}",
+            ])
+            from("${rootProject.projectDir}/gradle/innosetup/logo.ico")
+            into(innoSetupDir)
+        }
+
+        exec {
+            workingDir rootProject.projectDir
+            commandLine "iscc ${innoSetupDir}/cafe_exe_compiler.iss".split()
+        }
+    }
+}
