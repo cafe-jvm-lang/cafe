@@ -53,24 +53,24 @@ jobs:
           cp build/innosetup/*.exe cafe.exe
 
       - name: Attach build distribution from this build
-      uses: actions/upload-artifact@v2
-      with:
-        name: Cafe distribution from this build
-        path: |
-          ./cafe-distribution.zip
-          ./cafe.exe
+        uses: actions/upload-artifact@v2
+        with:
+          name: Cafe distribution from this build
+          path: |
+            ./cafe-distribution.zip
+            ./cafe.exe
 
-    - name: Create a release
-      id: create_release
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+      - name: Create a release
+        id: create_release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
       - name: Attach build distribution to the release
         if: startsWith(github.ref, 'refs/tags/')
