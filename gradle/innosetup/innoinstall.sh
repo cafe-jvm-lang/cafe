@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 rm -rf /tmp/inno
 mkdir /tmp/inno
