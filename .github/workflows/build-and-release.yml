@@ -35,12 +35,11 @@ jobs:
 
       - name: Inno Setup
         run: |
-          sudo add-apt-repository --yes ppa:arx/release
           sudo apt-get update -d
           sudo apt-get install -y -q innoextract wine-stable
           wine --version
           innoextract --version
-          ./gradle/innosetup/innoinstall.sh
+          sudo ./gradle/innosetup/innoinstall.sh
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
           iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
 
