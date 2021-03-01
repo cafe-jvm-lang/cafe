@@ -41,10 +41,8 @@ jobs:
           innoextract --version
           chmod +x ./gradle/innosetup/innoinstall.sh
           ./gradle/innosetup/innoinstall.sh
-          pwd
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
-          iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
-          echo "HEREe"
+          iscc
 
       - name: Build with Gradle
         run: ./gradlew build exe
