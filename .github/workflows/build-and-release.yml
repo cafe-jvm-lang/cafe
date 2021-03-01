@@ -35,14 +35,16 @@ jobs:
 
       - name: Inno Setup
         run: |
+          set -x
           sudo apt-get install -y -q innoextract wine-stable
           wine --version
           innoextract --version
           chmod +x ./gradle/innosetup/innoinstall.sh
           ./gradle/innosetup/innoinstall.sh
-          echo "HEREE"
+          pwd
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
           iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
+          echo "HEREe"
 
       - name: Build with Gradle
         run: ./gradlew build exe
