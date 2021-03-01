@@ -42,7 +42,7 @@ jobs:
           chmod +x ./gradle/innosetup/innoinstall.sh
           ./gradle/innosetup/innoinstall.sh
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
-          sudo iscc
+          sudo gradle/innosetup/iscc
 
       - name: Build with Gradle
         run: ./gradlew build exe
