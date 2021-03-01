@@ -141,7 +141,7 @@ tasks.register("exe"){
 
         exec {
             workingDir rootProject.projectDir
-            commandLine "iscc ${innoSetupDir}/cafe_exe_compiler.iss".split()
+            commandLine "sudo iscc ${innoSetupDir}/cafe_exe_compiler.iss".split()
         }
     }
 }
