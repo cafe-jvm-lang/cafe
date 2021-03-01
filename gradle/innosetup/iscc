@@ -3,4 +3,4 @@ set -x
 unset DISPLAY
 scriptname=$1
 [ -f "$scriptname" ] && scriptname=$(winepath -w "$scriptname")
-sudo wine "C:\inno\ISCC.exe" "$scriptname" "/q"
+wine "C:\inno\ISCC.exe" "$scriptname" "/q"
