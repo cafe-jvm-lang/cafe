@@ -46,7 +46,7 @@ jobs:
           chmod +x gradle/innosetup/iscc
           gradle/innosetup/iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
           echo "HEREEEE1"
-          sudo echo "export PATH="$PATH:/gradle/innosetup/iscc" >> ~/.bash_profile
+          sudo echo "export PATH=\"\$PATH:/gradle/innosetup/iscc\"" >> ~/.bash_profile
           echo "HEREEEE2"
           source ~/.bash_profile
 
