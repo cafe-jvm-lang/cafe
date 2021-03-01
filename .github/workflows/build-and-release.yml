@@ -42,8 +42,10 @@ jobs:
           chmod +x ./gradle/innosetup/innoinstall.sh
           ./gradle/innosetup/innoinstall.sh
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
-          sudo ./gradle/innosetup/iscc
+          chmod +x gradle/innosetup/iscc
+          sudo gradle/innosetup/iscc
           echo "export PATH="$PATH:/gradle/innosetup/iscc" >> ~/.bash_profile
+          source ~/.bash_profile
 
       - name: Build with Gradle
         run: ./gradlew build exe
