@@ -51,7 +51,7 @@ jobs:
           source ~/.bash_profile
 
       - name: Build with Gradle
-        run: ./gradlew build exe
+        run: ./gradlew build exe --stacktrace
 
       - name: Copy build distribution
         run: |
