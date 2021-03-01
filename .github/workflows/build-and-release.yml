@@ -40,6 +40,7 @@ jobs:
           innoextract --version
           chmod +x ./gradle/innosetup/innoinstall.sh
           ./gradle/innosetup/innoinstall.sh
+          echo "HEREE"
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
           iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
 
