@@ -44,14 +44,13 @@ jobs:
           ./gradle/innosetup/innoinstall.sh
           sudo cp gradle/innosetup/iscc /usr/local/bin/iscc
           chmod +x gradle/innosetup/iscc
-          gradle/innosetup/iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
-          echo "HEREEEE1"
           sudo echo "export PATH=\"\$PATH:/gradle/innosetup/iscc\"" >> ~/.bash_profile
-          echo "HEREEEE2"
-          source ~/.bash_profile
+          iscc /? 2> /dev/null | grep "Inno Setup Preprocessor"
 
       - name: Build with Gradle
-        run: sudo ./gradlew build exe --stacktrace
+        run: |
+          source ~/.bash_profile
+          ./gradlew build exe --stacktrace
 
       - name: Copy build distribution
         run: |
