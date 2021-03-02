@@ -20,4 +20,5 @@ l.add("last element");
 l.remove(z);
 l.removeAt(0);
 cmd.println(l);
+cmd.println("Size: "+l.size());
 
