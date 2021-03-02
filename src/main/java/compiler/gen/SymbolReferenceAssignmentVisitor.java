@@ -113,6 +113,15 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
     }
 
     @Override
+    public void visitMethodInvocation(MethodInvocation methodInvocation) {
+        methodInvocation.getInvokedUpon()
+                        .accept(this);
+        for (CafeElement<?> arg : methodInvocation.getArguments()) {
+            arg.accept(this);
+        }
+    }
+
+    @Override
     public void visitBlock(Block block) {
         ReferenceTable table = block.getReferenceTable();
         tableStack.push(table);
