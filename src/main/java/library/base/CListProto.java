@@ -37,11 +37,19 @@ public class CListProto {
         ((DList) object).add(value);
     }
 
+    public static Object get(DObject object, Object index) {
+        return ((DList) object).get((Integer) index);
+    }
+
     public static void remove(DObject object, Object value) {
         ((DList) object).remove(value);
     }
 
     public static void removeAt(DObject object, Object value) {
         ((DList) object).removeAt((Integer) value);
+    }
+
+    public static int size(DObject object) {
+        return ((DList) object).size();
     }
 }
