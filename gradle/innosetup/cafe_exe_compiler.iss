@@ -33,7 +33,7 @@ SourceDir=..\\install\\cafe
 OutputDir=..\\..\\innosetup
 OutputBaseFilename=cafe-${applicationVersion}
 
-SetupIconFile=..\\..\\innosetup\\logo.ico
+; SetupIconFile=..\\..\\innosetup\\logo.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
