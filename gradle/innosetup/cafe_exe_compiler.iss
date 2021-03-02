@@ -18,7 +18,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright (C) 2021 Cafe Authors
 
-DefaultDirName={commonpf}\\cafe
+DefaultDirName={pf}\\cafe
 DisableDirPage=yes
 DefaultGroupName=Cafe
 DisableProgramGroupPage=yes
@@ -50,8 +50,8 @@ Name: modifypath; Description: Add Cafe to PATH environment variable (recommende
 
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"; \
-    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{commonpf}\\cafe\\bin"; \
-    Check: ModifyPathKeyCheck(ExpandConstant('{commonpf}\\cafe\\bin'));
+    ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{pf}\\cafe\\bin"; \
+    Check: ModifyPathKeyCheck(ExpandConstant('{pf}\\cafe\\bin'));
 
 [Code]
 var ModifyPathKey: Boolean;
