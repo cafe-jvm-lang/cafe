@@ -126,8 +126,8 @@ public class SymbolReferenceAssignmentVisitor extends AbstractCafeIrVisitor {
         if (forLoopStatement.getInitStatements() != null) {
             for (AssignedStatement init : forLoopStatement.getInitStatements())
                 init.accept(this);
-            forLoopStatement.getBlock()
-                            .accept(this);
         }
+        forLoopStatement.getBlock()
+                        .accept(this);
     }
 }
