@@ -29,10 +29,8 @@
 
 package library;
 
-import java.util.List;
-
 public interface Slicable {
-    List<Object> slice(int s, int e);
+    DList slice(int s, int e);
 
     void setSlice(int s, int e, Object value);
 }
