@@ -1,0 +1,50 @@
+const merge = func(a,b){
+    const c = [];
+
+    for(;a.size()> 0 and b.size() > 0;){
+        var obj;
+
+        if(a.get(0) > b.get(0)){
+            obj = b.get(0);
+            b.removeAt(0);
+        }else{
+            obj = a.get(0);
+            a.removeAt(0);
+        }
+        c.add(obj);
+    }
+
+    for(;a.size()>0;){
+        c.add(a.get(0));
+        a.removeAt(0);
+    }
+
+    for(;b.size()>0;){
+        c.add(b.get(0));
+        b.removeAt(0);
+    }
+
+    return c;
+},
+merge_sort = func(a){
+    if (a.size() < 2){
+        return a;
+    }
+
+    const middle = floor(a.size()/2);
+    const a_l = a[0:middle];
+    const a_r = a[middle:a.size()];
+    const sorted_l = merge_sort(a_l);
+    const sorted_r = merge_sort(a_r);
+    return merge(sorted_l, sorted_r);
+};
+
+func floor(a){
+    const dec = a % 1;
+    if(dec < 0.5){ a =  a-dec; }
+    else{ a = a + (1-dec); }
+
+    return a;
+}
+
+cmd.println(merge_sort([5,4,3,2,1]));
