@@ -29,7 +29,6 @@
 
 package compiler.ir;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -69,10 +68,10 @@ public class MethodInvocation extends ExpressionStatement<MethodInvocation> {
         return invokedUpon;
     }
 
-    @Override
-    public List<CafeElement<?>> children() {
-        return Collections.singletonList(invokedUpon);
-    }
+//    @Override
+//    public List<CafeElement<?>> children() {
+//        return Collections.singletonList(invokedUpon);
+//    }
 
     @Override
     protected MethodInvocation self() {
