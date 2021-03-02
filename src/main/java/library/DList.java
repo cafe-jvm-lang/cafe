@@ -32,14 +32,18 @@ package library;
 import runtime.DObjectCreator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class DList extends DObject implements Subscriptable, Slicable {
-    private List<Object> list;
+    private ArrayList<Object> list;
 
     public DList(DObject __proto__) {
         super(__proto__);
         list = new ArrayList<>();
+    }
+
+    public DList(DObject __proto__, ArrayList<Object> list) {
+        super(__proto__);
+        this.list = list;
     }
 
     public void add(Object object) {
@@ -73,8 +77,8 @@ public class DList extends DObject implements Subscriptable, Slicable {
     }
 
     @Override
-    public List<Object> slice(int s, int e) {
-        return new ArrayList<>(list.subList(s, e));
+    public DList slice(int s, int e) {
+        return DObjectCreator.createList(new ArrayList<>(list.subList(s, e)));
     }
 
     @Override
@@ -100,8 +104,6 @@ public class DList extends DObject implements Subscriptable, Slicable {
 
     @Override
     public String toString() {
-        return "DList{" +
-                "list=" + list +
-                '}';
+        return list.toString();
     }
 }

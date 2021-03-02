@@ -41,6 +41,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +80,10 @@ public class DObjectCreator {
 
     public static DList createList() {
         return new DList(LIST_PROTO);
+    }
+
+    public static DList createList(ArrayList<Object> list) {
+        return new DList(LIST_PROTO, list);
     }
 
     public static DObject generateFrom(Class<?> clazz) {
