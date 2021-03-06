@@ -45,7 +45,7 @@ public class CompilerResult {
 
     private CompilerResult(String moduleName, File sourceFile) {
         this.moduleName = moduleName;
-        this.sourceFile = sourceFile;
+        this.sourceFile = sourceFile.getAbsoluteFile();
         sourceFolder = sourceFile.getParent() + File.separator;
     }
 
