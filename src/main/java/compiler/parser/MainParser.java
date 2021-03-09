@@ -1965,10 +1965,12 @@ public class MainParser extends Parser {
             switch (token.kind) {
                 case IMPORT:
                     ImportStmtNode importStmtNode = parseImportStatement();
+                    if (importStmtNode == null) return null;
                     tree.add(importStmtNode);
                     break;
                 case EXPORT:
                     List<ExportStmtNode> exports = parseExportStatement();
+                    if(exports == null) return null;
                     tree.addAll(exports);
                     break;
                 default:
