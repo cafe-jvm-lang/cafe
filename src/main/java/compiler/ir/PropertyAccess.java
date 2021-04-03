@@ -29,8 +29,16 @@
 
 package compiler.ir;
 
+import compiler.parser.Tokens;
+import compiler.util.Position;
+
 public class PropertyAccess extends ExpressionStatement<PropertyAccess> {
     private String name;
+    private Tokens.Token firstToken;
+
+    public void setFirstToken(Tokens.Token firstToken) {
+        this.firstToken = firstToken;
+    }
 
     private PropertyAccess(String name) {
         this.name = name;

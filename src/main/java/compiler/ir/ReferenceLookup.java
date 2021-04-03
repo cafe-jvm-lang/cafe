@@ -29,10 +29,17 @@
 
 package compiler.ir;
 
+import compiler.parser.Tokens;
+import compiler.util.Position;
+
 public class ReferenceLookup extends ExpressionStatement<ReferenceLookup> {
 
     private final String name;
+    private Tokens.Token firstToken;
 
+    public void setFirstToken(Tokens.Token firstToken) {
+        this.firstToken = firstToken;
+    }
     public ReferenceLookup(String name) {
         this.name = name;
     }
