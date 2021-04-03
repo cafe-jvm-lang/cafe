@@ -38,6 +38,7 @@ import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
 import compiler.util.Position;
+import jdk.nashorn.internal.ir.Assignment;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -1129,56 +1130,62 @@ public class ParseIR extends Parser {
          * Not used
          */
         if (error) return null;
-
-        ExpressionStatement exp1 = parseIdentifier();
-        accept(TokenKind.DOT);
-        ExpressionStatement exp2 = parseIdentifier();
-        exp1 = new ObjectAccessNode(exp1, exp2);
-        debug.add("Obj Access Parse Assign: " + exp1);
-        while (token.kind == TokenKind.DOT) {
-            if (error)
-                return null;
-            accept(TokenKind.DOT);
-            exp2 = parseIdentifier();
-            exp1 = new ObjectAccessNode(exp1, exp2);
-        }
-        accept(TokenKind.EQU);
-        ExprNode exp = parseValue();
-        accept(TokenKind.SEMICOLON);
-        if (error) return null;
-        return new AsgnStmtNode(exp1, exp);
+//
+//        ExpressionStatement exp1 = parseIdentifier();
+//        accept(TokenKind.DOT);
+//        ExpressionStatement exp2 = parseIdentifier();
+//        exp1 = new ObjectAccessNode(exp1, exp2);
+//        debug.add("Obj Access Parse Assign: " + exp1);
+//        while (token.kind == TokenKind.DOT) {
+//            if (error)
+//                return null;
+//            accept(TokenKind.DOT);
+//            exp2 = parseIdentifier();
+//            exp1 = new ObjectAccessNode(exp1, exp2);
+//        }
+//        accept(TokenKind.EQU);
+//        ExprNode exp = parseValue();
+//        accept(TokenKind.SEMICOLON);
+//        if (error) return null;
+//        return new AsgnStmtNode(exp1, exp);
     }
 
     /* Parse Loops */
-    List<StmtNode> parseForInit() {
+    List<AssignedStatement> parseForInit() {
         /*
          *
          *
          */
         if (error) return null;
-        List<StmtNode> init = null;
-        ExprNode iden, val;
+        List<AssignedStatement> init = null;
+        ExpressionStatement iden, val;
+        Context ctx = Context.context;
         if (token.kind == TokenKind.SEMICOLON)
             return init;
-        init = new ArrayList<>();
+        init = new LinkedList<>();
         while (token.kind == TokenKind.VAR || token.kind == TokenKind.IDENTIFIER) {
             if (error)
                 return null;
             if (token.kind == TokenKind.VAR) {
                 accept(TokenKind.VAR);
                 iden = parseIdentifier();
+                SymbolReference sym = ctx.createSymbolReference(iden.getName(), Node.Tag.VARDECL);
                 accept(TokenKind.EQU);
                 val = parseValue();
+                DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, val);
                 if (token.kind == TokenKind.COMMA)
                     nextToken();
-                init.add(new VarDeclNode((IdenNode) iden, val));
+                init.add(stmt);
             } else {
+                // this else is not needed but keeping just for reference..
                 iden = parseIdentifier();
+                SymbolReference sym = ctx.createSymbolReference(iden.getName(), Node.Tag.VARDECL);
                 accept(TokenKind.EQU);
                 val = parseValue();
+                DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, val);
                 if (token.kind == TokenKind.COMMA)
                     nextToken();
-                init.add(new AsgnStmtNode(iden, val));
+                init.add(stmt);
             }
         }
         if (error) return null;
@@ -1186,12 +1193,12 @@ public class ParseIR extends Parser {
         return init;
     }
 
-    ExprNode parseForCondition() {
+    ExpressionStatement parseForCondition() {
         /*
          * parseLogOrEcpression()
          */
         if (error) return null;
-        ExprNode cond = null;
+        ExpressionStatement cond = null;
         if (token.kind == TokenKind.SEMICOLON)
             return cond;
         cond = parseLogicalOrExpression();
@@ -1199,14 +1206,14 @@ public class ParseIR extends Parser {
         return cond;
     }
 
-    List<AssignmentStatement> parseForIncrement() {
+    List<CafeStatement<?>> parseForIncrement() {
         /*
          *
          * parseAssignmentStatement()
          */
         if (error) return null;
         ExpressionStatement iden, val, exp2;
-        List<AssignmentStatement> incrNodes = null;
+        List<CafeStatement<?>> incrNodes = null;
         if (token.kind == TokenKind.RPAREN) {
             if (error) return null;
             return incrNodes;
@@ -1242,17 +1249,20 @@ public class ParseIR extends Parser {
         return incrNodes;
     }
 
-    StmtNode parseForStatement() {
+    CafeStatement parseForStatement() {
         /*
          * accept(FOR) accept(LPAREN) if (SEMI ) parseForCondition() accept(SEMI)
          * parseForIncr() else parseForInit() accept(SEMI) parseForCondition()
          * accept(SEMI) parseForIncr()
          */
         if (error) return null;
-        List<StmtNode> init = null;
-        ExprNode cond = null;
-        List<AsgnStmtNode> incrNode = null;
-        BlockNode block = null;
+        Context context = Context.context;
+        ForLoopStatement forLoop = ForLoopStatement.loop();
+        context.forLoopStack.push(forLoop);
+        List<AssignedStatement> init = null;
+        ExpressionStatement cond = null;
+        List<CafeStatement<?>> incrNode = null;
+        Block block = null;
         accept(TokenKind.FOR);
         accept(TokenKind.LPAREN);
         init = parseForInit();
@@ -1265,19 +1275,24 @@ public class ParseIR extends Parser {
         block = parseLoopBlock();
         accept(TokenKind.RCURLY);
         if (error) return null;
-        return new ForStmtNode(init, cond, incrNode, block);
+        forLoop.condition(cond)
+                .init(init)
+                .postStatement(incrNode)
+                .block(block);
+        context.forLoopStack.pop();
+        return forLoop;
     }
 
-    StmtNode parseLoopStatement() {
+    CafeStatement parseLoopStatement() {
         /*
          * accept(LOOP) parseLoopIdentifier() accept(IN) parseLoopValue()
          * parseLoopBlock() parseCollectionComprehension()
          *
          */
         if (error) return null;
-        IdenNode iden1, iden2 = null;
-        ExprNode exp = null;
-        BlockNode block = null;
+        ExpressionStatement iden1, iden2 = null;
+        ExpressionStatement exp = null;
+        Block block = null;
 
         accept(TokenKind.LOOP);
         iden1 = parseIdentifier();
@@ -1302,15 +1317,18 @@ public class ParseIR extends Parser {
         block = parseLoopBlock();
         accept(TokenKind.RCURLY);
         if (error) return null;
-        return new LoopStmtNode(iden1, iden2, exp, block);
+        //TODO: Implementation of LoopStmt IR node is yet to be done.
+//        return new LoopStmtNode(iden1, iden2, exp, block);
+        return null;
     }
 
-    StmtNode parseFlowStatement() {
+    CafeStatement parseFlowStatement() {
         /*
          * if(CONTINUE) return ContinueNode if(BREAK) return BreakNode
          */
         if (error) return null;
         Token tk = token;
+        Context context = Context.context;
         if (breakAllowed)
             if (token.kind == TokenKind.CONTINUE) {
                 if (error) return null;
@@ -1318,14 +1336,16 @@ public class ParseIR extends Parser {
                 accept(TokenKind.SEMICOLON);
                 ContinueStmtNode continueStmtNode = new ContinueStmtNode();
                 continueStmtNode.setFirstToken(tk);
-                return continueStmtNode;
+                return BreakContinueStatement.newContinue()
+                        .setEnclosingLoop(context.forLoopStack.peek());
             } else {
                 if (error) return null;
                 accept(TokenKind.BREAK);
                 accept(TokenKind.SEMICOLON);
-                BreakStmtNode breakStmtNode = new BreakStmtNode();
-                breakStmtNode.setFirstToken(tk);
-                return breakStmtNode;
+//                BreakStmtNode breakStmtNode = new BreakStmtNode();
+//                breakStmtNode.setFirstToken(tk);
+                return BreakContinueStatement.newBreak()
+                        .setEnclosingLoop(context.forLoopStack.peek());
             }
         else {
             error = true;
@@ -1336,7 +1356,7 @@ public class ParseIR extends Parser {
     /* Parse Loop Done */
 
     /* Parse Collection */
-    ExprNode parseList() {
+    ExpressionStatement parseList() {
         /*
          * List of Values
          *
@@ -1347,14 +1367,16 @@ public class ParseIR extends Parser {
          * return List
          */
         if (error) return null;
-        List<ExprNode> listNode = new ArrayList<>();
-        ExprNode exp1, exp2;
+//        List<ExpressionStatement> listNode = new ArrayList<>();
+        ListCollection listNode = ListCollection.list();
+        ExpressionStatement exp1, exp2;
         exp1 = parseValue();
         if (token.kind == TokenKind.RANGE) {
-            accept(TokenKind.RANGE);
-            exp2 = parseValue();
-            accept(TokenKind.RSQU);
-            return new RangeNode(exp1, exp2, RangeNode.Type.LIST);
+            // TODO: to implement IR node implementation for RANGE
+            // accept(TokenKind.RANGE);
+            // exp2 = parseValue();
+            // accept(TokenKind.RSQU);
+            // return new RangeNode(exp1, exp2, RangeNode.Type.LIST);
         }
         listNode.add(exp1);
         while (token.kind != TokenKind.RSQU) {
@@ -1366,10 +1388,10 @@ public class ParseIR extends Parser {
         }
         accept(TokenKind.RSQU);
         if (error) return null;
-        return new ListCollNode(listNode);
+        return listNode;
     }
 
-    ExprNode parseListCollection() {
+    ExpressionStatement parseListCollection() {
         /*
          * List of Collection
          *
@@ -1384,10 +1406,12 @@ public class ParseIR extends Parser {
         if (token.kind == TokenKind.RSQU) {
             accept(TokenKind.RSQU);
             if (error) return null;
-            return new ListCollNode();
+            return ListCollection.list();
         } else if (token.kind == TokenKind.LOOP) {
             if (error) return null;
-            return parseComprehension("list");        // Accept Identifier Before
+            // TODO: implement IR node for Comprehension node
+            // return parseComprehension("list");        // Accept Identifier Before
+            return null;
         } else {
             if (error) return null;
             return parseList();
@@ -1406,7 +1430,7 @@ public class ParseIR extends Parser {
 
     }
 
-    ExprNode parseMapCollection() {
+    ExpressionStatement parseMapCollection() {
         /*
          * List of MapCollection List of Comp
          *
@@ -1416,93 +1440,95 @@ public class ParseIR extends Parser {
          * Comp.add(parseForComprehension())
          *
          */
-        if (error) return null;
-        Map<ExprNode, ExprNode> pairs = new LinkedHashMap<>();
-        nextToken();
-        accept(TokenKind.LSQU);
-        debug.add("Map Collection : " + token.kind);
-        while (token.kind != TokenKind.RSQU) {
-            if (error)
-                return null;
-            ExprNode exp2 = new MapCollNode(), exp1 = new MapCollNode();
-            if (token.kind == TokenKind.COMMA)
-                nextToken();
-            accept(TokenKind.LSQU);
-            if (token.kind == TokenKind.RSQU) {
-                pairs.put(exp1, exp2);
-                accept(TokenKind.RSQU);
-                accept(TokenKind.COMMA);
-                continue;
-            } else if (token.kind == TokenKind.LOOP) {
-                return parseComprehension("map");        // Accept Identifier Before
-            } else {
-                exp1 = parseValue();
-                accept(TokenKind.COMMA);
-                exp2 = parseValue();
-                accept(TokenKind.RSQU);
-            }
-
-            pairs.put(exp1, exp2);
-        }
-        accept(TokenKind.RSQU);
-        if (error) return null;
-        return new MapCollNode(pairs);
+        // TODO: to implement Map IR node
+//        if (error) return null;
+//        Map<ExprNode, ExprNode> pairs = new LinkedHashMap<>();
+//        nextToken();
+//        accept(TokenKind.LSQU);
+//        debug.add("Map Collection : " + token.kind);
+//        while (token.kind != TokenKind.RSQU) {
+//            if (error)
+//                return null;
+//            ExprNode exp2 = new MapCollNode(), exp1 = new MapCollNode();
+//            if (token.kind == TokenKind.COMMA)
+//                nextToken();
+//            accept(TokenKind.LSQU);
+//            if (token.kind == TokenKind.RSQU) {
+//                pairs.put(exp1, exp2);
+//                accept(TokenKind.RSQU);
+//                accept(TokenKind.COMMA);
+//                continue;
+//            } else if (token.kind == TokenKind.LOOP) {
+//                return parseComprehension("map");        // Accept Identifier Before
+//            } else {
+//                exp1 = parseValue();
+//                accept(TokenKind.COMMA);
+//                exp2 = parseValue();
+//                accept(TokenKind.RSQU);
+//            }
+//
+//            pairs.put(exp1, exp2);
+//        }
+//        accept(TokenKind.RSQU);
+//        if (error) return null;
+//        return new MapCollNode(pairs);
     }
 
-    CompTypeNode parseComprehension(String type) {
-        if (error) return null;
-        IdenNode iden1, iden2 = null;
-        ExprNode exp = null;
-        BlockNode block = null;
-        ExprNode ifCond;
-
-        CompTypeNode mapComp = type == "map" ? new MapCompNode()
-                : type == "list" ? new ListCompNode()
-                : type == "set" ? new SetCompNode() : type == "link" ? new LinkCompNode() : null;
-
-        while (token.kind != TokenKind.RSQU) {
-            if (error)
-                return null;
-            switch (token.kind) {
-                case LOOP:
-                    accept(TokenKind.LOOP);
-                    iden1 = parseIdentifier();
-                    if (token.kind == TokenKind.COMMA) {
-                        nextToken();
-                        iden2 = parseIdentifier();
-                    }
-                    accept(TokenKind.IN);
-                    exp = parseCollection();
-                    if (exp == null) {
-                        if (token.kind == TokenKind.LCURLY)
-                            exp = parseObjectCreation();
-                        else
-                            try {
-                                exp = parseAtomExpression();
-                            } catch (ParseException e) {
-                            }
-                    }
-                    mapComp.addExpr(new CompLoopNode(iden1, iden2, exp));
-                    break;
-                case IF:
-                    accept(TokenKind.IF);
-                    accept(TokenKind.LPAREN);
-                    ifCond = parseLogicalOrExpression();
-                    accept(TokenKind.RPAREN);
-                    debug.add("Comprehension: " + token.kind);
-                    mapComp.addExpr(new CompIfNode(ifCond));
-                    break;
-                default:
-                    error = true;
-                    accept(TokenKind.IDENTIFIER);
-            }
-        }
-        accept(TokenKind.RSQU);
-        if (error) return null;
-        return mapComp;
+    ExpressionStatement parseComprehension(String type) {
+//        if (error) return null;
+//        IdenNode iden1, iden2 = null;
+//        ExprNode exp = null;
+//        BlockNode block = null;
+//        ExprNode ifCond;
+//
+//        CompTypeNode mapComp = type == "map" ? new MapCompNode()
+//                : type == "list" ? new ListCompNode()
+//                : type == "set" ? new SetCompNode() : type == "link" ? new LinkCompNode() : null;
+//
+//        while (token.kind != TokenKind.RSQU) {
+//            if (error)
+//                return null;
+//            switch (token.kind) {
+//                case LOOP:
+//                    accept(TokenKind.LOOP);
+//                    iden1 = parseIdentifier();
+//                    if (token.kind == TokenKind.COMMA) {
+//                        nextToken();
+//                        iden2 = parseIdentifier();
+//                    }
+//                    accept(TokenKind.IN);
+//                    exp = parseCollection();
+//                    if (exp == null) {
+//                        if (token.kind == TokenKind.LCURLY)
+//                            exp = parseObjectCreation();
+//                        else
+//                            try {
+//                                exp = parseAtomExpression();
+//                            } catch (ParseException e) {
+//                            }
+//                    }
+//                    mapComp.addExpr(new CompLoopNode(iden1, iden2, exp));
+//                    break;
+//                case IF:
+//                    accept(TokenKind.IF);
+//                    accept(TokenKind.LPAREN);
+//                    ifCond = parseLogicalOrExpression();
+//                    accept(TokenKind.RPAREN);
+//                    debug.add("Comprehension: " + token.kind);
+//                    mapComp.addExpr(new CompIfNode(ifCond));
+//                    break;
+//                default:
+//                    error = true;
+//                    accept(TokenKind.IDENTIFIER);
+//            }
+//        }
+//        accept(TokenKind.RSQU);
+//        if (error) return null;
+//        return mapComp;
+        return  null;
     }
 
-    ExprNode parseSet() {
+    ExpressionStatement parseSet() {
         /*
          * List of Values
          *
@@ -1512,30 +1538,31 @@ public class ParseIR extends Parser {
          *
          * return List
          */
-        if (error) return null;
-        List<ExprNode> setNode = new ArrayList<>();
-        ExprNode exp1, exp2;
-        exp1 = parseValue();
-        if (token.kind == TokenKind.RANGE) {
-            accept(TokenKind.RANGE);
-            exp2 = parseValue();
-            accept(TokenKind.RSQU);
-            return new RangeNode(exp1, exp2, RangeNode.Type.SET);
-        }
-        setNode.add(exp1);
-        while (token.kind != TokenKind.RSQU) {
-            if (error)
-                return null;
-            accept(TokenKind.COMMA);
-            if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
-            setNode.add(parseValue());
-        }
-        accept(TokenKind.RSQU);
-        if (error) return null;
-        return new SetCollNode(setNode);
+        // Not used
+//        if (error) return null;
+//        List<ExprNode> setNode = new ArrayList<>();
+//        ExprNode exp1, exp2;
+//        exp1 = parseValue();
+//        if (token.kind == TokenKind.RANGE) {
+//            accept(TokenKind.RANGE);
+//            exp2 = parseValue();
+//            accept(TokenKind.RSQU);
+//            return new RangeNode(exp1, exp2, RangeNode.Type.SET);
+//        }
+//        setNode.add(exp1);
+//        while (token.kind != TokenKind.RSQU) {
+//            if (error)
+//                return null;
+//            accept(TokenKind.COMMA);
+//            if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
+//            setNode.add(parseValue());
+//        }
+//        accept(TokenKind.RSQU);
+//        if (error) return null;
+//        return new SetCollNode(setNode);
     }
 
-    ExprNode parseSetCollection() {
+    ExpressionStatement parseSetCollection() {
         /*
          * List of Collection
          *
@@ -1545,20 +1572,22 @@ public class ParseIR extends Parser {
          *
          *
          */
-        if (error) return null;
-        nextToken();
-        accept(TokenKind.LSQU);
-        if (token.kind == TokenKind.RSQU) {
-            accept(TokenKind.RSQU);
-            if (error) return null;
-            return new SetCollNode();
-        } else if (token.kind == TokenKind.LOOP) {
-            if (error) return null;
-            return parseComprehension("set");    // Accept Identifier Before
-        } else {
-            if (error) return null;
-            return parseSet();
-        }
+        // TODO: to implement SET IR node
+//        if (error) return null;
+//        nextToken();
+//        accept(TokenKind.LSQU);
+//        if (token.kind == TokenKind.RSQU) {
+//            accept(TokenKind.RSQU);
+//            if (error) return null;
+//            return new SetCollNode();
+//        } else if (token.kind == TokenKind.LOOP) {
+//            if (error) return null;
+//            return parseComprehension("set");    // Accept Identifier Before
+//        } else {
+//            if (error) return null;
+//            return parseSet();
+//        }
+        return null;
     }
 
     ExprNode parseLink() {
@@ -1571,30 +1600,31 @@ public class ParseIR extends Parser {
          *
          * return List
          */
-        if (error) return null;
-        List<ExprNode> listNode = new ArrayList<>();
-        ExprNode exp1, exp2;
-        exp1 = parseValue();
-        if (token.kind == TokenKind.RANGE) {
-            accept(TokenKind.RANGE);
-            exp2 = parseValue();
-            accept(TokenKind.RSQU);
-            return new RangeNode(exp1, exp2, RangeNode.Type.LINK);
-        }
-        listNode.add(exp1);
-        while (token.kind != TokenKind.RSQU) {
-            if (error)
-                return null;
-            accept(TokenKind.COMMA);
-            if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
-            listNode.add(parseValue());
-        }
-        accept(TokenKind.RSQU);
-        if (error) return null;
-        return new LinkCollNode(listNode);
+        // not Used
+//        if (error) return null;
+//        List<ExprNode> listNode = new ArrayList<>();
+//        ExprNode exp1, exp2;
+//        exp1 = parseValue();
+//        if (token.kind == TokenKind.RANGE) {
+//            accept(TokenKind.RANGE);
+//            exp2 = parseValue();
+//            accept(TokenKind.RSQU);
+//            return new RangeNode(exp1, exp2, RangeNode.Type.LINK);
+//        }
+//        listNode.add(exp1);
+//        while (token.kind != TokenKind.RSQU) {
+//            if (error)
+//                return null;
+//            accept(TokenKind.COMMA);
+//            if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
+//            listNode.add(parseValue());
+//        }
+//        accept(TokenKind.RSQU);
+//        if (error) return null;
+//        return new LinkCollNode(listNode);
     }
 
-    ExprNode parseLinkCollection() {
+    ExpressionStatement parseLinkCollection() {
         /*
          * List of Collection
          *
@@ -1604,23 +1634,26 @@ public class ParseIR extends Parser {
          *
          *
          */
-        if (error) return null;
-        nextToken();
-        accept(TokenKind.LSQU);
-        if (token.kind == TokenKind.RSQU) {
-            accept(TokenKind.RSQU);
-            if (error) return null;
-            return new LinkCollNode();
-        } else if (token.kind == TokenKind.LOOP) {
-            if (error) return null;
-            return parseComprehension("link");        // Accept Identifier Before
-        } else {
-            if (error) return null;
-            return parseLink();
-        }
+        // TODO: to implement LINK IR node
+//        if (error) return null;
+//        nextToken();
+//        accept(TokenKind.LSQU);
+//        if (token.kind == TokenKind.RSQU) {
+//            accept(TokenKind.RSQU);
+//            if (error) return null;
+//            return new LinkCollNode();
+//        } else if (token.kind == TokenKind.LOOP) {
+//            if (error) return null;
+//            return parseComprehension("link");        // Accept Identifier Before
+//        } else {
+//            if (error) return null;
+//            return parseLink();
+//        }
+
+        return null;
     }
 
-    ExprNode parseCollection() {
+    ExpressionStatement parseCollection() {
         /*
          * List of Collection
          *
@@ -1630,7 +1663,7 @@ public class ParseIR extends Parser {
          * return List
          */
         if (error) return null;
-        ExprNode collExpr = null;
+        ExpressionStatement collExpr = null;
 
         switch (token.kind) {
             case LSQU:
@@ -1798,8 +1831,9 @@ public class ParseIR extends Parser {
             if (error)
                 return null;
             Token tk = token;
-            IdenNode idenNode = parseIdentifier();
-            ExprNode exp = null;
+            ExpressionStatement iden = parseIdentifier();
+            ExpressionStatement exp = null;
+            Context ctx = Context.context;
             if (error)
                 return null;
             if (token.kind == TokenKind.EQU) {
@@ -1810,17 +1844,19 @@ public class ParseIR extends Parser {
                 accept(TokenKind.COMMA);
             }
             debug.add("Var Decl: " + exp);
-            VarDeclNode varDecl = new VarDeclNode(idenNode, exp);
-            varDecl.setFirstToken(tk);
-            varDeclNodes.add(varDecl);
+            SymbolReference sym = ctx.createSymbolReference(iden.getName(), Node.Tag.VARDECL);
+            DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, exp);
+            varDeclNodes.add(stmt);
+//            VarDeclNode varDecl = new VarDeclNode(idenNode, exp);
+//            varDecl.setFirstToken(tk);
+//            varDeclNodes.add(varDecl);
         }
         accept(TokenKind.SEMICOLON);
         if (error) return null;
         return varDeclNodes;
-
     }
 
-    List<ConstDeclNode> parseConstVariable() {
+    List<DeclarativeAssignmentStatement> parseConstVariable() {
         /*
          * List Variables checks grammar for variable Declaration
          *
@@ -1830,20 +1866,23 @@ public class ParseIR extends Parser {
          * return List
          */
         if (error) return null;
-        List<ConstDeclNode> constDeclNodes = new ArrayList<>();
+        List<DeclarativeAssignmentStatement> constDeclNodes = new ArrayList<>();
         accept(TokenKind.CONST);
+        Context ctx = Context.context;
         while (token.kind != TokenKind.SEMICOLON) {
             if (error)
                 return null;
             Token tk = token;
-            IdenNode idenNode = parseIdentifier();
+            ExpressionStatement iden = parseIdentifier();
             accept(TokenKind.EQU);
-            ExprNode exp = parseValue();
+            ExpressionStatement exp = parseValue();
             if (token.kind != TokenKind.SEMICOLON)
                 accept(TokenKind.COMMA);
-            ConstDeclNode constDecl = new ConstDeclNode(idenNode, exp);
-            constDecl.setFirstToken(tk);
-            constDeclNodes.add(constDecl);
+            SymbolReference sym = ctx.createSymbolReference(iden.getName(), Tag.CONSTDECL);
+            DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, exp);
+//            ConstDeclNode constDecl = new ConstDeclNode(idenNo, exp);
+//            constDecl.setFirstToken(tk);
+            constDeclNodes.add(stmt);
         }
         accept(TokenKind.SEMICOLON);
         if (error) return null;
@@ -1863,7 +1902,7 @@ public class ParseIR extends Parser {
          */
         if (error) return null;
         boolean varArg = false;
-        List<IdenNode> idenNodes = new ArrayList<>();
+        List<ExpressionStatement> idenNodes = new ArrayList<>();
 
         while (token.kind != TokenKind.RPAREN) {
             if (error)
@@ -1959,27 +1998,28 @@ public class ParseIR extends Parser {
 
     }
 
-    StmtNode parseReturnStatement() {
+    CafeStatement<ReturnStatement> parseReturnStatement() {
         if (error) return null;
         accept(TokenKind.RET);
         Token tk = token;
-        ExprNode exp = parseValue();
+        ExpressionStatement exp = parseValue();
         debug.add("Return : " + exp);
         accept(TokenKind.SEMICOLON);
         if (error) return null;
-
-        ReturnStmtNode rtrnNode = new ReturnStmtNode(exp);
-        rtrnNode.setFirstToken(tk);
-        return rtrnNode;
+        ReturnStatement returnStatement = ReturnStatement.of(exp);
+//        rtrnNode.setFirstToken(tk);
+        return returnStatement;
     }
 
-    BlockNode parseLoopBlock() {
+    Block parseLoopBlock() {
         /*
          * parseBlockStatement() parseFlowStatement()
          */
         if (error) return null;
-        List<StmtNode> blockStats = new ArrayList<>();
-        BlockNode blockNode = new BlockNode();
+        List<CafeStatement> blockStats = new ArrayList<>();
+
+        Context context = Context.context;
+        Block block = context.enterScope();
         while (token.kind != TokenKind.RCURLY) {
             if (error)
                 return null;
@@ -1989,32 +2029,34 @@ public class ParseIR extends Parser {
                     blockStats.add(parseFlowStatement());
                     break;
                 default:
-                    List<StmtNode> stm = parseBlock();
+                    List<CafeStatement<?>> stm = parseBlock();
                     if (stm == null) return null;
                     blockStats.addAll(stm);
+                    for (CafeStatement<?> stmt: blockStats){
+                        block.add(stmt);
+                    }
             }
         }
         if (error) return null;
-        blockNode.setStmt(blockStats);
-        return blockNode;
+        return block;
     }
 
     // return Block Statement Node
-    List<StmtNode> parseBlock() {
+    List<CafeStatement<?>> parseBlock() {
         /*
          * List of block Statements calls parseBlockStatement
          */
         if (error) return null;
-        List<StmtNode> blockStmt = new ArrayList<>();
+        List<CafeStatement<?>> blockStmt = new ArrayList<>();
         debug.add("Token kind " + token.kind);
         switch (token.kind) {
             case VAR:
-                List<VarDeclNode> stm = parseVariable();
+                List<DeclarativeAssignmentStatement> stm = parseVariable();
                 if (stm == null) return null;
                 blockStmt.addAll(stm);
                 break;
             case CONST:
-                List<ConstDeclNode> stm1 = parseConstVariable();
+                List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
                 if (stm1 == null) return null;
                 blockStmt.addAll(stm1);
                 break;
@@ -2031,26 +2073,26 @@ public class ParseIR extends Parser {
             case FOR:
                 innerLoop = breakAllowed ? true : false;
                 breakAllowed = true;
-                StmtNode stm3 = parseForStatement();
+                CafeStatement stm3 = parseForStatement();
                 if (stm3 == null) return null;
                 blockStmt.add(stm3);
                 breakAllowed = innerLoop ? true : false;
                 innerLoop = false;
                 break;
             case LOOP:
-                StmtNode stm4 = parseLoopStatement();
+                CafeStatement stm4 = parseLoopStatement();
                 if (stm4 == null) return null;
                 blockStmt.add(stm4);
                 break;
             case RET:
-                StmtNode stm5 = parseReturnStatement();
+                CafeStatement<ReturnStatement> stm5 = parseReturnStatement();
                 if (stm5 == null) return null;
                 blockStmt.add(stm5);
                 break;
             case IDENTIFIER:
             case THIS:
             case NULL:
-                StmtNode stm6 = parseExprStmt();
+                CafeStatement stm6 = parseExprStmt();
                 if (stm6 == null) return null;
                 blockStmt.add(stm6);
                 debug.add("Block Stmt: " + token.kind);
@@ -2058,7 +2100,7 @@ public class ParseIR extends Parser {
                 break;
             case BREAK:
             case CONTINUE:
-                StmtNode stm7 = parseFlowStatement();
+                CafeStatement stm7 = parseFlowStatement();
                 blockStmt.add(stm7);
                 debug.add("Block Stmt: " + token.kind);
                 break;
@@ -2089,7 +2131,7 @@ public class ParseIR extends Parser {
                 break;
 
             case VAR:
-                List<VarDeclNode> stm = parseVariable();
+                List<DeclarativeAssignmentStatement> stm = parseVariable();
                 if (stm == null) return null;
                 for (VarDeclNode var : stm) {
                     exportStmtNode.add(new ExportStmtNode(var.getIden(), var));
@@ -2188,7 +2230,7 @@ public class ParseIR extends Parser {
 
         nextToken();
         debug.add("Stmt Node Token: " + token.kind);
-        List<StmtNode> tree = new ArrayList<>();
+        List<CafeStatement<?>> tree = new ArrayList<>();
         while (token.kind != TokenKind.END) {
             if (error)
                 return null;
@@ -2204,7 +2246,7 @@ public class ParseIR extends Parser {
                     tree.addAll(exports);
                     break;
                 default:
-                    List<StmtNode> stmt = parseBlock();
+                    List<CafeStatement<?>> stmt = parseBlock();
                     if (stmt == null) return null;
                     tree.addAll(stmt);
                     break;
