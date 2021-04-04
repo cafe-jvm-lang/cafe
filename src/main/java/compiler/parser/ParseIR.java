@@ -43,6 +43,7 @@ import jdk.nashorn.internal.ir.Assignment;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
+import java.util.concurrent.locks.Condition;
 
 import static compiler.util.Log.Type.*;
 import static compiler.util.Messages.message;
@@ -52,12 +53,19 @@ public class ParseIR extends Parser {
         ParserFactory.registerParser(ParserType.MAINPARSER, new ParseIR());
     }
 
+    public CafeModule parseToIR(String moduleName) {
+        ParseIR.Context.context.createModule(moduleName);
+        ParseIR.Context.context.newObjectStack();
+        parseStatements();
+        return ParseIR.Context.context.module;
+    }
+
     private static final class Context {
         final static ParseIR.Context context = new ParseIR.Context();
 
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
-        private final Deque<Node.FuncNode> functionStack = new LinkedList<>();
+        private final Deque<String> functionStack = new LinkedList<>();
         private final Deque<Deque<Object>> objectStack = new LinkedList<>();
         private final Deque<ForLoopStatement> forLoopStack = new LinkedList<>();
         private final AnnFuncNameGenerator annFuncNameGenerator = new AnnFuncNameGenerator();
@@ -102,7 +110,7 @@ public class ParseIR extends Parser {
             referenceTableStack.pop();
         }
 
-        public void enterFunc(Node.FuncNode n) {
+        public void enterFunc(String n) {
             isModuleScope = false;
             functionStack.push(n);
             annFuncNameGenerator.enter();
@@ -200,12 +208,7 @@ public class ParseIR extends Parser {
         }
     }
 
-    public CafeModule parseToIR(String moduleName) {
-        ParseIR.Context.context.createModule(moduleName);
-        ParseIR.Context.context.newObjectStack();
-        parse();
-        return ParseIR.Context.context.module;
-    }
+
 
 
     private Lexer lexer;
@@ -701,12 +704,25 @@ public class ParseIR extends Parser {
             switch (token.kind) {
                 case LPAREN:
                     accept(TokenKind.LPAREN);
-                    node = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
+                    Context context = Context.context;
+
+//                    // eg: a.b()
+//                    // b is a property of a, thus method invocation node is created.
+                    if (context.isProperty()) {
+//                        n.invokedOn.accept(this);
+                        node = MethodInvocation.create(oExp, (List) parseArgList());
+                    }
+                    else {
+                        // eg: a()
+                        // a() is normal function call, thus function invocation node is created.
+                        node = FunctionInvocation.create(oExp, (List) parseArgList());
+                    }
+//                    node = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
                     accept(TokenKind.RPAREN);
                     break;
 
                 case LSQU:
-                    ExprNode exp1, exp2;
+                    ExpressionStatement exp1, exp2;
                     debug.add("Atom Expr: " + token.kind);
                     while (token.kind == TokenKind.LSQU) {
                         if (error)
@@ -721,10 +737,14 @@ public class ParseIR extends Parser {
                             accept(TokenKind.COLON);
                             exp2 = parseAtomExpression();
                             accept(TokenKind.RSQU);
-                            node = new SliceNode(oExp, exp1, exp2);
+                            node = SliceExpression.slice(oExp)
+                                    .beginsAt(exp1)
+                                    .endsAt(exp2);
+//                            node = new SliceNode(oExp, exp1, exp2);
                         } else {
                             accept(TokenKind.RSQU);
-                            node = new SubscriptNode(oExp, exp1);
+                            node = SubscriptExpression.create(oExp, exp1);
+//                            node = new SubscriptNode(oExp, exp1);
                             oExp = node;
                         }
 
@@ -734,8 +754,8 @@ public class ParseIR extends Parser {
                     ExpressionStatement e1;
                     debug.add("Atom DOT:" + oExp);
                     accept(TokenKind.DOT);
-                    Context context = Context.context;
-                    context.enterProperty();
+                    Context context1 = Context.context;
+                    context1.enterProperty();
                     e1 = parseIdentifier();
                     if (error)
                         return null;
@@ -743,7 +763,7 @@ public class ParseIR extends Parser {
                     while (token.kind != TokenKind.DOT && (token.kind == TokenKind.LSQU || token.kind == TokenKind.LPAREN)) {
                         trail = parseTrailer(trail);
                     }
-                    context.leaveProperty();
+                    context1.leaveProperty();
                     if (trail == null)
                         node = ObjectAccessStatement.create(oExp, e1);
                     else
@@ -999,12 +1019,12 @@ public class ParseIR extends Parser {
          */
     }
 
-    List<ExprNode> parseArgList() {
+    List<ExpressionStatement> parseArgList() {
         /*
          * parseArg() while(COMMA) parseArg()
          */
         if (error) return null;
-        List<ExprNode> args = new ArrayList<>();
+        List<ExpressionStatement> args = new ArrayList<>();
         while (token.kind != TokenKind.RPAREN) {
             if (error)
                 return null;
@@ -1040,10 +1060,10 @@ public class ParseIR extends Parser {
     }
 
     /* parseStatements */
-    IfStmtNode parseIf() {
+    ConditionalBranching parseIf() {
         if (error) return null;
-        ExprNode ifCond = null;
-        BlockNode ifBlock = new BlockNode();
+        ExpressionStatement ifCond = null;
+        Block ifBlock = null;
 
         Token firstToken = token;
 
@@ -1065,12 +1085,17 @@ public class ParseIR extends Parser {
 
         if (error) return null;
 
-        IfStmtNode ifNode = new IfStmtNode(ifCond, ifBlock);
-        ifNode.setFirstToken(firstToken);
-        return ifNode;
+        ConditionalBranching conditionalBranching = ConditionalBranching
+                .branch()
+                .condition(ifCond)
+                .whenTrue(ifBlock);
+
+//        IfStmtNode ifNode = new IfStmtNode(ifCond, ifBlock);
+//        ifNode.setFirstToken(firstToken);
+        return conditionalBranching;
     }
 
-    StmtNode parseIfStatement() {
+    CafeStatement<ConditionalBranching> parseIfStatement() {
         /*
          * Parse If Statement and check if there any 'else' is there, if 'yes' then
          * parseIt and Break otherwise parse Else if statement and append to a list
@@ -1078,26 +1103,24 @@ public class ParseIR extends Parser {
 
         if (error) return null;
 
-        IfStmtNode ifNode;
+        ConditionalBranching ifNode;
         if ((ifNode = parseIf()) != null) {
-            StmtNode elseBlock = null;
+            CafeStatement<ConditionalBranching> elseBlock = null;
             if (token.kind == TokenKind.ELSE) {
                 Token elseFT = token;
                 nextToken();
                 if (token.kind == TokenKind.IF) {
                     elseBlock = parseIfStatement();
                 } else if (accept(TokenKind.LCURLY)) {
-                    BlockNode blockNode = new BlockNode();
-                    List<StmtNode> stmt = new LinkedList<>();
+                    Block blockNode = null;
                     while(token.kind != TokenKind.RCURLY)
-                        stmt.addAll(parseBlock());
-                    blockNode.setStmt(stmt);
+                        blockNode = parseBlock();
                     accept(TokenKind.RCURLY);
-                    elseBlock = new ElseStmtNode(ifNode, blockNode);
-                    elseBlock.setFirstToken(elseFT);
+                    elseBlock = ifNode.elseBranch(blockNode);
+//                    elseBlock.setFirstToken(elseFT);
                 }
                 if (error) return null;
-                ifNode.setElsePart(elseBlock);
+                ifNode.otherwise(elseBlock);
             }
             return ifNode;
         }
@@ -1148,6 +1171,7 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.SEMICOLON);
 //        if (error) return null;
 //        return new AsgnStmtNode(exp1, exp);
+        return null;
     }
 
     /* Parse Loops */
@@ -1472,6 +1496,7 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.RSQU);
 //        if (error) return null;
 //        return new MapCollNode(pairs);
+        return null;
     }
 
     ExpressionStatement parseComprehension(String type) {
@@ -1560,6 +1585,7 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.RSQU);
 //        if (error) return null;
 //        return new SetCollNode(setNode);
+        return null;
     }
 
     ExpressionStatement parseSetCollection() {
@@ -1622,6 +1648,7 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.RSQU);
 //        if (error) return null;
 //        return new LinkCollNode(listNode);
+        return null;
     }
 
     ExpressionStatement parseLinkCollection() {
@@ -1698,7 +1725,7 @@ public class ParseIR extends Parser {
          */
 
         if (error) return null;
-        Map<String, ExprNode> object = new LinkedHashMap<>();
+        Map<String, ExpressionStatement> object = new LinkedHashMap<>();
         ExpressionStatement idenNode;
         ExpressionStatement exprNode;
 
@@ -1737,32 +1764,67 @@ public class ParseIR extends Parser {
          */
     }
 
-    ExprNode parseAnnFunction() {
+    AnonymousFunction parseAnnFunction() {
         /*
          * accept(FUNC) isAnnFunmc = true parseFunction()
          *
          */
         if (error) return null;
-        List<StmtNode> stmt = new ArrayList<>();
+        Context context = Context.context;
         accept(TokenKind.FUNC);
+        String funcName = context.getNextAnnFuncName();
+        context.enterFunc(funcName);
         accept(TokenKind.LPAREN);
-        ParameterListNode params = parseParameter();
+        List<String> params = parseParameter();
         accept(TokenKind.RPAREN);
         accept(TokenKind.LCURLY);
         debug.add("Ann Func Node: " + token.kind);
+        List<CafeStatement<?>> stmt = new ArrayList<>();
         while (token.kind != TokenKind.RCURLY) {
             if (error)
                 return null;
-            List<StmtNode> stm = parseBlock();
+            Block stm = parseBlock();
             if (stm == null) return null;
-            stmt.addAll(stm);
+            stmt.addAll(stm.getStatements());
         }
-        debug.add("Ann Func Node: " + token.kind);
         accept(TokenKind.RCURLY);
-        BlockNode block = new BlockNode(); // BlockNode(stmt);
-        block.setStmt(stmt);
+        Block block = context.enterScope();
+        for (CafeStatement<?> stm: stmt) {
+            block.add(stm);
+        }
+
+        if (!block.hasReturn())
+            block.add(ReturnStatement.of(null));
+        CafeFunction function = CafeFunction.function(funcName)
+                .block(block)
+                .withParameters(params);
+        if (context.isExport)
+            function = function.asExport();
+
+        context.addFunction(function);
+
+        ExpressionStatement<?> expression=null;
+        if (context.currentScope() == ParseIR.Context.Scope.CLOSURE) {
+            expression = function.asClosure();
+        } else {
+            expression = FunctionWrapper.wrap(function);
+        }
+        context.leaveFunc();
+//        while (token.kind != TokenKind.RCURLY) {
+//            if (error)
+//                return null;
+//            List<StmtNode> stm = parseBlock();
+//            if (stm == null) return null;
+//            stmt.addAll(stm);
+//        }
+//        debug.add("Ann Func Node: " + token.kind);
+//        accept(TokenKind.RCURLY);
+//        BlockNode block = new BlockNode(); // BlockNode(stmt);
+//        block.setStmt(stmt);
+        TargetFuncWrapper targetFuncWrapper = (TargetFuncWrapper) expression;
+        AnonymousFunction anonymousFunction = AnonymousFunction.func(targetFuncWrapper);
         if (error) return null;
-        return new AnnFuncNode(params, block);
+        return anonymousFunction;
     }
 
     ExpressionStatement parseValue() {
@@ -1890,7 +1952,7 @@ public class ParseIR extends Parser {
 
     }
 
-    ParameterListNode parseParameter() {
+    List<String> parseParameter() {
         /*
          * List of Arguments
          *
@@ -1902,30 +1964,28 @@ public class ParseIR extends Parser {
          */
         if (error) return null;
         boolean varArg = false;
-        List<ExpressionStatement> idenNodes = new ArrayList<>();
+        List<String> idenNodes = new ArrayList<>();
 
         while (token.kind != TokenKind.RPAREN) {
             if (error)
                 return null;
             debug.add("ARG List: " + token.kind);
             debug.add("ARG List: " + token.value());
-            if (error)
-                return null;
+
             if (token.kind == TokenKind.VARARGS) {
                 accept(TokenKind.VARARGS);
                 varArg = true;
-                idenNodes.add(parseIdentifier());
+                idenNodes.add(parseIdentifier().getName());
                 // accept(TokenKind.RPAREN);
                 break;
             }
-            idenNodes.add(parseIdentifier());
+            idenNodes.add(parseIdentifier().getName());
             if (TokenKind.RPAREN != token.kind)
                 accept(TokenKind.COMMA);
         }
 
         if (error) return null;
-        return new ParameterListNode(idenNodes, varArg);
-
+        return idenNodes;
     }
 
     // ExprNode parseFunctionCall(){
@@ -1933,7 +1993,7 @@ public class ParseIR extends Parser {
 
     // }
 
-    DeclNode parseFunctionDeclaration() {
+    DeclarativeAssignmentStatement parseFunctionDeclaration() {
         /*
          * List of Parameter BlockNode
          *
@@ -1943,29 +2003,55 @@ public class ParseIR extends Parser {
          * FunctionNode(name, parameter, BlockNode); returns FunctionNode
          */
         if (error) return null;
+        Context context = Context.context;
         accept(TokenKind.FUNC);
         Token tk = token;
-        ExprNode funcName = parseIdentifier();
+        ExpressionStatement funcName = parseIdentifier();
+        context.enterFunc(funcName.getName());
         accept(TokenKind.LPAREN);
-        ParameterListNode arg = parseParameter();
+        List<String> arg = parseParameter();
         accept(TokenKind.RPAREN);
         accept(TokenKind.LCURLY);
-        List<StmtNode> stmt = new ArrayList<>();
+        List<CafeStatement<?>> stmt = new ArrayList<>();
         while (token.kind != TokenKind.RCURLY) {
             if (error)
                 return null;
-            List<StmtNode> stm = parseBlock();
+            Block stm = parseBlock();
             if (stm == null) return null;
-            stmt.addAll(stm);
+            stmt.addAll(stm.getStatements());
         }
         accept(TokenKind.RCURLY);
-        BlockNode block = new BlockNode();
-        block.setStmt(stmt);
+        Block block = context.enterScope();
+        for (CafeStatement<?> stm: stmt) {
+            block.add(stm);
+        }
+
+        if (!block.hasReturn())
+            block.add(ReturnStatement.of(null));
+        CafeFunction function = CafeFunction.function(funcName.getName())
+                .block(block)
+                .withParameters(arg);
+        if (context.isExport)
+            function = function.asExport();
+
+        context.addFunction(function);
+
+        ExpressionStatement<?> expression=null;
+        if (context.currentScope() == ParseIR.Context.Scope.CLOSURE) {
+            expression = function.asClosure();
+        } else {
+            expression = FunctionWrapper.wrap(function);
+        }
+        context.leaveFunc();
+        SymbolReference ref = context.createSymbolReference(funcName.getName(), Node.Tag.VARDECL);
+        DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, expression);
+//        BlockNode block = new BlockNode();
+//        block.setStmt(stmt);
         if (error) return null;
 
-        FuncDeclNode funcDecl = new FuncDeclNode((IdenNode) funcName, arg, block);
-        funcDecl.setFirstToken(tk);
-        return funcDecl;
+//        FuncDeclNode funcDecl = new FuncDeclNode((IdenNode) funcName, arg, block);
+//        funcDecl.setFirstToken(tk);
+        return statement;
     }
 
     void parseDeclarativeStatement() {
@@ -2029,12 +2115,13 @@ public class ParseIR extends Parser {
                     blockStats.add(parseFlowStatement());
                     break;
                 default:
-                    List<CafeStatement<?>> stm = parseBlock();
-                    if (stm == null) return null;
-                    blockStats.addAll(stm);
-                    for (CafeStatement<?> stmt: blockStats){
-                        block.add(stmt);
-                    }
+                    block = parseBlock();
+//                    List<CafeStatement<?>> stm = parseBlock();
+//                    if (stm == null) return null;
+//                    blockStats.addAll(stm);
+//                    for (CafeStatement<?> stmt: blockStats){
+//                        block.add(stmt);
+//                    }
             }
         }
         if (error) return null;
@@ -2042,90 +2129,120 @@ public class ParseIR extends Parser {
     }
 
     // return Block Statement Node
-    List<CafeStatement<?>> parseBlock() {
+    Block parseBlock() {
         /*
          * List of block Statements calls parseBlockStatement
          */
         if (error) return null;
-        List<CafeStatement<?>> blockStmt = new ArrayList<>();
+
+        Context context = Context.context;
+        Block block = context.enterScope();
+
+//        for (Node.StmtNode stmt : n.block) {
+//            stmt.accept(this);
+//            CafeStatement<?> statement = (CafeStatement<?>) context.pop();
+//            block.add(statement);
+//        }
+//        context.push(block);
+
+//        List<CafeStatement<?>> blockStmt = new ArrayList<>();
         debug.add("Token kind " + token.kind);
-        switch (token.kind) {
-            case VAR:
-                List<DeclarativeAssignmentStatement> stm = parseVariable();
-                if (stm == null) return null;
-                blockStmt.addAll(stm);
-                break;
-            case CONST:
-                List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
-                if (stm1 == null) return null;
-                blockStmt.addAll(stm1);
-                break;
-            case FUNC:
-                DeclNode decl = parseFunctionDeclaration();
-                if (decl == null) return null;
-                blockStmt.add(decl);
-                break;
-            case IF:
-                StmtNode stm2 = parseIfStatement();
-                if (stm2 == null) return null;
-                blockStmt.add(stm2);
-                break;
-            case FOR:
-                innerLoop = breakAllowed ? true : false;
-                breakAllowed = true;
-                CafeStatement stm3 = parseForStatement();
-                if (stm3 == null) return null;
-                blockStmt.add(stm3);
-                breakAllowed = innerLoop ? true : false;
-                innerLoop = false;
-                break;
-            case LOOP:
-                CafeStatement stm4 = parseLoopStatement();
-                if (stm4 == null) return null;
-                blockStmt.add(stm4);
-                break;
-            case RET:
-                CafeStatement<ReturnStatement> stm5 = parseReturnStatement();
-                if (stm5 == null) return null;
-                blockStmt.add(stm5);
-                break;
-            case IDENTIFIER:
-            case THIS:
-            case NULL:
-                CafeStatement stm6 = parseExprStmt();
-                if (stm6 == null) return null;
-                blockStmt.add(stm6);
-                debug.add("Block Stmt: " + token.kind);
-                accept(TokenKind.SEMICOLON);
-                break;
-            case BREAK:
-            case CONTINUE:
-                CafeStatement stm7 = parseFlowStatement();
-                blockStmt.add(stm7);
-                debug.add("Block Stmt: " + token.kind);
-                break;
-            default:
-                logError(TokenKind.IDENTIFIER);
-        }
+
+            switch (token.kind) {
+                case VAR:
+                    List<DeclarativeAssignmentStatement> stm = parseVariable();
+                    if (stm == null) return null;
+                    for (CafeStatement<?> st : stm) {
+                        block.add(st);
+                    }
+                    break;
+                case CONST:
+                    List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
+                    if (stm1 == null) return null;
+                    for (CafeStatement<?> st : stm1) {
+                        block.add(st);
+                    }
+                    break;
+                case FUNC:
+                    DeclarativeAssignmentStatement decl = parseFunctionDeclaration();
+                    if (decl == null) return null;
+                    block.add(decl);
+                    break;
+                case IF:
+                    CafeStatement<ConditionalBranching> stm2 = parseIfStatement();
+                    if (stm2 == null) return null;
+                    block.add(stm2);
+                    break;
+                case FOR:
+                    innerLoop = breakAllowed ? true : false;
+                    breakAllowed = true;
+                    CafeStatement stm3 = parseForStatement();
+                    if (stm3 == null) return null;
+                    block.add(stm3);
+                    breakAllowed = innerLoop ? true : false;
+                    innerLoop = false;
+                    break;
+                case LOOP:
+                    CafeStatement stm4 = parseLoopStatement();
+                    if (stm4 == null) return null;
+                    block.add(stm4);
+                    break;
+                case RET:
+                    CafeStatement<ReturnStatement> stm5 = parseReturnStatement();
+                    if (stm5 == null) return null;
+                    block.add(stm5);
+                    break;
+                case IDENTIFIER:
+                case THIS:
+                case NULL:
+                    CafeStatement stm6 = parseExprStmt();
+                    if (stm6 == null) return null;
+                    block.add(stm6);
+                    debug.add("Block Stmt: " + token.kind);
+                    accept(TokenKind.SEMICOLON);
+                    break;
+                case BREAK:
+                case CONTINUE:
+                    CafeStatement stm7 = parseFlowStatement();
+                    block.add(stm7);
+                    debug.add("Block Stmt: " + token.kind);
+                    break;
+                default:
+                    logError(TokenKind.IDENTIFIER);
+            }
+        context.leaveScope();
         if (error) return null;
-        debug.add("Block Stmt: " + blockStmt);
-        return blockStmt;
+        debug.add("Block Stmt: " + block);
+        return block;
     }
 
-    List<ExportStmtNode> parseExportStatement() {
-        List<ExportStmtNode> exportStmtNode = new ArrayList<ExportStmtNode>();
+    List<CafeExport> parseExportStatement() {
+        List<CafeExport> exportStmtNode = new ArrayList<CafeExport>();
+
+        Context context = Context.context;
+        context.isExport = true;
+//        String name = n.iden.name;
+//        CafeExport export = CafeExport.export(name);
+//        context.module.addExport(export);
+//        if (n.node == null) {
+//            // Just pushing to avoid error
+//            context.push(export);
+//        } else {
+//            n.node.accept(this);
+//        }
+
 
         accept(TokenKind.EXPORT);
         switch (token.kind) {
             case IDENTIFIER:
-                IdenNode id = parseIdentifier();
+                ExpressionStatement id = parseIdentifier();
                 if (id == null) return null;
-                exportStmtNode.add(new ExportStmtNode(id, null));
+                exportStmtNode.add(CafeExport.export(id.getName()));
                 while (token.kind == TokenKind.COMMA) {
                     accept(TokenKind.COMMA);
                     id = parseIdentifier();
                     if (id == null) return null;
-                    exportStmtNode.add(new ExportStmtNode(id, null));
+                    exportStmtNode.add(CafeExport.export(id.getName()));
                 }
                 accept(TokenKind.SEMICOLON);
                 break;
@@ -2133,31 +2250,36 @@ public class ParseIR extends Parser {
             case VAR:
                 List<DeclarativeAssignmentStatement> stm = parseVariable();
                 if (stm == null) return null;
-                for (VarDeclNode var : stm) {
-                    exportStmtNode.add(new ExportStmtNode(var.getIden(), var));
+                for (DeclarativeAssignmentStatement var : stm) {
+                    exportStmtNode.add(CafeExport.export(var.getSymbolReference().getName()));
                 }
                 break;
             case CONST:
-                List<ConstDeclNode> stm1 = parseConstVariable();
+                List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
                 if (stm1 == null) return null;
-                for (ConstDeclNode var : stm1) {
-                    exportStmtNode.add(new ExportStmtNode(var.getIden(), var));
+                for (DeclarativeAssignmentStatement var : stm1) {
+                    exportStmtNode.add(CafeExport.export(var.getSymbolReference().getName()));
                 }
                 break;
             case FUNC:
-                DeclNode decl = parseFunctionDeclaration();
+                DeclarativeAssignmentStatement decl = parseFunctionDeclaration();
                 if (decl == null) return null;
-                exportStmtNode.add(new ExportStmtNode(decl.getIden(), decl));
+                exportStmtNode.add(CafeExport.export(decl.getName()));
                 break;
             default:
                 error = true;
+        }
+
+        context.isExport = false;
+        for(CafeExport expo : exportStmtNode){
+            context.module.addExport(expo);
         }
         if (error) return null;
         return exportStmtNode;
     }
 
     // return Import Statement Node
-    ImportStmtNode parseImportStatement() {
+    CafeImport parseImportStatement() {
         /* List of Imports */
 
         // accept('@');
@@ -2165,8 +2287,18 @@ public class ParseIR extends Parser {
         // if(valid) return ImportStatement(token.value())
         // else Throw Error
         ImportStmtNode importStmtNode = null;
-        Map<IdenNode, IdenNode> blocks = new HashMap<IdenNode, IdenNode>();
-        IdenNode id1, id2 = null;
+        Map<String, String> blocks = new HashMap<String, String>();
+        ExpressionStatement id1, id2 = null;
+        Context context = Context.context;
+//
+//        for (Map.Entry<Node.IdenNode, Node.IdenNode> entry : n.importAliasMap.entrySet()) {
+//            Node.IdenNode value = entry.getValue();
+//            String alias = null;
+//            if (value != null)
+//                alias = value.name;
+//            cafeImport.add(entry.getKey().name, alias);
+//        }
+
 
         accept(TokenKind.IMPORT);
         if(token.kind == TokenKind.IDENTIFIER){
@@ -2175,7 +2307,7 @@ public class ParseIR extends Parser {
                 accept(token.kind);
                 id2 = parseIdentifier();
             }
-            blocks.put(id1, id2);
+            blocks.put(id1.getName(), id2 != null ?  id2.getName() : null);
             while (token.kind == TokenKind.COMMA) {
                 accept(TokenKind.COMMA);
                 id1 = parseIdentifier();
@@ -2184,14 +2316,14 @@ public class ParseIR extends Parser {
                     accept(token.kind);
                     id2 = parseIdentifier();
                 }
-                blocks.put(id1, id2);
+                blocks.put(id1.getName(), id2 != null ? id2.getName() : null);
             }
         } else {
             if(accept(TokenKind.MUL)) {
-                id1 = new IdenNode("*");
+//                id1 = new IdenNode("*");
                 accept(TokenKind.AS);
                 id2 = parseIdentifier();
-                blocks.put(id1, id2);
+                blocks.put("*", id2.getName());
             }
         }
 
@@ -2202,17 +2334,22 @@ public class ParseIR extends Parser {
 //            logError(INVALID_IMPORT_FILE, token.value());
 //            error = true;
 //        } else {
-        importStmtNode = new ImportStmtNode(blocks, token.value());
+
+        CafeImport cafeImport = CafeImport.of(token.value());
+//        importStmtNode = new ImportStmtNode(blocks, token.value());
         nextToken();
         accept(TokenKind.SEMICOLON);
-
-        return importStmtNode;
+        for (Map.Entry<String, String> entry : blocks.entrySet()) {
+            cafeImport.add(entry.getKey(), entry.getValue());
+        }
+        context.module.addImport(cafeImport);
+        return cafeImport;
     }
 
     // return Statement Node
 
     // return List Of Statements
-    ProgramNode parseStatements() {
+    CafeModule parseStatements() {
         /*
          * List of Statement stats
          *
@@ -2236,25 +2373,29 @@ public class ParseIR extends Parser {
                 return null;
             switch (token.kind) {
                 case IMPORT:
-                    ImportStmtNode importStmtNode = parseImportStatement();
+                    CafeImport importStmtNode = parseImportStatement();
                     if (importStmtNode == null) return null;
                     tree.add(importStmtNode);
                     break;
                 case EXPORT:
-                    List<ExportStmtNode> exports = parseExportStatement();
+                    List<CafeExport> exports = parseExportStatement();
                     if(exports == null) return null;
                     tree.addAll(exports);
                     break;
                 default:
-                    List<CafeStatement<?>> stmt = parseBlock();
+                    Block stmt = parseBlock();
                     if (stmt == null) return null;
-                    tree.addAll(stmt);
+                    tree.addAll(stmt.getStatements());
                     break;
             }
         }
         if (error) return null;
         debug.add("Block Statements " + tree);
-        return new ProgramNode(tree);
+        for( CafeStatement<?> stm: tree){
+            Context.context.module.add(stm);
+        }
+//        return new ProgramNode(tree);
+        return Context.context.module;
     }
 
     // void parseStatementAsBlock() {
@@ -2268,7 +2409,7 @@ public class ParseIR extends Parser {
         // node = parseStatements()
         // return node
         if (error) return null;
-        ProgramNode node = parseStatements();
+        ProgramNode node =null;
         if (error) return null;
         return node;
     }
