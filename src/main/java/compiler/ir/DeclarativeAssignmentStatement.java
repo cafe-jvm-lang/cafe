@@ -65,6 +65,10 @@ public class DeclarativeAssignmentStatement extends AssignedStatement {
     }
 
     @Override
+    public String getName(){
+        return symbolReference.getName();
+    }
+    @Override
     public List<CafeElement<?>> children() {
         return Collections.singletonList(expressionStatement);
     }

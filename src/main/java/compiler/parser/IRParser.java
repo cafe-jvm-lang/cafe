@@ -436,7 +436,11 @@ public class IRParser extends Parser {
                     op = OperatorType.NOTIN;
                     accept(TokenKind.IN);
                 }
+            }else{
+                accept(token.kind);
             }
+            System.out.println("Relational Operator type: "+op);
+
             ExpressionStatement<?> exp2 = parseBitOrExpression();
             exp1 = BinaryExpression.of(op)
                     .right(exp2)
@@ -664,7 +668,7 @@ public class IRParser extends Parser {
                 OperatorType op = token.kind == TokenKind.SUB ? OperatorType.MINUS : TokenKind.TILDE == token.kind ? OperatorType.TILDE : TokenKind.NOT == token.kind ?  OperatorType.NOT : OperatorType.NOTOP;
                 accept(token.kind);
                 exp1 = parsePowerExpression();
-                exp1 = UnaryExpression.create(exp1, op);
+                exp1 = UnaryExpression.create(op, exp1);
             }
         } else {
             exp1 = parsePowerExpression();
@@ -894,7 +898,7 @@ public class IRParser extends Parser {
     ExpressionStatement<?> parseThis() {
         if (error) return null;
 //        Token tk = token;
-//        accept(TokenKind.THIS);
+        accept(TokenKind.THIS);
 //        ThisNode thisNode = new ThisNode();
 //        thisNode.setFirstToken(tk);
         IRParser.Context context = IRParser.Context.context;
@@ -1111,7 +1115,7 @@ public class IRParser extends Parser {
                 } else if (accept(TokenKind.LCURLY)) {
                     Block blockNode = parseBlock();
                     accept(TokenKind.RCURLY);
-                    elseBlock = ifNode.elseBranch(blockNode);
+                    elseBlock = ifNode.whenFalse(blockNode);
 //                    elseBlock.setFirstToken(elseFT);
                 }
                 if (error) return null;
@@ -1762,10 +1766,11 @@ public class IRParser extends Parser {
          */
         if (error) return null;
         Context context = Context.context;
+        String funcName = "#_ANN_Hello";
         accept(TokenKind.FUNC);
-        String funcName = context.getNextAnnFuncName();
-        context.enterFunc(funcName);
         accept(TokenKind.LPAREN);
+        context.enterFunc(funcName);
+        funcName = context.getNextAnnFuncName();
         List<String> params = parseParameter();
         accept(TokenKind.RPAREN);
         accept(TokenKind.LCURLY);
@@ -2051,7 +2056,7 @@ public class IRParser extends Parser {
 //         */
 //    }
 
-    CafeStatement<ReturnStatement> parseReturnStatement() {
+    ReturnStatement parseReturnStatement() {
         if (error) return null;
         accept(TokenKind.RET);
 //        Token tk = token;
@@ -2098,21 +2103,25 @@ public class IRParser extends Parser {
         switch (token.kind) {
             case VAR:
                 List<DeclarativeAssignmentStatement> stm = parseVariable();
+                System.out.println("Var Statement: "+stm);
                 if (stm == null) return null;
                 block.addAll(stm);
                 break;
             case CONST:
                 List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
+                System.out.println("const Statement: "+stm1);
                 if (stm1 == null) return null;
                 block.addAll(stm1);
                 break;
             case FUNC:
                 DeclarativeAssignmentStatement decl = parseFunctionDeclaration();
+                System.out.println("For Statement: "+decl);
                 if (decl == null) return null;
                 block.add(decl);
                 break;
             case IF:
                 CafeStatement<ConditionalBranching> stm2 = parseIfStatement();
+                System.out.println("If Statement: "+stm2);
                 if (stm2 == null) return null;
                 block.add(stm2);
                 break;
@@ -2120,12 +2129,14 @@ public class IRParser extends Parser {
                 boolean innerLoop = breakAllowed;
                 breakAllowed = true;
                 CafeStatement<?> stm3 = parseForStatement();
+                System.out.println("for Statement: "+stm3);
                 if (stm3 == null) return null;
                 block.add(stm3);
                 breakAllowed = innerLoop;
 //                innerLoop = false;
                 break;
             case LOOP:
+                System.out.println("Entered to Loop:");
 //                CafeStatement<?> stm4 = parseLoopStatement();
 //                if (stm4 == null) return null;
 //                block.add(stm4);
@@ -2141,19 +2152,22 @@ public class IRParser extends Parser {
                 CafeStatement<?> stm6 = parseExprStmt();
                 if (stm6 == null) return null;
                 block.add(stm6);
-                debug.add("Block Stmt: " + token.kind);
+                System.out.println("Iden This Block Stmt: " + stm6+error);
+                System.out.println("Iden This BlockToken: " + token.value());
                 accept(TokenKind.SEMICOLON);
                 break;
             case BREAK:
             case CONTINUE:
                 CafeStatement<?> stm7 = parseFlowStatement();
                 block.add(stm7);
-                debug.add("Block Stmt: " + token.kind);
+                System.out.println("Break Continue Block Stmt: " + stm7);
+                debug.add("Break Continue Block Stmt: " + token.kind);
                 break;
             default:
                 logError(TokenKind.IDENTIFIER);
         }
-        if(error || block.isEmpty()) return null;
+        if(error) return null;
+        System.out.println("Block Statement: "+block);
         return block;
     }
     // return Block Statement Node
@@ -2175,10 +2189,11 @@ public class IRParser extends Parser {
 
         List<CafeStatement<?>> blockStmt = new ArrayList<>();
         debug.add("Token kind " + token.kind);
-
+        System.out.println("Block Entered");
         while(token.kind != TokenKind.RCURLY) {
             if (error) return null;
             List<CafeStatement<?>> stm = parseStatement();
+            System.out.println("Block Stmt: "+stm);
             if (stm == null) return null;
             blockStmt.addAll(stm);
         }
@@ -2189,6 +2204,7 @@ public class IRParser extends Parser {
         context.leaveScope();
         if (error) return null;
         debug.add("Block Stmt: " + block);
+        System.out.println("Block: "+block);
         return block;
     }
 
