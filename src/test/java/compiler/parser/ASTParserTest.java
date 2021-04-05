@@ -29,7 +29,6 @@
 
 package compiler.parser;
 
-import compiler.ast.Node;
 import compiler.ir.CafeModule;
 import compiler.main.SourceFileManager;
 import compiler.util.Context;
@@ -44,7 +43,7 @@ import java.util.Iterator;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
-public class MainParserTest {
+public class ASTParserTest {
     public static final String SRC = "src/test/resources/parse-test/";
     public static final String ERR = "src/test/resources/parse-test/error_test";
 
