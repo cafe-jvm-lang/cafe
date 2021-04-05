@@ -47,7 +47,7 @@ import static compiler.util.Messages.message;
 
 public class MainParser extends Parser {
     static {
-        ParserFactory.registerParser(ParserType.MAINPARSER, new MainParser());
+//        ParserFactory.registerParser(ParserType.IRParser, new IRParser());
     }
 
     @Override

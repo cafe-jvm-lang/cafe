@@ -114,7 +114,7 @@ public class CafeCompiler {
                     fileManager.setSourceFile(sourceFile);
                     break;
                 case PARSEIR:
-                    parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.asCharList());
+                    parser = parserFactory.newParser(ParserType.IRParser, fileManager.asCharList());
                     module = parser.parseToIR(moduleName);
                     System.out.println("Success "+module);
                     break;

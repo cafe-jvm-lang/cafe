@@ -45,25 +45,24 @@ import java.util.*;
 import static compiler.util.Log.Type.*;
 import static compiler.util.Messages.message;
 
-public class ParseIR extends Parser {
+public class IRParser extends Parser {
     static {
-        ParserFactory.registerParser(ParserType.MAINPARSER, new ParseIR());
+        ParserFactory.registerParser(ParserType.IRParser, new IRParser());
     }
 
     public CafeModule parseToIR(String moduleName) {
-        ParseIR.Context.context.createModule(moduleName);
-        ParseIR.Context.context.newObjectStack();
-        parseStatements();
-        return ParseIR.Context.context.module;
+        IRParser.Context.context.createModule(moduleName);
+//        IRParser.Context.context.newObjectStack();
+        return parseStatements();
     }
 
     private static final class Context {
-        final static ParseIR.Context context = new ParseIR.Context();
+        final static IRParser.Context context = new IRParser.Context();
 
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
         private final Deque<String> functionStack = new LinkedList<>();
-        private final Deque<Deque<Object>> objectStack = new LinkedList<>();
+//        private final Deque<Deque<Object>> objectStack = new LinkedList<>();
         private final Deque<ForLoopStatement> forLoopStack = new LinkedList<>();
         private final AnnFuncNameGenerator annFuncNameGenerator = new AnnFuncNameGenerator();
 
@@ -131,22 +130,21 @@ public class ParseIR extends Parser {
             GLOBAL, LOCAL, CLOSURE
         }
 
-        public ParseIR.Context.Scope currentScope() {
+        public IRParser.Context.Scope currentScope() {
             if (functionStack.size() == 0)
-                return ParseIR.Context.Scope.GLOBAL;
+                return IRParser.Context.Scope.GLOBAL;
             if (functionStack.size() == 1)
-                return ParseIR.Context.Scope.LOCAL;
-            return ParseIR.Context.Scope.CLOSURE;
+                return IRParser.Context.Scope.LOCAL;
+            return IRParser.Context.Scope.CLOSURE;
         }
 
+/*
         public void newObjectStack() {
             objectStack.push(new LinkedList<>());
         }
-
         public void popObjectStack() {
             objectStack.pop();
         }
-
         public void push(Object object) {
             if (objectStack.isEmpty()) {
                 newObjectStack();
@@ -165,6 +163,7 @@ public class ParseIR extends Parser {
         public Object peek() {
             return objectStack.peek();
         }
+*/
 
         SymbolReference createSymbolReference(String name, SymbolReference.Kind kind, SymbolReference.Scope scope) {
             SymbolReference ref = SymbolReference.of(name, kind, scope);
@@ -178,11 +177,13 @@ public class ParseIR extends Parser {
             return createSymbolReference(name, getSymbolKind(tag), getSymbolScope());
         }
 
+/*
         public SymbolReference getReference(String name) {
             assert referenceTableStack.peek() != null;
             return referenceTableStack.peek()
                     .get(name);
         }
+*/
 
         SymbolReference.Kind getSymbolKind(Node.Tag tag) {
             if (tag == Node.Tag.VARDECL) {
@@ -197,10 +198,10 @@ public class ParseIR extends Parser {
             // There can be only 2 visible symbol scopes: GLOBAL & LOCAL.
             // A symbol declared inside a closure is LOCAL to that closure & a CLOSURE itself is LOCAL to its parent block.
             // So there is no CLOSURE scope for symbols.
-            ParseIR.Context.Scope scope = currentScope();
-            if (scope == ParseIR.Context.Scope.GLOBAL)
+            IRParser.Context.Scope scope = currentScope();
+            if (scope == IRParser.Context.Scope.GLOBAL)
                 return SymbolReference.Scope.GLOBAL;
-            if (scope == ParseIR.Context.Scope.LOCAL || scope == ParseIR.Context.Scope.CLOSURE)
+            if (scope == IRParser.Context.Scope.LOCAL || scope == IRParser.Context.Scope.CLOSURE)
                 return SymbolReference.Scope.LOCAL;
             throw new AssertionError("Invalid Symbol Scope");
         }
@@ -216,18 +217,19 @@ public class ParseIR extends Parser {
     private Lexer lexer;
     private Token token;
     private Log log;
-    private boolean breakAllowed = false, innerLoop = false, error = false;
-    private final List<String> debug = new ArrayList<>();
+    private boolean breakAllowed = false;
+    private boolean error = false;
+    private  List<String> debug = new ArrayList<>();
 
-    private ParseIR() {
+    private IRParser() {
     }
 
-    private ParseIR(ParserFactory factory, Lexer lexer) {
+    private IRParser(ParserFactory factory, Lexer lexer) {
         debug.add("PARSING");
         this.lexer = lexer;
         this.log = factory.log;
         // TESTING
-//         nextToken();
+        // nextToken();
         // while(token.kind != TokenKind.END) {
         // debug.add(token.kind);
         // nextToken();
@@ -237,13 +239,13 @@ public class ParseIR extends Parser {
     }
 
     @Override
-    protected ParseIR instance(ParserFactory factory, Lexer lexer) {
-        return new ParseIR(factory, lexer);
+    protected IRParser instance(ParserFactory factory, Lexer lexer) {
+        return new IRParser(factory, lexer);
     }
 
-    Token token() {
-        return token;
-    }
+//    Token token() {
+//        return token;
+//    }
 
     Token prevToken() {
         return lexer.prevToken();
@@ -895,7 +897,7 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.THIS);
 //        ThisNode thisNode = new ThisNode();
 //        thisNode.setFirstToken(tk);
-        ParseIR.Context context = ParseIR.Context.context;
+        IRParser.Context context = IRParser.Context.context;
         boolean isGlobal = false;
         if (context.isModuleScope) {
             isGlobal = true;
@@ -912,7 +914,7 @@ public class ParseIR extends Parser {
         accept(TokenKind.IDENTIFIER);
         IdenNode iden = new IdenNode(prev.value());
         iden.setFirstToken(prev);
-        ParseIR.Context context = ParseIR.Context.context;
+        IRParser.Context context = IRParser.Context.context;
         if (context.isProperty()) {
             PropertyAccess prop = PropertyAccess.of(prev.value());
             prop.setFirstToken(prev);
@@ -998,21 +1000,21 @@ public class ParseIR extends Parser {
         return null;
     }
 
-    void parseSubscriptList() {
-        /*
-         * while(LBRACKET) parseSubscript()
-         *
-         */
-    }
+//    void parseSubscriptList() {
+//        /*
+//         * while(LBRACKET) parseSubscript()
+//         *
+//         */
+//    }
 
-    void parseSubscript() {
-        /*
-         * accept(LBRACKET) parseNumberLiteral() if ( COLON) parseNumberLiteral()
-         * accept(LBRACKET)
-         *
-         *
-         */
-    }
+//    void parseSubscript() {
+//        /*
+//         * accept(LBRACKET) parseNumberLiteral() if ( COLON) parseNumberLiteral()
+//         * accept(LBRACKET)
+//         *
+//         *
+//         */
+//    }
 
     List<ExpressionStatement<?>> parseArgList() {
         /*
@@ -1032,11 +1034,11 @@ public class ParseIR extends Parser {
 
     }
 
-    void parseArg() {
-        /*
-         * parseValue()
-         */
-    }
+//    void parseArg() {
+//        /*
+//         * parseValue()
+//         */
+//    }
 
     //void parseTrailer() {
     /*
@@ -1046,13 +1048,13 @@ public class ParseIR extends Parser {
      */
     //}
 
-    void parseExpressionStatement() {
-        /*
-         * parseLogAndExpression() if (|| | 'or') parseLogAndExpression() else if (EQUAL
-         * OPERATOR) parseEqualOperator() parseValue() else handle Error
-         *
-         */
-    }
+//    void parseExpressionStatement() {
+//        /*
+//         * parseLogAndExpression() if (|| | 'or') parseLogAndExpression() else if (EQUAL
+//         * OPERATOR) parseEqualOperator() parseValue() else handle Error
+//         *
+//         */
+//    }
 
     /* parseStatements */
     ConditionalBranching parseIf() {
@@ -1120,32 +1122,32 @@ public class ParseIR extends Parser {
         return null;
     }
 
-    void parseElseStatement() {
-        /*
-         * accept(ELSE) accept(LCURLY) parseBlockStatements() accept(RCURLY)
-         */
-    }
+//    void parseElseStatement() {
+//        /*
+//         * accept(ELSE) accept(LCURLY) parseBlockStatements() accept(RCURLY)
+//         */
+//    }
 
-    void parseElseIfStatement() {
-        /*
-         * List of ElseIfNodes
-         *
-         * while ( !ELSEIF ){ accept(ELSEIF) accept(LPAREN) parseLogORExpression()
-         * accept(RPAREN) accept(LCURLY) parseBlockStatements() accept(RCURLY)
-         * ElseIf.add(ElseIFNode(condition, block)
-         *
-         * return ElseIfNode
-         */
-    }
+//    void parseElseIfStatement() {
+//        /*
+//         * List of ElseIfNodes
+//         *
+//         * while ( !ELSEIF ){ accept(ELSEIF) accept(LPAREN) parseLogORExpression()
+//         * accept(RPAREN) accept(LCURLY) parseBlockStatements() accept(RCURLY)
+//         * ElseIf.add(ElseIFNode(condition, block)
+//         *
+//         * return ElseIfNode
+//         */
+//    }
 
-    StmtNode parseAssignmentStatement() {
+//    StmtNode parseAssignmentStatement() {
         /*
          * parseIdentifier() while (DOT) parseIdentifier() parseEqualOperator()
          * parseValue() accept(SEMI)
          *
          * Not used
          */
-        if (error) return null;
+//        if (error) return null;
 //
 //        ExpressionStatement<? exp1 = parseIdentifier();
 //        accept(TokenKind.DOT);
@@ -1164,8 +1166,8 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.SEMICOLON);
 //        if (error) return null;
 //        return new AsgnStmtNode(exp1, exp);
-        return null;
-    }
+//        return null;
+//    }
 
     /* Parse Loops */
     List<AssignedStatement> parseForInit() {
@@ -1299,44 +1301,44 @@ public class ParseIR extends Parser {
         return forLoop;
     }
 
-    CafeStatement<?> parseLoopStatement() {
-        /*
-         * accept(LOOP) parseLoopIdentifier() accept(IN) parseLoopValue()
-         * parseLoopBlock() parseCollectionComprehension()
-         *
-         */
-        if (error) return null;
-        ExpressionStatement<?> iden1=null, iden2=null;
-        ExpressionStatement<?> exp = null;
-        Block block=null;
-
-        accept(TokenKind.LOOP);
-        iden1 = parseIdentifier();
-        if (token.kind == TokenKind.COMMA) {
-            nextToken();
-            iden2 = parseIdentifier();
-        }
-        accept(TokenKind.IN);
-        try {
-            exp = parseAtomExpression();
-        } catch (ParseException ignored) {
-        }
-
-        if (exp == null) {
-            if (token.kind == TokenKind.LCURLY)
-                exp = parseCollection();
-            else
-                exp = parseObjectCreation();
-
-        }
-        accept(TokenKind.LCURLY);
-        block = parseLoopBlock();
-        accept(TokenKind.RCURLY);
-        if (error) return null;
-        //TODO: Implementation of LoopStmt IR node is yet to be done.
+//    CafeStatement<?> parseLoopStatement() {
+//        /*
+//         * accept(LOOP) parseLoopIdentifier() accept(IN) parseLoopValue()
+//         * parseLoopBlock() parseCollectionComprehension()
+//         *
+//         */
+//        if (error) return null;
+//        ExpressionStatement<?> iden1 = null, iden2 = null;
+//        ExpressionStatement<?> exp = null;
+//        Block block=null;
+//
+//        accept(TokenKind.LOOP);
+//        iden1 = parseIdentifier();
+//        if (token.kind == TokenKind.COMMA) {
+//            nextToken();
+//            iden2 = parseIdentifier();
+//        }
+//        accept(TokenKind.IN);
+//        try {
+//            exp = parseAtomExpression();
+//        } catch (ParseException ignored) {
+//        }
+//
+//        if (exp == null) {
+//            if (token.kind == TokenKind.LCURLY)
+//                exp = parseCollection();
+//            else
+//                exp = parseObjectCreation();
+//
+//        }
+//        accept(TokenKind.LCURLY);
+//        block = parseLoopBlock();
+//        accept(TokenKind.RCURLY);
+//        if (error) return null;
+//        TODO: Implementation of LoopStmt IR node is yet to be done.
 //        return new LoopStmtNode(iden1, iden2, exp, block);
-        return null;
-    }
+//        return null;
+//    }
 
     CafeStatement<?> parseFlowStatement() {
         /*
@@ -1385,13 +1387,13 @@ public class ParseIR extends Parser {
         ListCollection listNode = ListCollection.list();
         ExpressionStatement<?> exp1;
         exp1 = parseValue();
-        if (token.kind == TokenKind.RANGE) {
+//        if (token.kind == TokenKind.RANGE) {
             // TODO: to implement IR node implementation for RANGE
             // accept(TokenKind.RANGE);
             // exp2 = parseValue();
             // accept(TokenKind.RSQU);
             // return new RangeNode(exp1, exp2, RangeNode.Type.LIST);
-        }
+//        }
         listNode.add(exp1);
         while (token.kind != TokenKind.RSQU) {
             if (error)
@@ -1432,17 +1434,16 @@ public class ParseIR extends Parser {
         }
     }
 
-    void parseMap() { // NOT Used by MapColl
-        /*
-         * List of Map<dynamic, dynamic>
-         *
-         * case RBRACKET: return List.add(map)) case LBRACKET: map.addKey(parseValue())
-         * accept(COMMA) map.addValue(parseValue()) List.add(map)
-         *
-         * return map
-         */
-
-    }
+//    void parseMap() { // NOT Used by MapColl
+//        /*
+//         * List of Map<dynamic, dynamic>
+//         *
+//         * case RBRACKET: return List.add(map)) case LBRACKET: map.addKey(parseValue())
+//         * accept(COMMA) map.addValue(parseValue()) List.add(map)
+//         *
+//         * return map
+//         */
+//    }
 
     ExpressionStatement<?> parseMapCollection() {
         /*
@@ -1489,7 +1490,7 @@ public class ParseIR extends Parser {
         return null;
     }
 
-    ExpressionStatement<?> parseComprehension(String type) {
+//    ExpressionStatement<?> parseComprehension(String type) {
 //        if (error) return null;
 //        IdenNode iden1, iden2 = null;
 //        ExprNode exp = null;
@@ -1540,10 +1541,10 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.RSQU);
 //        if (error) return null;
 //        return mapComp;
-        return  null;
-    }
+//        return  null;
+//    }
 
-    ExpressionStatement<?> parseSet() {
+//    ExpressionStatement<?> parseSet() {      // Not Used
         /*
          * List of Values
          *
@@ -1575,8 +1576,8 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.RSQU);
 //        if (error) return null;
 //        return new SetCollNode(setNode);
-        return null;
-    }
+//        return null;
+//    }
 
     ExpressionStatement<?> parseSetCollection() {
         /*
@@ -1606,7 +1607,7 @@ public class ParseIR extends Parser {
         return null;
     }
 
-    ExpressionStatement<?> parseLink() {
+//    ExpressionStatement<?> parseLink() {  // Not Used
         /*
          * List of Values
          *
@@ -1638,8 +1639,8 @@ public class ParseIR extends Parser {
 //        accept(TokenKind.RSQU);
 //        if (error) return null;
 //        return new LinkCollNode(listNode);
-        return null;
-    }
+//        return null;
+//    }
 
     ExpressionStatement<?> parseLinkCollection() {
         /*
@@ -1739,7 +1740,7 @@ public class ParseIR extends Parser {
 
     }
 
-    void parseObject() { // Not Used
+//    void parseObject() { // Not Used
         /*
          * accept(LCURLY) parseIdentifier()
          *
@@ -1752,7 +1753,7 @@ public class ParseIR extends Parser {
          *
          * return ObjectNode
          */
-    }
+//    }
 
     AnonymousFunction parseAnnFunction() {
         /*
@@ -1783,7 +1784,7 @@ public class ParseIR extends Parser {
         context.addFunction(function);
 
         ExpressionStatement<?> expression;
-        if (context.currentScope() == ParseIR.Context.Scope.CLOSURE) {
+        if (context.currentScope() == IRParser.Context.Scope.CLOSURE) {
             expression = function.asClosure();
         } else {
             expression = FunctionWrapper.wrap(function);
@@ -1846,15 +1847,15 @@ public class ParseIR extends Parser {
 
     /* Parse Values DOne */
 
-    void parseVariableDeclaration() {
-        /*
-         *
-         * parseIdentifier() parseEqualOperator() parseValue()
-         *
-         * return VariableNode
-         */
-
-    }
+//    void parseVariableDeclaration() {
+//        /*
+//         *
+//         * parseIdentifier() parseEqualOperator() parseValue()
+//         *
+//         * return VariableNode
+//         */
+//
+//    }
 
     List<DeclarativeAssignmentStatement> parseVariable() {
         /*
@@ -1942,7 +1943,7 @@ public class ParseIR extends Parser {
          * return List
          */
         if (error) return null;
-        boolean varArg = false;
+//        boolean varArg = false;
         List<String> idenNodes = new ArrayList<>();
 
         while (token.kind != TokenKind.RPAREN) {
@@ -1953,7 +1954,7 @@ public class ParseIR extends Parser {
 
             if (token.kind == TokenKind.VARARGS) {
                 accept(TokenKind.VARARGS);
-                varArg = true;
+//                varArg = true;
                 idenNodes.add(parseIdentifier().getName());
                 // accept(TokenKind.RPAREN);
                 break;
@@ -1984,7 +1985,7 @@ public class ParseIR extends Parser {
         if (error) return null;
         Context context = Context.context;
         accept(TokenKind.FUNC);
-        Token tk = token;
+//        Token tk = token;
         ExpressionStatement<?> funcName = parseIdentifier();
         context.enterFunc(funcName.getName());
         accept(TokenKind.LPAREN);
@@ -2003,8 +2004,8 @@ public class ParseIR extends Parser {
 
         context.addFunction(function);
 
-        ExpressionStatement<?> expression=null;
-        if (context.currentScope() == ParseIR.Context.Scope.CLOSURE) {
+        ExpressionStatement<?> expression;
+        if (context.currentScope() == IRParser.Context.Scope.CLOSURE) {
             expression = function.asClosure();
         } else {
             expression = FunctionWrapper.wrap(function);
@@ -2021,47 +2022,45 @@ public class ParseIR extends Parser {
         return statement;
     }
 
-    void parseDeclarativeStatement() {
-        /*
-         * List of Declarative Statement
-         *
-         * Checks Type of Statement and calls below methods to parse calls parseFunction
-         * calls parseVariable
-         */
-    }
+//    void parseDeclarativeStatement() {
+//        /*
+//         * List of Declarative Statement
+//         *
+//         * Checks Type of Statement and calls below methods to parse calls parseFunction
+//         * calls parseVariable
+//         */
+//    }
 
-    void block() {
-        /*
-         * Handles Cases For Each Type of Block Statements like DECL, ASGN, IF etc. and
-         * calls respective methods
-         *
-         */
-    }
+//    void block() {
+//        /*
+//         * Handles Cases For Each Type of Block Statements like DECL, ASGN, IF etc. and
+//         * calls respective methods
+//         *
+//         */
+//    }
 
-    void parseBlockStatement() {
-        /*
-         * List of Statement
-         *
-         * parse Grammar, checks type of Statement and calls block()
-         */
-
-        /*
-         * switch(token.kind){ case VAR }
-         */
-
-    }
+//    void parseBlockStatement() {
+//        /*
+//         * List of Statement
+//         *
+//         * parse Grammar, checks type of Statement and calls block()
+//         */
+//
+//        /*
+//         * switch(token.kind){ case VAR }
+//         */
+//    }
 
     CafeStatement<ReturnStatement> parseReturnStatement() {
         if (error) return null;
         accept(TokenKind.RET);
-        Token tk = token;
+//        Token tk = token;
         ExpressionStatement<?> exp = parseValue();
         debug.add("Return : " + exp);
         accept(TokenKind.SEMICOLON);
         if (error) return null;
-        ReturnStatement returnStatement = ReturnStatement.of(exp);
-//        rtrnNode.setFirstToken(tk);
-        return returnStatement;
+        //        rtrnNode.setFirstToken(tk);
+        return ReturnStatement.of(exp);
     }
 
     Block parseLoopBlock() {
@@ -2118,18 +2117,18 @@ public class ParseIR extends Parser {
                 block.add(stm2);
                 break;
             case FOR:
-                innerLoop = breakAllowed;
+                boolean innerLoop = breakAllowed;
                 breakAllowed = true;
                 CafeStatement<?> stm3 = parseForStatement();
                 if (stm3 == null) return null;
                 block.add(stm3);
                 breakAllowed = innerLoop;
-                innerLoop = false;
+//                innerLoop = false;
                 break;
             case LOOP:
-                CafeStatement<?> stm4 = parseLoopStatement();
-                if (stm4 == null) return null;
-                block.add(stm4);
+//                CafeStatement<?> stm4 = parseLoopStatement();
+//                if (stm4 == null) return null;
+//                block.add(stm4);
                 break;
             case RET:
                 CafeStatement<ReturnStatement> stm5 = parseReturnStatement();
@@ -2194,7 +2193,7 @@ public class ParseIR extends Parser {
     }
 
     List<CafeExport> parseExportStatement() {
-        List<CafeExport> exportStmtNode = new ArrayList<CafeExport>();
+        List<CafeExport> exportStmtNode = new ArrayList<>();
 
         Context context = Context.context;
         context.isExport = true;
@@ -2263,11 +2262,10 @@ public class ParseIR extends Parser {
         // boolean valid = checkFilePathRegex(token.value());
         // if(valid) return ImportStatement(token.value())
         // else Throw Error
-        ImportStmtNode importStmtNode = null;
-        Map<String, String> blocks = new HashMap<String, String>();
+//        ImportStmtNode importStmtNode = null;
+        Map<String, String> blocks = new HashMap<>();
         ExpressionStatement<?> id1, id2 = null;
         Context context = Context.context;
-//
 //        for (Map.Entry<Node.IdenNode, Node.IdenNode> entry : n.importAliasMap.entrySet()) {
 //            Node.IdenNode value = entry.getValue();
 //            String alias = null;
@@ -2385,10 +2383,9 @@ public class ParseIR extends Parser {
         // TODO: ProgramNode node;
         // node = parseStatements()
         // return node
-        if (error) return null;
-        ProgramNode node =null;
-        if (error) return null;
-        return node;
+//        if (error) return null;
+//        ProgramNode node =null;
+        return null;
     }
 
     @Override

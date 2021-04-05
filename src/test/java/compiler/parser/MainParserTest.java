@@ -71,7 +71,7 @@ public class MainParserTest {
     @Test(dataProvider = "cafe-files")
     public void test_no_error(File file) {
         fm.setSourceFile(file);
-        Parser parser = factory.newParser(ParserType.MAINPARSER, fm.asCharList());
+        Parser parser = factory.newParser(ParserType.IRParser, fm.asCharList());
         CafeModule module = parser.parseToIR(file.getName());
         System.out.println("Success "+module);
 //        Node n = parser.parse();
@@ -81,7 +81,7 @@ public class MainParserTest {
     @Test(dataProvider = "cafe-error-files")
     public void test_error(File file) {
         fm.setSourceFile(file);
-        Parser parser = factory.newParser(ParserType.MAINPARSER, fm.asCharList());
+        Parser parser = factory.newParser(ParserType.IRParser, fm.asCharList());
         CafeModule module = parser.parseToIR(file.getName());
         System.out.println("Success "+module);
 //        Node n = parser.parse();
