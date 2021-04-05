@@ -85,9 +85,8 @@ public class CafeCompiler {
 
     enum Phase {
         INIT,
-        PARSE,
+        PARSEIR,
         ANALYZE,
-        IR,
         GEN
     }
 
@@ -114,20 +113,21 @@ public class CafeCompiler {
                 case INIT:
                     fileManager.setSourceFile(sourceFile);
                     break;
-                case PARSE:
+                case PARSEIR:
                     parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.asCharList());
-                    programNode = parser.parse();
+                    module = parser.parseToIR(moduleName);
+                    System.out.println("Success "+module);
                     break;
                 case ANALYZE:
 //                    System.out.println((char) 27 + "[33m" + "\nPrettyPrint");
 //                    new PrettyPrinter().prettyPrint(programNode);
-                    analyzer.visitProgram((ProgramNode) programNode);
+//                    analyzer.visitProgram((ProgramNode) programNode);
                     break;
-                case IR:
-                    module = new ASTToCafeIrVisitor().transform((ProgramNode) programNode, moduleName);
-                    module.accept(new ClosureReferenceVisitor());
-                    module.accept(new SymbolReferenceAssignmentVisitor());
-                    break;
+//                case IR:
+//                    module = new ASTToCafeIrVisitor().transform((ProgramNode) programNode, moduleName);
+//                    module.accept(new ClosureReferenceVisitor());
+//                    module.accept(new SymbolReferenceAssignmentVisitor());
+//                    break;
                 case GEN:
                     byteCode = new JVMByteCodeGenVisitor().generateByteCode(module, moduleName);
                     result.ok(byteCode);

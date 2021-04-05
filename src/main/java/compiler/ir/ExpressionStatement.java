@@ -38,5 +38,7 @@ public abstract class ExpressionStatement<T extends ExpressionStatement<T>> exte
 
         throw cantConvert("ExpressionStatement", expr);
     }
-    public abstract String getName();
+    public String getName(){
+        return null;
+    }
 }

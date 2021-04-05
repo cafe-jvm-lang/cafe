@@ -35,7 +35,7 @@ package compiler.parser;
  * @author Dhyey
  */
 public enum ParserType {
-    MAINPARSER("MainParser");
+    MAINPARSER("ParseIR");
 
     String parserClassName;
 

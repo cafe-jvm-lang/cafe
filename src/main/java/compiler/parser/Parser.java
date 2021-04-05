@@ -30,9 +30,10 @@
 package compiler.parser;
 
 import compiler.ast.Node;
+import compiler.ir.CafeModule;
 
 public abstract class Parser {
     abstract Parser instance(ParserFactory factory, Lexer lexer);
-
+    public abstract CafeModule parseToIR(String moduleName);
     public abstract Node parse();
 }

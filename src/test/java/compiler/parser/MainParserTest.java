@@ -30,6 +30,7 @@
 package compiler.parser;
 
 import compiler.ast.Node;
+import compiler.ir.CafeModule;
 import compiler.main.SourceFileManager;
 import compiler.util.Context;
 import org.testng.annotations.BeforeMethod;
@@ -71,15 +72,19 @@ public class MainParserTest {
     public void test_no_error(File file) {
         fm.setSourceFile(file);
         Parser parser = factory.newParser(ParserType.MAINPARSER, fm.asCharList());
-        Node n = parser.parse();
-        assertNotNull(n);
+        CafeModule module = parser.parseToIR(file.getName());
+        System.out.println("Success "+module);
+//        Node n = parser.parse();
+        assertNotNull(module);
     }
 
     @Test(dataProvider = "cafe-error-files")
     public void test_error(File file) {
         fm.setSourceFile(file);
         Parser parser = factory.newParser(ParserType.MAINPARSER, fm.asCharList());
-        Node n = parser.parse();
-        assertNull(n);
+        CafeModule module = parser.parseToIR(file.getName());
+        System.out.println("Success "+module);
+//        Node n = parser.parse();
+        assertNull(module);
     }
 }

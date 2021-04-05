@@ -31,6 +31,8 @@ package compiler.parser;
 
 import compiler.ast.Node;
 import compiler.ast.Node.*;
+import compiler.ir.CafeModule;
+import compiler.ir.ReferenceTable;
 import compiler.parser.Tokens.Token;
 import compiler.parser.Tokens.TokenKind;
 import compiler.util.Log;
@@ -46,6 +48,11 @@ import static compiler.util.Messages.message;
 public class MainParser extends Parser {
     static {
         ParserFactory.registerParser(ParserType.MAINPARSER, new MainParser());
+    }
+
+    @Override
+    public CafeModule parseToIR(String mod){
+        return CafeModule.create(mod, new ReferenceTable());
     }
 
     private Lexer lexer;
