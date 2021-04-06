@@ -2208,7 +2208,7 @@ public class IRParser extends Parser {
         return block;
     }
 
-    List<CafeExport> parseExportStatement() {
+    List<DeclarativeAssignmentStatement> parseExportStatement() {
         List<CafeExport> exportStmtNode = new ArrayList<>();
 
         Context context = Context.context;
@@ -2222,7 +2222,7 @@ public class IRParser extends Parser {
 //        } else {
 //            n.node.accept(this);
 //        }
-
+        List<DeclarativeAssignmentStatement> decl = new ArrayList<>();
 
         accept(TokenKind.EXPORT);
         switch (token.kind) {
@@ -2240,23 +2240,25 @@ public class IRParser extends Parser {
                 break;
 
             case VAR:
-                List<DeclarativeAssignmentStatement> stm = parseVariable();
-                if (stm == null) return null;
-                for (DeclarativeAssignmentStatement var : stm) {
+//                List<DeclarativeAssignmentStatement> stm = parseVariable();
+                decl = parseVariable();
+                if (decl == null) return null;
+                for (DeclarativeAssignmentStatement var : decl) {
                     exportStmtNode.add(CafeExport.export(var.getSymbolReference().getName()));
                 }
                 break;
             case CONST:
-                List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
-                if (stm1 == null) return null;
-                for (DeclarativeAssignmentStatement var : stm1) {
+                decl = parseConstVariable();
+                if (decl == null) return null;
+                for (DeclarativeAssignmentStatement var : decl) {
                     exportStmtNode.add(CafeExport.export(var.getSymbolReference().getName()));
                 }
                 break;
             case FUNC:
-                DeclarativeAssignmentStatement decl = parseFunctionDeclaration();
-                if (decl == null) return null;
-                exportStmtNode.add(CafeExport.export(decl.getName()));
+                DeclarativeAssignmentStatement funcDecl = parseFunctionDeclaration();
+                if (funcDecl == null) return null;
+                exportStmtNode.add(CafeExport.export(funcDecl.getName()));
+                decl.add(funcDecl);
                 break;
             default:
                 error = true;
@@ -2267,7 +2269,7 @@ public class IRParser extends Parser {
             context.module.addExport(expo);
         }
         if (error) return null;
-        return exportStmtNode;
+        return decl;
     }
 
     // return Import Statement Node
@@ -2369,7 +2371,7 @@ public class IRParser extends Parser {
                     tree.add(importStmtNode);
                     break;
                 case EXPORT:
-                    List<CafeExport> exports = parseExportStatement();
+                    List<DeclarativeAssignmentStatement> exports = parseExportStatement();
                     if(exports == null) return null;
                     tree.addAll(exports);
                     break;
