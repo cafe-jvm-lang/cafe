@@ -711,30 +711,35 @@ public class IRParser extends Parser {
 
     ExpressionStatement<?> parseTrailer(ExpressionStatement<?> oExp) throws ParseException {
         ExpressionStatement<?> node = null;
+        Context context = Context.context;
+        boolean isProperty = context.isProperty();
         if (token.kind == TokenKind.LPAREN || token.kind == TokenKind.DOT || token.kind == TokenKind.LSQU) {
             switch (token.kind) {
                 case LPAREN:
                     accept(TokenKind.LPAREN);
-                    Context context = Context.context;
 
 //                    // eg: a.b()
 //                    // b is a property of a, thus method invocation node is created.
                     if (context.isProperty()) {
 //                        n.invokedOn.accept(this);
+                        context.leaveProperty();
                         node = MethodInvocation.create(oExp, parseArgList());
                     }
                     else {
                         // eg: a()
                         // a() is normal function call, thus function invocation node is created.
+                        context.leaveProperty();
                         node = FunctionInvocation.create(oExp, parseArgList());
                     }
 //                    node = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
+                    if (isProperty) context.enterProperty();
                     accept(TokenKind.RPAREN);
                     break;
 
                 case LSQU:
                     ExpressionStatement<?> exp1, exp2;
                     debug.add("Atom Expr: " + token.kind);
+                    context.leaveProperty();
                     while (token.kind == TokenKind.LSQU) {
                         if (error)
                             return null;
@@ -760,13 +765,13 @@ public class IRParser extends Parser {
                         }
 
                     }
+                    if (isProperty) context.enterProperty();
                     break;
                 case DOT:
                     ExpressionStatement<?> e1;
                     debug.add("Atom DOT:" + oExp);
                     accept(TokenKind.DOT);
-                    Context context1 = Context.context;
-                    context1.enterProperty();
+                    context.enterProperty();
                     e1 = parseIdentifier();
                     if (error)
                         return null;
@@ -774,7 +779,7 @@ public class IRParser extends Parser {
                     while (token.kind != TokenKind.DOT && (token.kind == TokenKind.LSQU || token.kind == TokenKind.LPAREN)) {
                         trail = parseTrailer(trail);
                     }
-                    context1.leaveProperty();
+                    context.leaveProperty();
                     if (trail == null)
                         node = ObjectAccessStatement.create(oExp, e1);
                     else
