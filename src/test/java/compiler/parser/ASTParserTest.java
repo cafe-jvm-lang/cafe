@@ -71,7 +71,7 @@ public class ASTParserTest {
     public void test_no_error(File file) {
         fm.setSourceFile(file);
         Parser parser = factory.newParser(ParserType.IRParser, fm.asCharList());
-        CafeModule module = parser.parseToIR(file.getName());
+        CafeModule module = parser.parse(file.getName());
         System.out.println("Success "+module);
 //        Node n = parser.parse();
         assertNotNull(module);
@@ -81,7 +81,7 @@ public class ASTParserTest {
     public void test_error(File file) {
         fm.setSourceFile(file);
         Parser parser = factory.newParser(ParserType.IRParser, fm.asCharList());
-        CafeModule module = parser.parseToIR(file.getName());
+        CafeModule module = parser.parse(file.getName());
         System.out.println("Success "+module);
 //        Node n = parser.parse();
         assertNull(module);

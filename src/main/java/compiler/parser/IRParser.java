@@ -30,7 +30,9 @@
 package compiler.parser;
 
 import compiler.ast.Node;
-import compiler.ast.Node.*;
+import compiler.ast.Node.ContinueStmtNode;
+import compiler.ast.Node.IdenNode;
+import compiler.ast.Node.Tag;
 import compiler.gen.AnnFuncNameGenerator;
 import compiler.ir.*;
 import compiler.parser.Tokens.Token;
@@ -42,7 +44,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 
-import static compiler.util.Log.Type.*;
+import static compiler.util.Log.Type.SOURCE_POSITION;
+import static compiler.util.Log.Type.SYMBOL_EXPECTED;
 import static compiler.util.Messages.message;
 
 public class IRParser extends Parser {
@@ -50,7 +53,8 @@ public class IRParser extends Parser {
         ParserFactory.registerParser(ParserType.IRParser, new IRParser());
     }
 
-    public CafeModule parseToIR(String moduleName) {
+    @Override
+    public CafeModule parse(String moduleName) {
         IRParser.Context.context.createModule(moduleName);
 //        IRParser.Context.context.newObjectStack();
         return parseStatements();
@@ -2396,30 +2400,4 @@ public class IRParser extends Parser {
     // 	 * switch(token.kind){ case IF: case FOR: case }
     // 	 */
     // }
-
-    ProgramNode parseProgram() {
-        // TODO: ProgramNode node;
-        // node = parseStatements()
-        // return node
-//        if (error) return null;
-//        ProgramNode node =null;
-        return null;
-    }
-
-    @Override
-    public Node parse() {
-        // while(token.kind != TokenKind.END) {
-        // if(token.kind == TokenKind.ERROR) {
-        // return;
-        // }
-        // debug.add(token.kind+" "+token.value()+" "+token.pos);
-        // lexer.nextToken();
-        // token = lexer.token();
-        // }
-
-        // Parser p = parseProgram();
-        // return p;
-
-        return parseProgram();
-    }
 }
