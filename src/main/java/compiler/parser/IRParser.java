@@ -1124,7 +1124,6 @@ public class IRParser extends Parser {
                 } else if (accept(TokenKind.LCURLY)) {
                     Block blockNode = parseBlock();
                     accept(TokenKind.RCURLY);
-                    elseBlock = ifNode.whenFalse(blockNode);
 //                    elseBlock.setFirstToken(elseFT);
                 }
                 if (error) return null;
