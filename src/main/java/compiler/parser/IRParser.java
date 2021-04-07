@@ -56,7 +56,6 @@ public class IRParser extends Parser {
     @Override
     public CafeModule parse(String moduleName) {
         IRParser.Context.context.createModule(moduleName);
-//        IRParser.Context.context.newObjectStack();
         return parseStatements();
     }
 
@@ -66,7 +65,6 @@ public class IRParser extends Parser {
         public CafeModule module;
         private final Deque<ReferenceTable> referenceTableStack = new LinkedList<>();
         private final Deque<String> functionStack = new LinkedList<>();
-//        private final Deque<Deque<Object>> objectStack = new LinkedList<>();
         private final Deque<ForLoopStatement> forLoopStack = new LinkedList<>();
         private final AnnFuncNameGenerator annFuncNameGenerator = new AnnFuncNameGenerator();
 
@@ -142,33 +140,6 @@ public class IRParser extends Parser {
             return IRParser.Context.Scope.CLOSURE;
         }
 
-/*
-        public void newObjectStack() {
-            objectStack.push(new LinkedList<>());
-        }
-        public void popObjectStack() {
-            objectStack.pop();
-        }
-        public void push(Object object) {
-            if (objectStack.isEmpty()) {
-                newObjectStack();
-            }
-            assert objectStack.peek() != null;
-            objectStack.peek()
-                    .push(object);
-        }
-
-        public Object pop() {
-            assert objectStack.peek() != null;
-            return objectStack.peek()
-                    .pop();
-        }
-
-        public Object peek() {
-            return objectStack.peek();
-        }
-*/
-
         SymbolReference createSymbolReference(String name, SymbolReference.Kind kind, SymbolReference.Scope scope) {
             SymbolReference ref = SymbolReference.of(name, kind, scope);
             assert referenceTableStack.peek() != null;
@@ -181,13 +152,6 @@ public class IRParser extends Parser {
             return createSymbolReference(name, getSymbolKind(tag), getSymbolScope());
         }
 
-/*
-        public SymbolReference getReference(String name) {
-            assert referenceTableStack.peek() != null;
-            return referenceTableStack.peek()
-                    .get(name);
-        }
-*/
 
         SymbolReference.Kind getSymbolKind(Node.Tag tag) {
             if (tag == Node.Tag.VARDECL) {
@@ -247,10 +211,6 @@ public class IRParser extends Parser {
         return new IRParser(factory, lexer);
     }
 
-//    Token token() {
-//        return token;
-//    }
-
     Token prevToken() {
         return lexer.prevToken();
     }
@@ -280,10 +240,6 @@ public class IRParser extends Parser {
             return false;
         }
     }
-
-//    private boolean accept(TokenKind tokenKindExpected) {
-//        return accept(tokenKindExpected);
-//    }
 
     private void logError(TokenKind tokenKindExpected) {
         error = true;
@@ -443,7 +399,6 @@ public class IRParser extends Parser {
             }else{
                 accept(token.kind);
             }
-            System.out.println("Relational Operator type: "+op);
 
             ExpressionStatement<?> exp2 = parseBitOrExpression();
             exp1 = BinaryExpression.of(op)
@@ -509,13 +464,11 @@ public class IRParser extends Parser {
         while (token.kind == TokenKind.ANDOP) {
             if (error)
                 return null;
-//            String op = token.value();
             accept(token.kind);
             ExpressionStatement<?> exp2 = parseBitRightShiftExpression();
             exp1 = BinaryExpression.of(OperatorType.AND)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
@@ -537,7 +490,6 @@ public class IRParser extends Parser {
             exp1 = BinaryExpression.of(op)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
@@ -553,13 +505,11 @@ public class IRParser extends Parser {
         while (token.kind == TokenKind.LSHIFT) {
             if (error)
                 return null;
-//            String op = token.value();
             accept(token.kind);
             ExpressionStatement<?> exp2 = parseSubtractExpression();
             exp1 = BinaryExpression.of(OperatorType.BITLEFTSHIFT)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
@@ -575,13 +525,11 @@ public class IRParser extends Parser {
         while (token.kind == TokenKind.SUB) {
             if (error)
                 return null;
-//            String op = token.value();
             accept(token.kind);
             ExpressionStatement<?> exp2 = parseAdditionExpression();
             exp1 = BinaryExpression.of(OperatorType.MINUS)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
@@ -597,13 +545,11 @@ public class IRParser extends Parser {
         while (token.kind == TokenKind.ADD) {
             if (error)
                 return null;
-//            String op = token.value();
             accept(token.kind);
             ExpressionStatement<?> exp2 = parseMultiplicationExpression();
             exp1 = BinaryExpression.of(OperatorType.PLUS)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
@@ -619,13 +565,11 @@ public class IRParser extends Parser {
         while (token.kind == TokenKind.MUL) {
             if (error)
                 return null;
-//            String op = token.value();
             accept(token.kind);
             ExpressionStatement<?> exp2 = parseDivisionExpression();
             exp1 = BinaryExpression.of(OperatorType.TIMES)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         }
         if (error) return null;
         return exp1;
@@ -644,7 +588,6 @@ public class IRParser extends Parser {
             OperatorType op = TokenKind.DIV == token.kind ? OperatorType.DIVIDE : TokenKind.MOD == token.kind ? OperatorType.MODULO : OperatorType.FLOOR;
             accept(token.kind);
             ExpressionStatement<?> exp2 = parseFactorExpression();
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
             exp1 = BinaryExpression.of(op)
                     .right(exp2)
                     .left(exp1);
@@ -692,13 +635,11 @@ public class IRParser extends Parser {
             while (token.kind == TokenKind.POWER) {
                 if (error)
                     return null;
-//                String op = token.value();
                 accept(TokenKind.POWER);
                 exp2 = parseFactorExpression();
                 exp1 = BinaryExpression.of(OperatorType.POW)
                         .right(exp2)
                         .left(exp1);
-//                exp1 = new BinaryExprNode(exp1, exp2, op);
             }
             if (error) return null;
             return exp1;
@@ -721,7 +662,6 @@ public class IRParser extends Parser {
 //                    // eg: a.b()
 //                    // b is a property of a, thus method invocation node is created.
                     if (context.isProperty()) {
-//                        n.invokedOn.accept(this);
                         context.leaveProperty();
                         node = MethodInvocation.create(oExp, parseArgList());
                     }
@@ -731,7 +671,6 @@ public class IRParser extends Parser {
                         context.leaveProperty();
                         node = FunctionInvocation.create(oExp, parseArgList());
                     }
-//                    node = new FuncCallNode(oExp, new ArgsListNode(parseArgList()));
                     if (isProperty) context.enterProperty();
                     accept(TokenKind.RPAREN);
                     break;
@@ -756,11 +695,9 @@ public class IRParser extends Parser {
                             node = SliceExpression.slice(oExp)
                                     .beginsAt(exp1)
                                     .endsAt(exp2);
-//                            node = new SliceNode(oExp, exp1, exp2);
                         } else {
                             accept(TokenKind.RSQU);
                             node = SubscriptExpression.create(oExp, exp1);
-//                            node = new SubscriptNode(oExp, exp1);
                             oExp = node;
                         }
 
@@ -784,7 +721,6 @@ public class IRParser extends Parser {
                         node = ObjectAccessStatement.create(oExp, e1);
                     else
                         node= ObjectAccessStatement.create(oExp, trail);
-//                        node = new ObjectAccessNode(oExp, trail);
                     debug.add("Token Kind: " + token.kind);
                     break;
             }
@@ -830,13 +766,11 @@ public class IRParser extends Parser {
             exp1 = BinaryExpression.of(op)
                     .right(exp2)
                     .left(exp1);
-//            exp1 = new BinaryExprNode(exp1, exp2, op);
         } else if (token.kind == TokenKind.EQU) {
             accept(token.kind);
             exp2 = parseValue();
 
             return AssignmentStatement.create(exp1, exp2);
-//            return new AsgnStmtNode(exp1, exp2);
         }
         if (error) return null;
         return exp1;
@@ -897,19 +831,12 @@ public class IRParser extends Parser {
 
     ExpressionStatement<?> parseNull() {
         if (error) return null;
-//        Token tk = token;
-//        accept(TokenKind.NULL);
-//        NullNode nullNode = new NullNode();
-//        nullNode.setFirstToken(tk);
         return new NullStatement();
     }
 
     ExpressionStatement<?> parseThis() {
         if (error) return null;
-//        Token tk = token;
         accept(TokenKind.THIS);
-//        ThisNode thisNode = new ThisNode();
-//        thisNode.setFirstToken(tk);
         IRParser.Context context = IRParser.Context.context;
         boolean isGlobal = false;
         if (context.isModuleScope) {
@@ -960,7 +887,6 @@ public class IRParser extends Parser {
         accept(TokenKind.NUMLIT);
         Number num, num2;
         debug.add("Num Literal PrevToken: " + prevToken.kind);
-        debug.add("Num Literal Token: " + token.kind);
         if (token.kind == TokenKind.DOT) {
             nextToken();
             if (token.kind == TokenKind.NUMLIT) {
@@ -1000,34 +926,14 @@ public class IRParser extends Parser {
         if (token.kind == TokenKind.TRUE) {
             accept(TokenKind.TRUE);
             if (error) return null;
-
-            //            boolLit.setFirstToken(tk);
             return new ConstantStatement(true);
         } else if (token.kind == TokenKind.FALSE) {
             accept(TokenKind.FALSE);
             if (error) return null;
-
-            //            boolLit.setFirstToken(tk);
             return new ConstantStatement(false);
         }
         return null;
     }
-
-//    void parseSubscriptList() {
-//        /*
-//         * while(LBRACKET) parseSubscript()
-//         *
-//         */
-//    }
-
-//    void parseSubscript() {
-//        /*
-//         * accept(LBRACKET) parseNumberLiteral() if ( COLON) parseNumberLiteral()
-//         * accept(LBRACKET)
-//         *
-//         *
-//         */
-//    }
 
     List<ExpressionStatement<?>> parseArgList() {
         /*
@@ -1044,39 +950,13 @@ public class IRParser extends Parser {
         }
         if (error) return null;
         return args;
-
     }
-
-//    void parseArg() {
-//        /*
-//         * parseValue()
-//         */
-//    }
-
-    //void parseTrailer() {
-    /*
-     * if (LPAREN) parseArgList() else if (DOT) parseIdentifier() else if (LBRACKET)
-     * parseSubscriptList() else return false
-     *
-     */
-    //}
-
-//    void parseExpressionStatement() {
-//        /*
-//         * parseLogAndExpression() if (|| | 'or') parseLogAndExpression() else if (EQUAL
-//         * OPERATOR) parseEqualOperator() parseValue() else handle Error
-//         *
-//         */
-//    }
 
     /* parseStatements */
     ConditionalBranching parseIf() {
         if (error) return null;
         ExpressionStatement<?> ifCond;
         Block ifBlock;
-
-//        Token firstToken = token;
-
         nextToken();
         accept(TokenKind.LPAREN);
         ifCond = parseLogicalOrExpression();
@@ -1096,9 +976,6 @@ public class IRParser extends Parser {
         accept(TokenKind.RCURLY);
 
         if (error) return null;
-
-        //        IfStmtNode ifNode = new IfStmtNode(ifCond, ifBlock);
-//        ifNode.setFirstToken(firstToken);
         return ConditionalBranching
                 .branch()
                 .condition(ifCond)
@@ -1115,16 +992,15 @@ public class IRParser extends Parser {
 
         ConditionalBranching ifNode;
         if ((ifNode = parseIf()) != null) {
-            CafeStatement<ConditionalBranching> elseBlock = null;
+            CafeStatement<?> elseBlock = null;
             if (token.kind == TokenKind.ELSE) {
 //                Token elseFT = token;
                 nextToken();
                 if (token.kind == TokenKind.IF) {
                     elseBlock = parseIfStatement();
                 } else if (accept(TokenKind.LCURLY)) {
-                    Block blockNode = parseBlock();
+                    elseBlock = parseBlock();
                     accept(TokenKind.RCURLY);
-//                    elseBlock.setFirstToken(elseFT);
                 }
                 if (error) return null;
                 ifNode.otherwise(elseBlock);
@@ -1133,53 +1009,6 @@ public class IRParser extends Parser {
         }
         return null;
     }
-
-//    void parseElseStatement() {
-//        /*
-//         * accept(ELSE) accept(LCURLY) parseBlockStatements() accept(RCURLY)
-//         */
-//    }
-
-//    void parseElseIfStatement() {
-//        /*
-//         * List of ElseIfNodes
-//         *
-//         * while ( !ELSEIF ){ accept(ELSEIF) accept(LPAREN) parseLogORExpression()
-//         * accept(RPAREN) accept(LCURLY) parseBlockStatements() accept(RCURLY)
-//         * ElseIf.add(ElseIFNode(condition, block)
-//         *
-//         * return ElseIfNode
-//         */
-//    }
-
-//    StmtNode parseAssignmentStatement() {
-        /*
-         * parseIdentifier() while (DOT) parseIdentifier() parseEqualOperator()
-         * parseValue() accept(SEMI)
-         *
-         * Not used
-         */
-//        if (error) return null;
-//
-//        ExpressionStatement<? exp1 = parseIdentifier();
-//        accept(TokenKind.DOT);
-//        ExpressionStatement<? exp2 = parseIdentifier();
-//        exp1 = new ObjectAccessNode(exp1, exp2);
-//        debug.add("Obj Access Parse Assign: " + exp1);
-//        while (token.kind == TokenKind.DOT) {
-//            if (error)
-//                return null;
-//            accept(TokenKind.DOT);
-//            exp2 = parseIdentifier();
-//            exp1 = new ObjectAccessNode(exp1, exp2);
-//        }
-//        accept(TokenKind.EQU);
-//        ExprNode exp = parseValue();
-//        accept(TokenKind.SEMICOLON);
-//        if (error) return null;
-//        return new AsgnStmtNode(exp1, exp);
-//        return null;
-//    }
 
     /* Parse Loops */
     List<AssignedStatement> parseForInit() {
@@ -1254,9 +1083,6 @@ public class IRParser extends Parser {
             if (error)
                 return null;
             iden = parseIdentifier();
-            // accept(TokenKind.DOT);
-            // ExprNode expn = parseIdentifier();
-            // iden = new ObjectAccessNode(iden, expn);
             Context ctx= Context.context;
             ctx.enterProperty();
             while (token.kind == TokenKind.DOT) {
@@ -1265,12 +1091,10 @@ public class IRParser extends Parser {
                 accept(TokenKind.DOT);
                 exp2 = parseIdentifier();
                 iden = ObjectAccessStatement.create(iden, exp2);
-//                iden = new ObjectAccessNode(iden, exp2);
             }
             ctx.leaveProperty();
             accept(TokenKind.EQU);
             val = parseValue();
-//            incrNodes.add(new AsgnStmtNode(iden, val));
             incrNodes.add(AssignmentStatement.create(iden, val));
             if (token.kind == TokenKind.COMMA)
                 nextToken();
@@ -1370,8 +1194,6 @@ public class IRParser extends Parser {
             } else {
                 accept(TokenKind.BREAK);
                 accept(TokenKind.SEMICOLON);
-//                BreakStmtNode breakStmtNode = new BreakStmtNode();
-//                breakStmtNode.setFirstToken(tk);
                 return BreakContinueStatement.newBreak()
                         .setEnclosingLoop(context.forLoopStack.peek());
             }
@@ -1395,7 +1217,6 @@ public class IRParser extends Parser {
          * return List
          */
         if (error) return null;
-//        List<ExpressionStatement<?> listNode = new ArrayList<>();
         ListCollection listNode = ListCollection.list();
         ExpressionStatement<?> exp1;
         exp1 = parseValue();
@@ -1426,8 +1247,6 @@ public class IRParser extends Parser {
          * if (RBRACKET){ return ListNode() }
          *
          * else { return parseList(); }
-         *
-         *
          */
         if (error) return null;
         accept(TokenKind.LSQU);
@@ -1445,17 +1264,6 @@ public class IRParser extends Parser {
             return parseList();
         }
     }
-
-//    void parseMap() { // NOT Used by MapColl
-//        /*
-//         * List of Map<dynamic, dynamic>
-//         *
-//         * case RBRACKET: return List.add(map)) case LBRACKET: map.addKey(parseValue())
-//         * accept(COMMA) map.addValue(parseValue()) List.add(map)
-//         *
-//         * return map
-//         */
-//    }
 
     ExpressionStatement<?> parseMapCollection() {
         /*
@@ -1556,41 +1364,6 @@ public class IRParser extends Parser {
 //        return  null;
 //    }
 
-//    ExpressionStatement<?> parseSet() {      // Not Used
-        /*
-         * List of Values
-         *
-         * accept(LBRACKET) List.add(parseValue()) if(COMMA or DOTDOT)
-         * List.add(parseValue()) else if(LOOP_KEYWORD)
-         * List.add(parseForComprehension())
-         *
-         * return List
-         */
-        // Not used
-//        if (error) return null;
-//        List<ExprNode> setNode = new ArrayList<>();
-//        ExprNode exp1, exp2;
-//        exp1 = parseValue();
-//        if (token.kind == TokenKind.RANGE) {
-//            accept(TokenKind.RANGE);
-//            exp2 = parseValue();
-//            accept(TokenKind.RSQU);
-//            return new RangeNode(exp1, exp2, RangeNode.Type.SET);
-//        }
-//        setNode.add(exp1);
-//        while (token.kind != TokenKind.RSQU) {
-//            if (error)
-//                return null;
-//            accept(TokenKind.COMMA);
-//            if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
-//            setNode.add(parseValue());
-//        }
-//        accept(TokenKind.RSQU);
-//        if (error) return null;
-//        return new SetCollNode(setNode);
-//        return null;
-//    }
-
     ExpressionStatement<?> parseSetCollection() {
         /*
          * List of Collection
@@ -1618,41 +1391,6 @@ public class IRParser extends Parser {
 //        }
         return null;
     }
-
-//    ExpressionStatement<?> parseLink() {  // Not Used
-        /*
-         * List of Values
-         *
-         * accept(LBRACKET) List.add(parseValue()) if(COMMA or DOTDOT)
-         * List.add(parseValue()) else if(LOOP_KEYWORD)
-         * List.add(parseForComprehension())
-         *
-         * return List
-         */
-        // not Used
-//        if (error) return null;
-//        List<ExprNode> listNode = new ArrayList<>();
-//        ExprNode exp1, exp2;
-//        exp1 = parseValue();
-//        if (token.kind == TokenKind.RANGE) {
-//            accept(TokenKind.RANGE);
-//            exp2 = parseValue();
-//            accept(TokenKind.RSQU);
-//            return new RangeNode(exp1, exp2, RangeNode.Type.LINK);
-//        }
-//        listNode.add(exp1);
-//        while (token.kind != TokenKind.RSQU) {
-//            if (error)
-//                return null;
-//            accept(TokenKind.COMMA);
-//            if (token.kind == TokenKind.RSQU) accept(TokenKind.IDENTIFIER);
-//            listNode.add(parseValue());
-//        }
-//        accept(TokenKind.RSQU);
-//        if (error) return null;
-//        return new LinkCollNode(listNode);
-//        return null;
-//    }
 
     ExpressionStatement<?> parseLinkCollection() {
         /*
@@ -1748,24 +1486,7 @@ public class IRParser extends Parser {
         accept(TokenKind.RCURLY);
         if (error) return null;
         return ObjectCreationStatement.of(object);
-//        return new ObjCreationNode(object);
-
     }
-
-//    void parseObject() { // Not Used
-        /*
-         * accept(LCURLY) parseIdentifier()
-         *
-         * check Colon
-         *
-         * parseValue()
-         *
-         * accept(RCURLY)
-         *
-         *
-         * return ObjectNode
-         */
-//    }
 
     AnonymousFunction parseAnnFunction() {
         /*
@@ -1803,17 +1524,6 @@ public class IRParser extends Parser {
             expression = FunctionWrapper.wrap(function);
         }
         context.leaveFunc();
-//        while (token.kind != TokenKind.RCURLY) {
-//            if (error)
-//                return null;
-//            List<StmtNode> stm = parseBlock();
-//            if (stm == null) return null;
-//            stmt.addAll(stm);
-//        }
-//        debug.add("Ann Func Node: " + token.kind);
-//        accept(TokenKind.RCURLY);
-//        BlockNode block = new BlockNode(); // BlockNode(stmt);
-//        block.setStmt(stmt);
         TargetFuncWrapper targetFuncWrapper = (TargetFuncWrapper) expression;
         AnonymousFunction anonymousFunction = AnonymousFunction.func(targetFuncWrapper);
         if (error) return null;
@@ -1860,16 +1570,6 @@ public class IRParser extends Parser {
 
     /* Parse Values DOne */
 
-//    void parseVariableDeclaration() {
-//        /*
-//         *
-//         * parseIdentifier() parseEqualOperator() parseValue()
-//         *
-//         * return VariableNode
-//         */
-//
-//    }
-
     List<DeclarativeAssignmentStatement> parseVariable() {
         /*
          * List Variables checks grammar for variable Declaration
@@ -1885,7 +1585,6 @@ public class IRParser extends Parser {
         while (token.kind != TokenKind.SEMICOLON) {
             if (error)
                 return null;
-//            Token tk = token;
             ExpressionStatement<?> iden = parseIdentifier();
             ExpressionStatement<?> exp = null;
             Context ctx = Context.context;
@@ -1902,9 +1601,6 @@ public class IRParser extends Parser {
             SymbolReference sym = ctx.createSymbolReference(iden.getName(), Node.Tag.VARDECL);
             DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, exp);
             varDeclNodes.add(stmt);
-//            VarDeclNode varDecl = new VarDeclNode(idenNode, exp);
-//            varDecl.setFirstToken(tk);
-//            varDeclNodes.add(varDecl);
         }
         accept(TokenKind.SEMICOLON);
         if (error) return null;
@@ -1927,7 +1623,6 @@ public class IRParser extends Parser {
         while (token.kind != TokenKind.SEMICOLON) {
             if (error)
                 return null;
-//            Token tk = token;
             ExpressionStatement<?> iden = parseIdentifier();
             accept(TokenKind.EQU);
             ExpressionStatement<?> exp = parseValue();
@@ -1935,14 +1630,11 @@ public class IRParser extends Parser {
                 accept(TokenKind.COMMA);
             SymbolReference sym = ctx.createSymbolReference(iden.getName(), Tag.CONSTDECL);
             DeclarativeAssignmentStatement stmt = DeclarativeAssignmentStatement.create(sym, exp);
-//            ConstDeclNode constDecl = new ConstDeclNode(idenNo, exp);
-//            constDecl.setFirstToken(tk);
             constDeclNodes.add(stmt);
         }
         accept(TokenKind.SEMICOLON);
         if (error) return null;
         return constDeclNodes;
-
     }
 
     List<String> parseParameter() {
@@ -1956,7 +1648,6 @@ public class IRParser extends Parser {
          * return List
          */
         if (error) return null;
-//        boolean varArg = false;
         List<String> idenNodes = new ArrayList<>();
 
         while (token.kind != TokenKind.RPAREN) {
@@ -1967,9 +1658,7 @@ public class IRParser extends Parser {
 
             if (token.kind == TokenKind.VARARGS) {
                 accept(TokenKind.VARARGS);
-//                varArg = true;
                 idenNodes.add(parseIdentifier().getName());
-                // accept(TokenKind.RPAREN);
                 break;
             }
             idenNodes.add(parseIdentifier().getName());
@@ -1980,11 +1669,6 @@ public class IRParser extends Parser {
         if (error) return null;
         return idenNodes;
     }
-
-    // ExprNode parseFunctionCall(){
-    // IdenNode funcName = parseIdentifier();
-
-    // }
 
     DeclarativeAssignmentStatement parseFunctionDeclaration() {
         /*
@@ -2026,53 +1710,18 @@ public class IRParser extends Parser {
         context.leaveFunc();
         SymbolReference ref = context.createSymbolReference(funcName.getName(), Node.Tag.VARDECL);
         DeclarativeAssignmentStatement statement = DeclarativeAssignmentStatement.create(ref, expression);
-//        BlockNode block = new BlockNode();
-//        block.setStmt(stmt);
         if (error) return null;
 
-//        FuncDeclNode funcDecl = new FuncDeclNode((IdenNode) funcName, arg, block);
-//        funcDecl.setFirstToken(tk);
         return statement;
     }
-
-//    void parseDeclarativeStatement() {
-//        /*
-//         * List of Declarative Statement
-//         *
-//         * Checks Type of Statement and calls below methods to parse calls parseFunction
-//         * calls parseVariable
-//         */
-//    }
-
-//    void block() {
-//        /*
-//         * Handles Cases For Each Type of Block Statements like DECL, ASGN, IF etc. and
-//         * calls respective methods
-//         *
-//         */
-//    }
-
-//    void parseBlockStatement() {
-//        /*
-//         * List of Statement
-//         *
-//         * parse Grammar, checks type of Statement and calls block()
-//         */
-//
-//        /*
-//         * switch(token.kind){ case VAR }
-//         */
-//    }
 
     ReturnStatement parseReturnStatement() {
         if (error) return null;
         accept(TokenKind.RET);
-//        Token tk = token;
         ExpressionStatement<?> exp = parseValue();
         debug.add("Return : " + exp);
         accept(TokenKind.SEMICOLON);
         if (error) return null;
-        //        rtrnNode.setFirstToken(tk);
         return ReturnStatement.of(exp);
     }
 
@@ -2111,25 +1760,21 @@ public class IRParser extends Parser {
         switch (token.kind) {
             case VAR:
                 List<DeclarativeAssignmentStatement> stm = parseVariable();
-                System.out.println("Var Statement: "+stm);
                 if (stm == null) return null;
                 block.addAll(stm);
                 break;
             case CONST:
                 List<DeclarativeAssignmentStatement> stm1 = parseConstVariable();
-                System.out.println("const Statement: "+stm1);
                 if (stm1 == null) return null;
                 block.addAll(stm1);
                 break;
             case FUNC:
                 DeclarativeAssignmentStatement decl = parseFunctionDeclaration();
-                System.out.println("For Statement: "+decl);
                 if (decl == null) return null;
                 block.add(decl);
                 break;
             case IF:
                 CafeStatement<ConditionalBranching> stm2 = parseIfStatement();
-                System.out.println("If Statement: "+stm2);
                 if (stm2 == null) return null;
                 block.add(stm2);
                 break;
@@ -2137,14 +1782,11 @@ public class IRParser extends Parser {
                 boolean innerLoop = breakAllowed;
                 breakAllowed = true;
                 CafeStatement<?> stm3 = parseForStatement();
-                System.out.println("for Statement: "+stm3);
                 if (stm3 == null) return null;
                 block.add(stm3);
                 breakAllowed = innerLoop;
-//                innerLoop = false;
                 break;
             case LOOP:
-                System.out.println("Entered to Loop:");
 //                CafeStatement<?> stm4 = parseLoopStatement();
 //                if (stm4 == null) return null;
 //                block.add(stm4);
@@ -2160,25 +1802,20 @@ public class IRParser extends Parser {
                 CafeStatement<?> stm6 = parseExprStmt();
                 if (stm6 == null) return null;
                 block.add(stm6);
-                System.out.println("Iden This Block Stmt: " + stm6+error);
-                System.out.println("Iden This BlockToken: " + token.value());
                 accept(TokenKind.SEMICOLON);
                 break;
             case BREAK:
             case CONTINUE:
                 CafeStatement<?> stm7 = parseFlowStatement();
                 block.add(stm7);
-                System.out.println("Break Continue Block Stmt: " + stm7);
                 debug.add("Break Continue Block Stmt: " + token.kind);
                 break;
             default:
                 logError(TokenKind.IDENTIFIER);
         }
         if(error) return null;
-        System.out.println("Block Statement: "+block);
         return block;
     }
-    // return Block Statement Node
     Block parseBlock() {
         /*
          * List of block Statements calls parseBlockStatement
@@ -2187,21 +1824,11 @@ public class IRParser extends Parser {
 
         Context context = Context.context;
         Block block = context.enterScope();
-
-//        for (Node.StmtNode stmt : n.block) {
-//            stmt.accept(this);
-//            CafeStatement<?> statement = (CafeStatement<?>) context.pop();
-//            block.add(statement);
-//        }
-//        context.push(block);
-
         List<CafeStatement<?>> blockStmt = new ArrayList<>();
         debug.add("Token kind " + token.kind);
-        System.out.println("Block Entered");
         while(token.kind != TokenKind.RCURLY) {
             if (error) return null;
             List<CafeStatement<?>> stm = parseStatement();
-            System.out.println("Block Stmt: "+stm);
             if (stm == null) return null;
             blockStmt.addAll(stm);
         }
@@ -2212,7 +1839,6 @@ public class IRParser extends Parser {
         context.leaveScope();
         if (error) return null;
         debug.add("Block Stmt: " + block);
-        System.out.println("Block: "+block);
         return block;
     }
 
@@ -2221,15 +1847,6 @@ public class IRParser extends Parser {
 
         Context context = Context.context;
         context.isExport = true;
-//        String name = n.iden.name;
-//        CafeExport export = CafeExport.export(name);
-//        context.module.addExport(export);
-//        if (n.node == null) {
-//            // Just pushing to avoid error
-//            context.push(export);
-//        } else {
-//            n.node.accept(this);
-//        }
         List<DeclarativeAssignmentStatement> decl = new ArrayList<>();
 
         accept(TokenKind.EXPORT);
@@ -2292,14 +1909,6 @@ public class IRParser extends Parser {
         Map<String, String> blocks = new HashMap<>();
         ExpressionStatement<?> id1, id2 = null;
         Context context = Context.context;
-//        for (Map.Entry<Node.IdenNode, Node.IdenNode> entry : n.importAliasMap.entrySet()) {
-//            Node.IdenNode value = entry.getValue();
-//            String alias = null;
-//            if (value != null)
-//                alias = value.name;
-//            cafeImport.add(entry.getKey().name, alias);
-//        }
-
 
         accept(TokenKind.IMPORT);
         if(token.kind == TokenKind.IDENTIFIER){
@@ -2321,7 +1930,6 @@ public class IRParser extends Parser {
             }
         } else {
             if(accept(TokenKind.MUL)) {
-//                id1 = new IdenNode("*");
                 accept(TokenKind.AS);
                 id2 = parseIdentifier();
                 blocks.put("*", id2.getName());
@@ -2395,13 +2003,6 @@ public class IRParser extends Parser {
         for( CafeStatement<?> stm: tree){
             Context.context.module.add(stm);
         }
-//        return new ProgramNode(tree);
         return Context.context.module;
     }
-
-    // void parseStatementAsBlock() {
-    // 	/*
-    // 	 * switch(token.kind){ case IF: case FOR: case }
-    // 	 */
-    // }
 }
