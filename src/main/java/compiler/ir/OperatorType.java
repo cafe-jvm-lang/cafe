@@ -38,6 +38,7 @@ public enum OperatorType {
     TIMES("*"),
     DIVIDE("/"),
     MODULO("%"),
+    TILDE("~"),
 
     POW("**"),
     FLOOR("//"),

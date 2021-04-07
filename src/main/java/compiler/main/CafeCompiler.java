@@ -31,8 +31,6 @@ package compiler.main;
 
 import compiler.analyzer.SemanticsChecker;
 import compiler.ast.Node;
-import compiler.ast.Node.ProgramNode;
-import compiler.gen.ASTToCafeIrVisitor;
 import compiler.gen.ClosureReferenceVisitor;
 import compiler.gen.JVMByteCodeGenVisitor;
 import compiler.gen.SymbolReferenceAssignmentVisitor;
@@ -86,8 +84,8 @@ public class CafeCompiler {
     enum Phase {
         INIT,
         PARSE,
-        ANALYZE,
         IR,
+        //     ANALYZE,
         GEN
     }
 
@@ -115,16 +113,17 @@ public class CafeCompiler {
                     fileManager.setSourceFile(sourceFile);
                     break;
                 case PARSE:
-                    parser = parserFactory.newParser(ParserType.MAINPARSER, fileManager.asCharList());
-                    programNode = parser.parse();
+                    parser = parserFactory.newParser(ParserType.IRParser, fileManager.asCharList());
+                    module = parser.parse(moduleName);
+                    System.out.println("Success " + module);
                     break;
-                case ANALYZE:
-//                    System.out.println((char) 27 + "[33m" + "\nPrettyPrint");
-//                    new PrettyPrinter().prettyPrint(programNode);
-                    analyzer.visitProgram((ProgramNode) programNode);
-                    break;
+//                case ANALYZE:
+////                    System.out.println((char) 27 + "[33m" + "\nPrettyPrint");
+////                    new PrettyPrinter().prettyPrint(programNode);
+////                    analyzer.visitProgram((ProgramNode) programNode);
+//                    break;
                 case IR:
-                    module = new ASTToCafeIrVisitor().transform((ProgramNode) programNode, moduleName);
+//                    module = new ASTToCafeIrVisitor().transform((ProgramNode) programNode, moduleName);
                     module.accept(new ClosureReferenceVisitor());
                     module.accept(new SymbolReferenceAssignmentVisitor());
                     break;

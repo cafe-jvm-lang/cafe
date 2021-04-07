@@ -29,7 +29,7 @@
 
 package compiler.parser;
 
-import compiler.ast.Node;
+import compiler.ir.CafeModule;
 import compiler.main.SourceFileManager;
 import compiler.util.Context;
 import org.testng.annotations.BeforeMethod;
@@ -43,7 +43,7 @@ import java.util.Iterator;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
-public class MainParserTest {
+public class ASTParserTest {
     public static final String SRC = "src/test/resources/parse-test/";
     public static final String ERR = "src/test/resources/parse-test/error_test";
 
@@ -70,16 +70,20 @@ public class MainParserTest {
     @Test(dataProvider = "cafe-files")
     public void test_no_error(File file) {
         fm.setSourceFile(file);
-        Parser parser = factory.newParser(ParserType.MAINPARSER, fm.asCharList());
-        Node n = parser.parse();
-        assertNotNull(n);
+        Parser parser = factory.newParser(ParserType.IRParser, fm.asCharList());
+        CafeModule module = parser.parse(file.getName());
+        System.out.println("Success "+module);
+//        Node n = parser.parse();
+        assertNotNull(module);
     }
 
     @Test(dataProvider = "cafe-error-files")
     public void test_error(File file) {
         fm.setSourceFile(file);
-        Parser parser = factory.newParser(ParserType.MAINPARSER, fm.asCharList());
-        Node n = parser.parse();
-        assertNull(n);
+        Parser parser = factory.newParser(ParserType.IRParser, fm.asCharList());
+        CafeModule module = parser.parse(file.getName());
+        System.out.println("Success "+module);
+//        Node n = parser.parse();
+        assertNull(module);
     }
 }

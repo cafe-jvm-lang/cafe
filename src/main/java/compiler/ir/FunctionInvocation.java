@@ -47,7 +47,7 @@ public class FunctionInvocation extends ExpressionStatement<FunctionInvocation> 
         return ref;
     }
 
-    public static FunctionInvocation create(Object ref, List<Object> args) {
+    public static FunctionInvocation create(Object ref, List<ExpressionStatement<?>> args) {
         List<CafeElement<?>> arguments = new LinkedList<>();
         for (Object arg : args) {
             if (arg instanceof CafeElement<?>) {

@@ -43,9 +43,9 @@ import java.util.*;
 import static compiler.util.Log.Type.*;
 import static compiler.util.Messages.message;
 
-public class MainParser extends Parser {
+public class ASTParser extends Parser {
     static {
-        ParserFactory.registerParser(ParserType.MAINPARSER, new MainParser());
+        ParserFactory.registerParser(ParserType.ASTParser, new ASTParser());
     }
 
     private Lexer lexer;
@@ -54,10 +54,10 @@ public class MainParser extends Parser {
     private boolean breakAllowed = false, innerLoop = false, error = false;
     private List<String> debug = new ArrayList<>();
 
-    private MainParser() {
+    private ASTParser() {
     }
 
-    private MainParser(ParserFactory factory, Lexer lexer) {
+    private ASTParser(ParserFactory factory, Lexer lexer) {
         debug.add("PARSING");
         this.lexer = lexer;
         this.log = factory.log;
@@ -72,8 +72,8 @@ public class MainParser extends Parser {
     }
 
     @Override
-    protected MainParser instance(ParserFactory factory, Lexer lexer) {
-        return new MainParser(factory, lexer);
+    protected ASTParser instance(ParserFactory factory, Lexer lexer) {
+        return new ASTParser(factory, lexer);
     }
 
     Token token() {
@@ -2002,7 +2002,7 @@ public class MainParser extends Parser {
     }
 
     @Override
-    public Node parse() {
+    public Node parse(String moduleName) {
         // while(token.kind != TokenKind.END) {
         // if(token.kind == TokenKind.ERROR) {
         // return;
